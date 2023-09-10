@@ -1,4 +1,4 @@
-from scrapers.common import scrape_website
+from data_retrievers.common import scrape_website
 import re
             
 def betclic_tennis_win_match_24h():

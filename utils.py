@@ -106,4 +106,7 @@ def find_arbitrage_bettings(data1, data2):
 def compare_strings(string1, string2):
   matcher = difflib.SequenceMatcher(None, string1, string2)
   ratio = matcher.ratio()
+  #if ratio < 0.6 and ratio > 0:
+    #debug
+    #print('Not match but not 0:' + string1 + " VS " + string2)
   return ratio >= 0.6

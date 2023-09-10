@@ -1,5 +1,5 @@
 import json
-from scrapers.common import scrape_website
+from data_retrievers.common import scrape_website
             
 def betano_tennis_win_match_24h():
   url = 'https://www.betano.pt/sport/tenis/jogos-de-hoje/'
