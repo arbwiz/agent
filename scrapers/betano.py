@@ -23,7 +23,7 @@ def betano_tennis_win_match_24h():
           for selection in market['selections']:
             event_data['selections'].append({
                 'name': selection['name'],
-                'price': selection['price']
+                'price': float(selection['price'])
             })
       events.append(event_data)
     return events
