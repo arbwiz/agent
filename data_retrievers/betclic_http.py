@@ -9,6 +9,7 @@ def betclic_tennis_win_match():
     events = []
     for event in resultDict['matches']:
         event_data = {
+            'bookmaker': 'betclic',
             'name': event['name'],
             'selections': []
         }

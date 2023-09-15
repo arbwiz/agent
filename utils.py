@@ -103,10 +103,37 @@ def find_arbitrage_bettings(data1, data2):
   return arbitrage_bettings, analysed_combinations
 
 
-def compare_strings(string1, string2):
+def compare_strings_with_ratio(string1, string2, minimum_ratio):
   matcher = difflib.SequenceMatcher(None, string1, string2)
   ratio = matcher.ratio()
   #if ratio < 0.6 and ratio > 0:
     #debug
     #print('Not match but not 0:' + string1 + " VS " + string2)
-  return ratio >= 0.6
+  return ratio >= minimum_ratio
+
+
+def calculate_arbitrage_3_websites(odds):
+
+  arbitrage_possibilities = []
+
+  # Iterate over all possible combinations of bets.
+
+  size = len(odds[0])
+
+  for i in range(size):
+    for j in range(size):
+      for k in range(size):
+        if i == j == k:
+          continue
+        
+        arbitrage_percentage = 1 / odds[i][0] + 1 / odds[j][1] + 1 / odds[k][2]
+        
+        arbitrage_possibilities.append({
+                "arbitrage_percentage": arbitrage_percentage,
+                "win": odds[i][0],
+                "draw": odds[j][1],
+                "lose": odds[k][2],
+          })
+        
+  return arbitrage_possibilities
+

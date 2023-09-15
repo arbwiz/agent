@@ -15,6 +15,7 @@ def betano_tennis_win_match_24h():
   for block in main_data['data']['blocks']:
     for event in block['events']:
       event_data = {
+          'bookmaker': 'betano',
           'name': event['name'],
           'selections': []
       }
