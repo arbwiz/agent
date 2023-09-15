@@ -1,4 +1,5 @@
 import difflib
+import json
 
 def is_two_way_market_surebet(odd1, odd2):
   """
@@ -137,3 +138,6 @@ def calculate_arbitrage_3_websites(odds):
         
   return arbitrage_possibilities
 
+
+def print_properly(data):
+  print(json.dumps(data, indent = 4))

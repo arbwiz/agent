@@ -56,6 +56,12 @@ class Event:
         self.total_arbitrage_percentage = total_arbitrage_percentage
         self.expected_earnings = (BET_SIZE / total_arbitrage_percentage) - BET_SIZE
         
+        print('\nevent: ' + str(self.data['name']) + 
+              '\nbest_odds: ' + str(self.best_odds) + 
+              '\narbitage_percentage: ' + str(self.total_arbitrage_percentage) + 
+              '%\n---\n')
+    
+        
         # if the sum of the reciprocals of the odds is less than 1, there is opportunity for arbitrage
         if total_arbitrage_percentage < 1:
             return True
