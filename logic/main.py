@@ -1,9 +1,9 @@
 from model.event import Event
-from data_retrievers.aggreagator import get_data
+from data_retrievers.aggregator import get_data
 
-def run():
+async def run():
     events = []
-    odds_response = get_data()
+    odds_response = await get_data()
 
     for data in odds_response:
         events.append(Event(data))

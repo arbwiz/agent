@@ -1,8 +1,11 @@
 from utils import calculate_arbitrage_3_websites
-from data_retrievers.aggreagator import process_data_set
+from data_retrievers.aggregator import process_data_set
+from data_retrievers.twentytwobet_http import twentytwobet_tennis_win_match
+from data_retrievers.esconline_scraper import esconline_tennis_win_match_24h
 from utils import print_properly
+import asyncio
 
-def main():
+async def main():
   
 
     betano_data = [
@@ -53,18 +56,11 @@ def main():
        }
     ]
 
-
-    aggregated = []
-
-    aggregated = process_data_set(aggregated, betano_data)
-
-    aggregated = process_data_set(aggregated, betclic_data)
-
-    print_properly(aggregated)
+    await esconline_tennis_win_match_24h()
 
     #arbitrage_possibilities = calculate_arbitrage_3_websites(odds)
 
     #print(json.dumps(arbitrage_possibilities, indent=4))
 
 if __name__ == '__main__':
-  main()
+  asyncio.run(main())

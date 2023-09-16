@@ -1,13 +1,18 @@
 from data_retrievers.betano_scraper import betano_tennis_win_match_24h
 from data_retrievers.betclic_http import betclic_tennis_win_match
+from data_retrievers.twentytwobet_http import twentytwobet_tennis_win_match
+from data_retrievers.esconline_scraper import esconline_tennis_win_match_24h
 import time
 
 from utils import compare_strings_with_ratio
 
-def get_data():
+async def get_data():
     aggregate_data = []
     aggregate_data = process_data_set(aggregate_data, betano_tennis_win_match_24h())
     aggregate_data = process_data_set(aggregate_data, betclic_tennis_win_match())
+    aggregate_data = process_data_set(aggregate_data, twentytwobet_tennis_win_match())
+    aggregate_data = process_data_set(aggregate_data, await esconline_tennis_win_match_24h())
+    
     data_with_at_least_two_bookmakers = list(filter(lambda event: len(event["bookmakers"]) > 1, aggregate_data['events']))
     return data_with_at_least_two_bookmakers
     
