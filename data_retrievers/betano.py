@@ -1,4 +1,5 @@
 import json
+import requests
 from data_retrievers.common import scrape_website
             
 def betano_tennis_win_match_24h():
@@ -29,4 +30,30 @@ def betano_tennis_win_match_24h():
       events.append(event_data)
     return events
 
+def betano_football():
+  url = 'https://www.betano.pt/api/sport/futebol/jogos-de-hoje/?sort=Leagues&req=la,s,stnf,c,mb'
 
+  result = requests.get(url)
+
+  main_data = json.loads(result.content)
+
+  events = []
+  for block in main_data['data']['blocks']:
+    for event in block['events']:
+      event_data = {
+          'bookmaker': 'betano',
+          'name': event['name'],
+          'selections': []
+      }
+      if not event['markets']:
+        break
+      for market in event['markets']:
+        if market['type'] == 'MRES' or market['type'] == 'MR12':
+          for selection in market['selections']:
+            event_data['selections'].append({
+                'name': selection['fullName'],
+                'price': float(selection['price'])
+            })
+          break
+      events.append(event_data)
+  return events

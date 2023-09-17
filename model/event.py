@@ -14,6 +14,8 @@ BOOKMAKER_INDEX = 0
 NAME_INDEX = 1
 ODDS_INDEX = 2
 FIRST = 0
+import json
+from notifications.telegram import send_telegram_message
 
 class Event:
     def __init__(self, data):
@@ -54,16 +56,24 @@ class Event:
             total_arbitrage_percentage += (1.0 / odds[ODDS_INDEX])
             
         self.total_arbitrage_percentage = total_arbitrage_percentage
-        self.expected_earnings = (BET_SIZE / total_arbitrage_percentage) - BET_SIZE
         
-        print('\nevent: ' + str(self.data['name']) + 
-              '\nbest_odds: ' + str(self.best_odds) + 
-              '\narbitage_percentage: ' + str(self.total_arbitrage_percentage) + 
-              '%\n---\n')
-    
-        
+        if self.total_arbitrage_percentage > 0:
+            self.expected_earnings = (BET_SIZE / total_arbitrage_percentage) - BET_SIZE
+        else :
+            print("Error with outcome for event:" + str(self.data['name']))
+            self.expected_earnings = -1
+            return False
+
         # if the sum of the reciprocals of the odds is less than 1, there is opportunity for arbitrage
         if total_arbitrage_percentage < 1:
+            message = '\nevent: ' + str(self.data['name']) 
+            + '\nbest_odds: ' 
+            + str(self.best_odds) 
+            + '\narbitage_percentage: ' 
+            + str(self.total_arbitrage_percentage) 
+            + '%\n---\n'
+            send_telegram_message(message)
+            print(message)
             return True
         return False
     
@@ -83,8 +93,13 @@ class Event:
         bet_amounts = []
         for outcome in range(self.num_outcomes):
             individual_arbitrage_percentage = 1 / self.best_odds[outcome][ODDS_INDEX]
-            bet_amount = (BET_SIZE * individual_arbitrage_percentage) / self.total_arbitrage_percentage
-            bet_amounts.append(round(bet_amount, 2))
+            if self.total_arbitrage_percentage > 0:
+                bet_amount = (BET_SIZE * individual_arbitrage_percentage) / self.total_arbitrage_percentage
+                bet_amounts.append(round(bet_amount, 2))
+            else:
+                print("Error with outcome for event:" + json.dumps(self.data))
+                bet_amount = 0
+                break
         
         self.bet_amounts = bet_amounts
         return bet_amounts

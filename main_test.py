@@ -1,8 +1,13 @@
 from utils import calculate_arbitrage_3_websites
 from data_retrievers.aggregator import process_data_set
-from data_retrievers.twentytwobet_http import twentytwobet_tennis_win_match
-from data_retrievers.esconline_scraper import esconline_tennis_win_match_24h
+from data_retrievers.twentytwobet import twentytwobet_tennis_win_match
+from data_retrievers.esconline import esconline_tennis_win_match_24h
+from data_retrievers.esconline import esconline_football
+from data_retrievers.betano import betano_football
+from data_retrievers.betclic import betclic_football
+from data_retrievers.twentytwobet import twentytwobet_football
 from utils import print_properly
+from utils import compare_strings_with_ratio
 import asyncio
 
 async def main():
@@ -56,11 +61,15 @@ async def main():
        }
     ]
 
-    await esconline_tennis_win_match_24h()
+    #await esconline_football()
 
     #arbitrage_possibilities = calculate_arbitrage_3_websites(odds)
 
     #print(json.dumps(arbitrage_possibilities, indent=4))
+
+    #twentytwobet_football()
+    
+    compare_strings_with_ratio("")
 
 if __name__ == '__main__':
   asyncio.run(main())
