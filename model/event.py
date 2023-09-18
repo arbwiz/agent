@@ -59,19 +59,14 @@ class Event:
         
         if self.total_arbitrage_percentage > 0:
             self.expected_earnings = (BET_SIZE / total_arbitrage_percentage) - BET_SIZE
-        else :
+        else:
             print("Error with outcome for event:" + str(self.data['name']))
             self.expected_earnings = -1
             return False
 
         # if the sum of the reciprocals of the odds is less than 1, there is opportunity for arbitrage
         if total_arbitrage_percentage < 1:
-            message = '\nevent: ' + str(self.data['name']) 
-            + '\nbest_odds: ' 
-            + str(self.best_odds) 
-            + '\narbitage_percentage: ' 
-            + str(self.total_arbitrage_percentage) 
-            + '%\n---\n'
+            message = '\nevent: ' + str(self.data['name']) + '\nbest_odds: ' + str(self.best_odds) + '\narbitage_percentage: ' + str(self.total_arbitrage_percentage) + '%\n---\n'
             send_telegram_message(message)
             print(message)
             return True

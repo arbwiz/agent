@@ -1,5 +1,6 @@
 import json
 import requests
+import datetime
 from data_retrievers.common import scrape_website
             
 def betano_tennis_win_match_24h():
@@ -18,7 +19,9 @@ def betano_tennis_win_match_24h():
       event_data = {
           'bookmaker': 'betano',
           'name': event['name'],
-          'selections': []
+          'selections': [],
+          'start_time': str(convert_time(event['startTime'])),
+          'start_time_ms': event['startTime']
       }
       for market in event['markets']:
         if market['name'] == 'Vencedor':
@@ -27,6 +30,8 @@ def betano_tennis_win_match_24h():
                 'name': selection['name'],
                 'price': float(selection['price'])
             })
+      if len(event_data['selections']) != 2:
+        continue
       events.append(event_data)
     return events
 
@@ -43,7 +48,9 @@ def betano_football():
       event_data = {
           'bookmaker': 'betano',
           'name': event['name'],
-          'selections': []
+          'selections': [],
+          'start_time': str(convert_time(event['startTime'])),
+          'start_time_ms': event['startTime']
       }
       if not event['markets']:
         break
@@ -55,5 +62,11 @@ def betano_football():
                 'price': float(selection['price'])
             })
           break
+      if len(event_data['selections']) != 3:
+        continue        
       events.append(event_data)
   return events
+
+def convert_time(millis):
+    dt = datetime.datetime.fromtimestamp(millis/1000)
+    return(dt.isoformat())

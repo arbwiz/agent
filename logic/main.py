@@ -8,7 +8,7 @@ async def run(sport):
     match sport:
         case 'football':
             odds_response = await get_football_data()
-        case 'tenis':
+        case 'tennis':
             odds_response = await get_tenis_data()
         case _:
             odds_response = await get_tenis_data()

@@ -10,76 +10,111 @@ from data_retrievers.twentytwobet import twentytwobet_football
 from data_retrievers.esconline import esconline_tennis_win_match_24h
 from data_retrievers.esconline import esconline_football
 
+from thefuzz import process
 import time
+import json
 
 from utils import compare_strings_with_ratio
-from notifications.telegram import send_telegram_message
-
-
 
 async def get_tenis_data():
-    aggregate_data = []
-    aggregate_data = process_data_set(aggregate_data, betano_tennis_win_match_24h())
-    aggregate_data = process_data_set(aggregate_data, betclic_tennis_win_match())
-    aggregate_data = process_data_set(aggregate_data, twentytwobet_tennis_win_match())
-    aggregate_data = process_data_set(aggregate_data, await esconline_tennis_win_match_24h())
-    
-    print('size before filter:' + str(len(aggregate_data['events'])))
-    data_with_at_least_two_bookmakers = list(filter(lambda event: len(event["bookmakers"]) > 1, aggregate_data['events']))
-    print('size after filter:' + str(len(data_with_at_least_two_bookmakers)))
-    return data_with_at_least_two_bookmakers
+    betano = betano_tennis_win_match_24h()
+    with open("output/betano_tennis.json", 'w') as outfile:
+        outfile.write(json.dumps(betano, indent=4)) 
+
+    betclic = betclic_tennis_win_match()
+    with open("output/betclic_tennis.json", 'w') as outfile:
+        outfile.write(json.dumps(betclic, indent=4)) 
+
+    twentytwo = twentytwobet_tennis_win_match()
+    with open("output/twentytwo_tennis.json", 'w') as outfile:
+        outfile.write(json.dumps(twentytwo, indent=4)) 
+
+    esconline = await esconline_tennis_win_match_24h()
+    with open("output/esconline_tennis.json", 'w') as outfile:
+        outfile.write(json.dumps(esconline, indent=4)) 
+
+    data = aggregate_data([betclic, betano, esconline, twentytwo], 'tennis')
+
+    with open("output/aggregated_tennis.json", 'w') as outfile:
+        outfile.write(json.dumps(data, indent = 4)) 
+
+    return data
     
 async def get_football_data():
+    betano = betano_football()
+
+    with open("output/betano.json", 'w') as outfile:
+        outfile.write(json.dumps(betano, indent=4)) 
+
+    betclic = betclic_football()
+
+    with open("output/betclic.json", 'w') as outfile:
+        outfile.write(json.dumps(betclic, indent=4)) 
+    twentytwo = twentytwobet_football()
+
+    with open("output/twentytwo.json", 'w') as outfile:
+        outfile.write(json.dumps(twentytwo, indent=4)) 
+    esconline = await esconline_football()
+
+    with open("output/esconline.json", 'w') as outfile:
+        outfile.write(json.dumps(esconline, indent=4)) 
+
+    data = aggregate_data([betclic, betano, esconline, twentytwo], 'football')
+
+    with open("output/aggregated.json", 'w') as outfile:
+        outfile.write(json.dumps(data, indent = 4)) 
+
+    return data
+
+def aggregate_data(all_sport_data, sport_name):
     aggregate_data = []
-    aggregate_data = process_data_set(aggregate_data, betano_football())
-    aggregate_data = process_data_set(aggregate_data, betclic_football())
-    aggregate_data = process_data_set(aggregate_data, twentytwobet_football())
-    aggregate_data = process_data_set(aggregate_data, await esconline_football())
-    
-    first_message = ('\ntotal events' + str(len(aggregate_data['events'])))
+    for sport_data in all_sport_data:
+        aggregate_data = merge_data_sets(aggregate_data, sport_data, sport_name)
+        
+    log_aggregate_data_info(aggregate_data)
+        
     data_with_at_least_two_bookmakers = list(filter(lambda event: len(event["bookmakers"]) > 1, aggregate_data['events']))
-    events_with_two = ('\nevents with two bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 2, aggregate_data['events'])))))
-    events_with_tree = ('\nevents with three bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 3, aggregate_data['events'])))))
-    events_with_four = ('\nevents with four bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 4, aggregate_data['events'])))))
-    last_message = ('\nsize after filter:' + str(len(data_with_at_least_two_bookmakers)))
-    
-    send_telegram_message(first_message + events_with_two + events_with_tree + events_with_four + last_message)
-    print(first_message + events_with_two + events_with_tree + events_with_four + last_message)
+
     return data_with_at_least_two_bookmakers
 
-def process_data_set(aggregate_data, new_data):
+def merge_data_sets(aggregate_data, new_data, sport_name):
     if len(aggregate_data) > 0:
         for new_event in new_data:
-            was_found = False
-            for event in aggregate_data['events']:
-                if compare_strings_with_ratio(event['name'], new_event['name'], 0.80):
 
-                    if any(bookmaker['title'] == new_event['bookmaker'] for bookmaker in event['bookmakers']):
-                        was_found = True
-                        break
+            event_names = [event['name'] for event in aggregate_data['events']]
 
-                    event['bookmakers'].append({
-                        'markets':[],
-                        'title': new_event['bookmaker']
+            event_found = process.extractOne(new_event['name'], event_names)
+
+            idx = event_names.index(event_found[0])
+
+            if event_found[1] >= 90:
+                event = aggregate_data['events'][idx]
+
+                event['bookmakers'].append({
+                    'markets':[],
+                    'title': new_event['bookmaker']
+                })
+                                
+                event['bookmakers'][len(event['bookmakers']) - 1]['markets'].append({
+                    'outcomes': [],
+                    'name': 'h2h'
+                })
+
+                idx = 0
+                for selection in new_event['selections']: 
+                    event['bookmakers'][len(event['bookmakers']) - 1]['markets'][0]['outcomes'].append({
+                        #normalize outcome names
+                        'name': event['bookmakers'][0]['markets'][0]['outcomes'][idx]['name'],
+                        'original_name': selection['name'],
+                        'price': selection['price']
                     })
-                                    
-                    event['bookmakers'][len(event['bookmakers']) - 1]['markets'].append({
-                        'outcomes': [],
-                        'name': 'h2h'
-                    })
-                    for selection in new_event['selections']: 
-                        event['bookmakers'][len(event['bookmakers']) - 1]['markets'][0]['outcomes'].append({
-                            'name': selection['name'],
-                            'price': selection['price']
-                        })
-                    was_found = True
-                    break
-            if not was_found:
+                    idx+=1
+            else: 
                 event_data = {
                     'name': new_event['name'],
                     'bookmakers' : [],
-                    'sport_key': "tennis",
-                    'id': time.time
+                    'sport_key': sport_name,
+                    'id': time.time()
                 }
                 
                 event_data['bookmakers'].append({
@@ -87,8 +122,6 @@ def process_data_set(aggregate_data, new_data):
                     'title': new_event['bookmaker']
                 })
 
-                #TODO: should also check if new selections name match existent (at least last event with new) so that there are less errors on
-                # matched events
                 event_data['bookmakers'][len(event_data['bookmakers']) - 1]['markets'].append({
                     'outcomes': [],
                     'name': 'h2h'
@@ -97,6 +130,7 @@ def process_data_set(aggregate_data, new_data):
                 for selection in new_event['selections']: 
                     event_data['bookmakers'][len(event_data['bookmakers']) - 1]['markets'][0]['outcomes'].append({
                         'name': selection['name'],
+                        'original_name': selection['name'],
                         'price': selection['price']
                 })
 
@@ -110,8 +144,8 @@ def process_data_set(aggregate_data, new_data):
             event_data = {
                     'name': new_event['name'],
                     'bookmakers' : [],
-                    'sport_key': "tennis",
-                    'id': time.time
+                    'sport_key': sport_name,
+                    'id': time.time()
                 }
             
             event_data['bookmakers'].append({
@@ -127,6 +161,7 @@ def process_data_set(aggregate_data, new_data):
             for selection in new_event['selections']: 
                 event_data['bookmakers'][len(event_data['bookmakers']) - 1]['markets'][0]['outcomes'].append({
                     'name': selection['name'],
+                    'original_name': selection['name'],
                     'price': selection['price']
                 })
 
@@ -136,3 +171,22 @@ def process_data_set(aggregate_data, new_data):
 
 def contains_event_name(events, name):
     return compare_strings_with_ratio(events['name'], name, 0.6)
+
+def belongs_same_event(existing_events, new_event):
+    event_names = [event['name'] for event in existing_events]
+
+    event_found = process.extractOne(new_event['name'], event_names)
+
+    idx = event_names.index(event_found[0])
+
+    #TODO finish this
+    
+
+def log_aggregate_data_info(aggregate_data):
+    first_message = ('\ntotal events' + str(len(aggregate_data['events'])))
+    events_with_two = ('\nevents with two bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 2, aggregate_data['events'])))))
+    events_with_tree = ('\nevents with three bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 3, aggregate_data['events'])))))
+    events_with_four = ('\nevents with four bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 4, aggregate_data['events'])))))
+    last_message = ('\nsize after filter:' + str(len(list(filter(lambda event: len(event["bookmakers"]) > 1, aggregate_data['events'])))))
+    
+    print(first_message + events_with_two + events_with_tree + events_with_four + last_message)

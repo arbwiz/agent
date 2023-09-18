@@ -1,5 +1,6 @@
 import requests
 import json
+import datetime
 
 def betclic_tennis_win_match(): 
     result = requests.get("https://offer.cdn.begmedia.com/api/pub/v4/sports/2?application=1024&countrycode=pt&hasSwitchMtc=true&language=pt&limit=150&markettypeId=2013&offset=0&sitecode=ptpt&sortBy=ByLiveRankingPreliveDate")
@@ -11,7 +12,9 @@ def betclic_tennis_win_match():
         event_data = {
             'bookmaker': 'betclic',
             'name': event['name'],
-            'selections': []
+            'selections': [],
+            'start_time': event['date'],
+            'start_time_ms': str(convert_time(event['date']))
         }
 
         if len(event['grouped_markets']) == 0 or len(event['grouped_markets'][0]['markets']) == 0:
@@ -25,6 +28,8 @@ def betclic_tennis_win_match():
                 'name': selection[0]['name'],
                 'price': float(selection[0]['odds'])
             })
+        if len(event_data['selections']) != 2:
+            continue
         events.append(event_data)
     return events
 
@@ -38,13 +43,15 @@ def betclic_football():
         event_data = {
             'bookmaker': 'betclic',
             'name': event['name'],
-            'selections': []
+            'selections': [],
+            'start_time': event['date'],
+            'start_time_ms': str(convert_time(event['date']))
         }
 
         if len(event['grouped_markets']) == 0 or len(event['grouped_markets'][0]['markets']) == 0:
             continue
 
-        if event['grouped_markets'][0]['markets'][0]['market_type_code'] != 'Ftb_Mr3':
+        if event['grouped_markets'][0]['markets'][0]['market_type_code'] != 'Ftb_Mr3' or len(event['grouped_markets'][0]['markets'][0]['selections']) != 3:
             continue
         
         for selection in event['grouped_markets'][0]['markets'][0]['selections']:
@@ -55,5 +62,11 @@ def betclic_football():
                 'name': selection[0]['name'],
                 'price': float(selection[0]['odds'])
             })
+        if len(event_data['selections']) != 3:
+            continue
         events.append(event_data)
     return events
+
+def convert_time(isoFormat):
+    dt = datetime.datetime.fromisoformat(isoFormat)
+    return(dt.timestamp()*1000)

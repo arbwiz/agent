@@ -1,6 +1,7 @@
 import websockets
 import json
 import uuid
+import datetime
   
 async def esconline_tennis_win_match_24h():
   tenis_code = 848
@@ -15,8 +16,10 @@ async def esconline_tennis_win_match_24h():
   for event in parsed_events:
     event_data = {
         'bookmaker': 'esconline',
-        'name': event['EventName'],
-        'selections': []
+        'name': event['EventName'].replace(':', '-'),
+        'selections': [],
+        'start_time': event['StartDate'],
+        'start_time_ms': str(convert_time(event['StartDate']))
     }
     for market in event['MarketItems']:
       if market['MarketName'] == 'Vencedor':
@@ -26,6 +29,8 @@ async def esconline_tennis_win_match_24h():
               'price': outcome['Odd']
           })
         break
+    if len(event_data['selections']) != 2:
+         continue    
     events.append(event_data)
   return events
 
@@ -42,8 +47,10 @@ async def esconline_football():
   for event in parsed_events:
     event_data = {
         'bookmaker': 'esconline',
-        'name': event['EventName'],
-        'selections': []
+        'name': event['EventName'].replace(':', '-'),
+        'selections': [],
+        'start_time': event['StartDate'],
+        'start_time_ms': str(convert_time(event['StartDate']))
     }
     for market in event['MarketItems']:
       if market['BetType'] == 'P1XP2':
@@ -53,6 +60,8 @@ async def esconline_football():
               'price': outcome['Odd']
           })
         break
+    if len(event_data['selections']) != 3:
+         continue  
     events.append(event_data)
   return events
 
@@ -91,3 +100,8 @@ async def retrieve_info_websocket(sport_id):
 
 def generate_str_uuid():
   return str(uuid.uuid4())
+
+
+def convert_time(isoFormat):
+    dt = datetime.datetime.fromisoformat(isoFormat)
+    return(dt.timestamp()*1000)

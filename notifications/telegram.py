@@ -1,5 +1,8 @@
 import requests
 import json
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 #6480489284
 def send_telegram_message(message):
     send_telegram_message_complex(message,
