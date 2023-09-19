@@ -14,7 +14,7 @@ def betclic_tennis_win_match():
             'name': event['name'],
             'selections': [],
             'start_time': event['date'],
-            'start_time_ms': str(convert_time(event['date']))
+            'start_time_ms': round(convert_time(event['date']))
         }
 
         if len(event['grouped_markets']) == 0 or len(event['grouped_markets'][0]['markets']) == 0:
@@ -45,7 +45,7 @@ def betclic_football():
             'name': event['name'],
             'selections': [],
             'start_time': event['date'],
-            'start_time_ms': str(convert_time(event['date']))
+            'start_time_ms': round(convert_time(event['date']))
         }
 
         if len(event['grouped_markets']) == 0 or len(event['grouped_markets'][0]['markets']) == 0:

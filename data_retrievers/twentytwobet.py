@@ -18,7 +18,7 @@ def twentytwobet_tennis_win_match():
             'name': event['O1'] + ' - ' + event['O2'],
             'selections': [],
             'start_time': str(convert_time(event['S'])),
-            'start_time_ms': str(event['S']*1000)
+            'start_time_ms': event['S']*1000
         }
         for selection in event['E']:
             if selection['T'] == 1:
@@ -52,7 +52,7 @@ def twentytwobet_football():
             'name': event['O1'] + ' - ' + event['O2'],
             'selections': [],
             'start_time': str(convert_time(event['S'])),
-            'start_time_ms': str(event['S']*1000)
+            'start_time_ms': event['S']*1000
         }
         
         if len(event['E']) == 0:

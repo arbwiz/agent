@@ -19,7 +19,7 @@ async def esconline_tennis_win_match_24h():
         'name': event['EventName'].replace(':', '-'),
         'selections': [],
         'start_time': event['StartDate'],
-        'start_time_ms': str(convert_time(event['StartDate']))
+        'start_time_ms': round(convert_time(event['StartDate']))
     }
     for market in event['MarketItems']:
       if market['MarketName'] == 'Vencedor':
@@ -50,7 +50,7 @@ async def esconline_football():
         'name': event['EventName'].replace(':', '-'),
         'selections': [],
         'start_time': event['StartDate'],
-        'start_time_ms': str(convert_time(event['StartDate']))
+        'start_time_ms': round(convert_time(event['StartDate']))
     }
     for market in event['MarketItems']:
       if market['BetType'] == 'P1XP2':

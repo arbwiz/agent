@@ -114,7 +114,9 @@ def merge_data_sets(aggregate_data, new_data, sport_name):
                     'name': new_event['name'],
                     'bookmakers' : [],
                     'sport_key': sport_name,
-                    'id': time.time()
+                    'id': time.time(),
+                    'start_time': new_event['start_time'],
+                    'start_time_ms': new_event['start_time_ms']
                 }
                 
                 event_data['bookmakers'].append({
@@ -145,7 +147,9 @@ def merge_data_sets(aggregate_data, new_data, sport_name):
                     'name': new_event['name'],
                     'bookmakers' : [],
                     'sport_key': sport_name,
-                    'id': time.time()
+                    'id': time.time(),
+                    'start_time': new_event['start_time'],
+                    'start_time_ms': new_event['start_time_ms']
                 }
             
             event_data['bookmakers'].append({
