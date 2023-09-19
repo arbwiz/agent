@@ -227,3 +227,6 @@ venv.bak/
 .mypy_cache/
 
 .vscode/
+
+# testing files
+output/
