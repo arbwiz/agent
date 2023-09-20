@@ -10,7 +10,7 @@ from data_retrievers.twentytwobet import twentytwobet_football
 from data_retrievers.esconline import esconline_tennis_win_match_24h
 from data_retrievers.esconline import esconline_football
 
-from thefuzz import process
+from thefuzz import process, fuzz
 import time
 import json
 
@@ -81,16 +81,10 @@ def merge_data_sets(aggregate_data, new_data, sport_name):
     if len(aggregate_data) > 0:
         for new_event in new_data:
 
-            event_names = [event['name'] for event in aggregate_data['events']]
-
-            event_found = process.extractOne(new_event['name'], event_names)
-
-            idx = event_names.index(event_found[0])
-
             matched_event = get_matched_event(new_event, aggregate_data['events'])
 
             if matched_event is not None:
-                event = aggregate_data['events'][idx]
+                event = matched_event
 
                 event['bookmakers'].append({
                     'markets':[],
@@ -199,6 +193,19 @@ def log_aggregate_data_info(aggregate_data):
 
 def get_matched_event(new_event, existing_events): 
     event_names = [existing_event['name'] for existing_event in existing_events]
-    event_found = process.extract(new_event['name'], event_names, limit=10)
+    events_found = process.extract(new_event['name'], event_names, limit=10, scorer = fuzz.token_set_ratio)
 
-    idx = event_names.index(event_found[0])
+    for event in events_found:
+        idx = event_names.index(event[0])
+        existing_event = existing_events[idx]
+
+        if(event[1] > 70 and dates_match(new_event["start_time_ms"], existing_event["start_time_ms"])):
+            return existing_event
+        
+    return None   
+            
+
+def dates_match(date1, date2):
+    dif = abs(date1 - date2)
+    # if diff is less than 1 hour, consider a match
+    return dif <= 3600000

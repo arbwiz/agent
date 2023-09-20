@@ -11,6 +11,9 @@ from utils import compare_strings_with_ratio
 import difflib
 import asyncio
 from thefuzz import process
+import json
+from data_retrievers.aggregator import get_matched_event
+from data_retrievers.aggregator import merge_data_sets
 
 async def main():
   
@@ -70,7 +73,7 @@ async def main():
 
     #twentytwobet_football()
 
-    print(difflib.SequenceMatcher(None, "AIK - Degerfors IF", "AIK Estocolmo - Degerfors IF").ratio())
+    """   print(difflib.SequenceMatcher(None, "AIK - Degerfors IF", "AIK Estocolmo - Degerfors IF").ratio())
     print(difflib.SequenceMatcher(None, "AIK Estocolmo", "AIK").ratio())
     print(difflib.SequenceMatcher(None, "Degerfors IF", "Degerfors IF").ratio())
     print(difflib.SequenceMatcher(None, "AIC Estocolmo", "AIK").ratio())
@@ -82,9 +85,25 @@ async def main():
 
 
     choices = ["Sporting Sub-23 - Mafra Sub-23", "Portimonense Sub-23 - Santa Clara Sub-23", "Estrela Amadora Sub-23 - Estoril Sub-23", "Gil Vicente FC Sub-23 - FC Vizela Sub-23"]
-    print(process.extract("Sporting Sub-23 - Mafra Sub -23", choices, limit=2))
+    print(process.extract("Sporting Sub-23 - Mafra Sub -23", choices, limit=2)) """
+
+    test()
     
 
+
+def test():
+   aggregated_file = open('input/aggregated.json')
+   betano_file = open('input/betano.json')
+
+   # returns JSON object as
+   # a dictionary
+   aggregated = json.load(aggregated_file)
+   betano_event = json.load(betano_file)[0]
+   #matched_event = get_matched_event(betano_event, aggregated)
+
+   result = merge_data_sets({"events":aggregated}, [betano_event], "football")
+
+   print(result)
 
 if __name__ == '__main__':
   asyncio.run(main())
