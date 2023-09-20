@@ -87,7 +87,9 @@ def merge_data_sets(aggregate_data, new_data, sport_name):
 
             idx = event_names.index(event_found[0])
 
-            if event_found[1] >= 90:
+            matched_event = get_matched_event(new_event, aggregate_data['events'])
+
+            if matched_event is not None:
                 event = aggregate_data['events'][idx]
 
                 event['bookmakers'].append({
@@ -194,3 +196,9 @@ def log_aggregate_data_info(aggregate_data):
     last_message = ('\nsize after filter:' + str(len(list(filter(lambda event: len(event["bookmakers"]) > 1, aggregate_data['events'])))))
     
     print(first_message + events_with_two + events_with_tree + events_with_four + last_message)
+
+def get_matched_event(new_event, existing_events): 
+    event_names = [existing_event['name'] for existing_event in existing_events]
+    event_found = process.extract(new_event['name'], event_names, limit=10)
+
+    idx = event_names.index(event_found[0])
