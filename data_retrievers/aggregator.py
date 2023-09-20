@@ -10,6 +10,8 @@ from data_retrievers.twentytwobet import twentytwobet_football
 from data_retrievers.esconline import esconline_tennis_win_match_24h
 from data_retrievers.esconline import esconline_football
 
+from data_retrievers.lebull import lebull_football
+
 from thefuzz import process, fuzz
 import time
 import json
@@ -59,7 +61,12 @@ async def get_football_data():
     with open("output/esconline.json", 'w') as outfile:
         outfile.write(json.dumps(esconline, indent=4)) 
 
-    data = aggregate_data([betclic, betano, esconline, twentytwo], 'football')
+    lebull = lebull_football()
+
+    with open("output/lebull.json", 'w') as outfile:
+        outfile.write(json.dumps(lebull, indent=4)) 
+
+    data = aggregate_data([betclic, betano, esconline, twentytwo, lebull], 'football')
 
     with open("output/aggregated.json", 'w') as outfile:
         outfile.write(json.dumps(data, indent = 4)) 
@@ -183,13 +190,14 @@ def belongs_same_event(existing_events, new_event):
     
 
 def log_aggregate_data_info(aggregate_data):
-    first_message = ('\ntotal events' + str(len(aggregate_data['events'])))
+    first_message = ('\nsize before filters:' + str(len(aggregate_data['events'])))
     events_with_two = ('\nevents with two bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 2, aggregate_data['events'])))))
     events_with_tree = ('\nevents with three bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 3, aggregate_data['events'])))))
     events_with_four = ('\nevents with four bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 4, aggregate_data['events'])))))
-    last_message = ('\nsize after filter:' + str(len(list(filter(lambda event: len(event["bookmakers"]) > 1, aggregate_data['events'])))))
+    events_with_five = ('\nevents with five bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 5, aggregate_data['events'])))))
+    last_message = ('\nsize after filters:' + str(len(list(filter(lambda event: len(event["bookmakers"]) > 1, aggregate_data['events'])))))
     
-    print(first_message + events_with_two + events_with_tree + events_with_four + last_message)
+    print(first_message + events_with_two + events_with_tree + events_with_four + events_with_five + last_message)
 
 def get_matched_event(new_event, existing_events): 
     event_names = [existing_event['name'] for existing_event in existing_events]

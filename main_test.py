@@ -14,6 +14,7 @@ from thefuzz import process
 import json
 from data_retrievers.aggregator import get_matched_event
 from data_retrievers.aggregator import merge_data_sets
+from data_retrievers.lebull import lebull_football
 
 async def main():
   
@@ -87,7 +88,9 @@ async def main():
     choices = ["Sporting Sub-23 - Mafra Sub-23", "Portimonense Sub-23 - Santa Clara Sub-23", "Estrela Amadora Sub-23 - Estoril Sub-23", "Gil Vicente FC Sub-23 - FC Vizela Sub-23"]
     print(process.extract("Sporting Sub-23 - Mafra Sub -23", choices, limit=2)) """
 
-    test()
+    #test()
+
+    lebull_football()
     
 
 
