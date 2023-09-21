@@ -12,6 +12,8 @@ from data_retrievers.esconline import esconline_football
 
 from data_retrievers.lebull import lebull_football
 
+from data_retrievers.bwin import bwin_football
+
 from thefuzz import process, fuzz
 import time
 import json
@@ -66,7 +68,12 @@ async def get_football_data():
     with open("output/lebull.json", 'w') as outfile:
         outfile.write(json.dumps(lebull, indent=4)) 
 
-    data = aggregate_data([betclic, betano, esconline, twentytwo, lebull], 'football')
+    bwin = bwin_football()
+
+    with open("output/bwin.json", 'w') as outfile:
+        outfile.write(json.dumps(bwin, indent=4)) 
+
+    data = aggregate_data([betclic, betano, esconline, twentytwo, lebull, bwin], 'football')
 
     with open("output/aggregated.json", 'w') as outfile:
         outfile.write(json.dumps(data, indent = 4)) 
@@ -195,21 +202,29 @@ def log_aggregate_data_info(aggregate_data):
     events_with_tree = ('\nevents with three bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 3, aggregate_data['events'])))))
     events_with_four = ('\nevents with four bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 4, aggregate_data['events'])))))
     events_with_five = ('\nevents with five bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 5, aggregate_data['events'])))))
+    events_with_six = ('\nevents with six bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 6, aggregate_data['events'])))))
     last_message = ('\nsize after filters:' + str(len(list(filter(lambda event: len(event["bookmakers"]) > 1, aggregate_data['events'])))))
     
-    print(first_message + events_with_two + events_with_tree + events_with_four + events_with_five + last_message)
+    print(first_message + events_with_two + events_with_tree + events_with_four + events_with_five + events_with_six + last_message)
 
 def get_matched_event(new_event, existing_events): 
     event_names = [existing_event['name'] for existing_event in existing_events]
     events_found = process.extract(new_event['name'], event_names, limit=10, scorer = fuzz.token_set_ratio)
+
+    number_of_outcomes = len(new_event['selections'])
+    second_outcome_idx = 1 if number_of_outcomes == 2 else 2
 
     for event in events_found:
         idx = event_names.index(event[0])
         existing_event = existing_events[idx]
 
         if(event[1] > 70 and dates_match(new_event["start_time_ms"], existing_event["start_time_ms"])):
-            return existing_event
-        
+            if(
+                compare_strings_with_ratio(new_event['selections'][0]['name'],  existing_event["bookmakers"][0]['markets'][0]['outcomes'][0]['name'], 0.6) 
+                and 
+                compare_strings_with_ratio(new_event['selections'][second_outcome_idx]['name'],  existing_event["bookmakers"][0]['markets'][0]['outcomes'][second_outcome_idx]['name'], 0.6)
+            ):
+                return existing_event
     return None   
             
 
