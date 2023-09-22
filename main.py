@@ -20,7 +20,7 @@ async def is_alive():
    send_telegram_message('Started...')
    while True:
       send_telegram_message('Still alive...')
-      await asyncio.sleep(1800)
+      await asyncio.sleep(3600)
       
 async def execute():
   while True:
