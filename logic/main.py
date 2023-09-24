@@ -1,5 +1,5 @@
 from model.event import Event
-from data_retrievers.aggregator import get_tenis_data
+from data_retrievers.aggregator import get_tennis_data
 from data_retrievers.aggregator import get_football_data
 
 async def run(sport):
@@ -9,9 +9,9 @@ async def run(sport):
         case 'football':
             odds_response = await get_football_data()
         case 'tennis':
-            odds_response = await get_tenis_data()
+            odds_response = await get_tennis_data()
         case _:
-            odds_response = await get_tenis_data()
+            odds_response = await get_tennis_data()
     
     for data in odds_response:
         events.append(Event(data))

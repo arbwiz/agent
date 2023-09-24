@@ -21,71 +21,28 @@ from datetime import datetime
 
 from utils import compare_strings_with_ratio
 
-async def get_tenis_data():
+async def get_tennis_data():
     betano = betano_tennis_win_match_24h()
-    with open("output/betano_tennis.json", 'w') as outfile:
-        outfile.write(json.dumps(betano, indent=4)) 
-
     betclic = betclic_tennis_win_match()
-    with open("output/betclic_tennis.json", 'w') as outfile:
-        outfile.write(json.dumps(betclic, indent=4)) 
-
     twentytwo = twentytwobet_tennis_win_match()
-    with open("output/twentytwo_tennis.json", 'w') as outfile:
-        outfile.write(json.dumps(twentytwo, indent=4)) 
-
     esconline = await esconline_tennis_win_match_24h()
-    with open("output/esconline_tennis.json", 'w') as outfile:
-        outfile.write(json.dumps(esconline, indent=4))
-
-    bwin = bwin_tennis()
-    with open("output/bwin_tennis.json", 'w') as outfile:
-        outfile.write(json.dumps(esconline, indent=4))
-
     lebull = lebull_tennis()
-    with open("output/lebull_tennis.json", 'w') as outfile:
-        outfile.write(json.dumps(esconline, indent=4))
+    bwin = bwin_tennis()
     data = aggregate_data([betclic, betano, esconline, twentytwo, bwin, lebull], 'tennis')
 
-    with open("output/aggregated_tennis.json", 'w') as outfile:
-        outfile.write(json.dumps(data, indent = 4)) 
-
+    await generate_output_files(betano, betclic, bwin, data, esconline, lebull, twentytwo, 'tennis')
     return data
-    
+
 async def get_football_data():
     betano = betano_football()
-
-    with open("output/betano.json", 'w') as outfile:
-        outfile.write(json.dumps(betano, indent=4)) 
-
     betclic = betclic_football()
-
-    with open("output/betclic.json", 'w') as outfile:
-        outfile.write(json.dumps(betclic, indent=4)) 
     twentytwo = twentytwobet_football()
-
-    with open("output/twentytwo.json", 'w') as outfile:
-        outfile.write(json.dumps(twentytwo, indent=4)) 
     esconline = await esconline_football()
-
-    with open("output/esconline.json", 'w') as outfile:
-        outfile.write(json.dumps(esconline, indent=4)) 
-
     lebull = lebull_football()
-
-    with open("output/lebull.json", 'w') as outfile:
-        outfile.write(json.dumps(lebull, indent=4)) 
-
     bwin = bwin_football()
-
-    with open("output/bwin.json", 'w') as outfile:
-        outfile.write(json.dumps(bwin, indent=4)) 
-
     data = aggregate_data([betclic, betano, esconline, twentytwo, lebull, bwin], 'football')
 
-    with open("output/aggregated.json", 'w') as outfile:
-        outfile.write(json.dumps(data, indent = 4)) 
-
+    await generate_output_files(betano, betclic, bwin, data, esconline, lebull, twentytwo, 'football')
     return data
 
 def aggregate_data(all_sport_data, sport_name):
@@ -203,7 +160,20 @@ def belongs_same_event(existing_events, new_event):
     idx = event_names.index(event_found[0])
 
     #TODO finish this
-    
+
+
+async def write_output_file(file_name, file_data):
+    with open("output/" + file_name + ".json", 'w') as outfile:
+        outfile.write(json.dumps(file_data, indent=4))
+
+async def generate_output_files(betano, betclic, bwin, data, esconline, lebull, twentytwo, sport_type):
+    await write_output_file('betano_' + sport_type, betano)
+    await write_output_file('betlic_' + sport_type, betclic)
+    await write_output_file('twentytwo_' + sport_type, twentytwo)
+    await write_output_file('esconline_' + sport_type, esconline)
+    await write_output_file('bwin_' + sport_type, bwin)
+    await write_output_file('lebull_' + sport_type, lebull)
+    await write_output_file('aggregated_' + sport_type, data)
 
 def log_aggregate_data_info(aggregate_data):
     current_time = ("time:"+ str(datetime.now()))
