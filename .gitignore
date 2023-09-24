@@ -231,3 +231,4 @@ venv.bak/
 # testing files
 output/
 input/
+.DS_Store
