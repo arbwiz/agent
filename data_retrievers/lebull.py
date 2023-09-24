@@ -16,6 +16,8 @@ def lebull_football():
 
     events = []
     for event in lebull_events:
+        if event['isLive'] == 'true': 
+            continue
         event_data = {
             'bookmaker': 'lebull',
             'name': event['teamA'] + ' - ' + event['teamB'],

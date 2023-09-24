@@ -66,7 +66,35 @@ class Event:
 
         # if the sum of the reciprocals of the odds is less than 1, there is opportunity for arbitrage
         if total_arbitrage_percentage < 1:
-            message = '\nevent: ' + str(self.data['name']) + '\nbest_odds: ' + str(self.best_odds) + '\narbitage_percentage: ' + str(self.total_arbitrage_percentage) + '%\n---\n'
+
+            stakes_message = None
+            if len(self.best_odds) == 2:
+                stakes_message = calculate_arbitrage_stakes(100, {
+                    'name': (f"Outcome: {self.best_odds[0][1]} @ {self.best_odds[0][0]} - "),
+                    'odd': self.best_odds[0][2]
+                    },
+                    {
+                    'name': (f"Outcome: {self.best_odds[1][1]} @ {self.best_odds[1][0]} - "),
+                    'odd': self.best_odds[1][2]
+                    })
+            else:
+                stakes_message = calculate_arbitrage_stakes(100, {
+                    'name': (f"Outcome: {self.best_odds[0][1]} @ {self.best_odds[0][0]} - "),
+                    'odd': self.best_odds[0][2]
+                    },
+                    {
+                    'name': (f"Outcome: {self.best_odds[1][1]}] @ {self.best_odds[1][0]} - "),
+                    'odd': self.best_odds[1][2]
+                    },
+                    {
+                    'name': (f"Outcome: {self.best_odds[2][1]} @ {self.best_odds[2][0]} - "),
+                    'odd': self.best_odds[2][2]
+                    })
+
+            
+            message = "\nEvent name: {} \nProfit %: {profit:.3f}\n---\n{stake}".format(str(self.data['name']), profit = ((1 - self.total_arbitrage_percentage)  * 100), stake = stakes_message)
+            
+            
             send_telegram_message(message)
             print(message)
             return True
@@ -98,3 +126,43 @@ class Event:
         
         self.bet_amounts = bet_amounts
         return bet_amounts
+    
+def calculate_arbitrage_stakes(stake, odds_a, odds_b, odds_c = None):
+    # Calculate the implied probabilities
+    implied_prob_a = 1 / odds_a['odd']
+    implied_prob_b = 1 / odds_b['odd']
+    
+    # Calculate the total implied probability
+    total_implied_prob = implied_prob_a + implied_prob_b
+
+    if odds_c is not None:
+        implied_prob_c = 1 / odds_c['odd']
+        total_implied_prob += implied_prob_c
+
+        # Calculate the stakes for each outcome
+        stake_a = (stake / total_implied_prob) * implied_prob_a
+        stake_b = (stake / total_implied_prob) * implied_prob_b
+        stake_c = (stake / total_implied_prob) * implied_prob_c
+
+        profit_a = stake_a * odds_a['odd']
+        profit_b = stake_b * odds_b['odd']
+        profit_c = stake_c * odds_c['odd']
+
+        output_string = "{}{} \nStake: {stake_a:.2f}".format(odds_a['name'], odds_a['odd'], stake_a = stake_a)
+        output_string += "\n{}{} \nStake: {stake_b:.2f}".format(odds_b['name'], odds_b['odd'], stake_b = stake_b)
+        output_string += "\n{}{} \nStake: {stake_c:.2f}".format(odds_c['name'], odds_c['odd'], stake_c = stake_c)
+
+        return output_string
+    else:
+
+        # Calculate the stakes for each outcome
+        stake_a = (stake / total_implied_prob) * implied_prob_a
+        stake_b = (stake / total_implied_prob) * implied_prob_b
+
+        profit_a = stake_a * odds_a['odd']
+        profit_b = stake_b * odds_b['odd']
+
+        output_string = "For a total stake of: {}\n{}{} \nStake: {stake_a:.2f}".format(stake, odds_a['name'], odds_a['odd'], stake_a = stake_a)
+        output_string += "\n{}{} \nStake: {stake_b:.2f}".format(odds_b['name'], odds_b['odd'], stake_b = stake_b)
+
+        return output_string

@@ -34,6 +34,9 @@ def bwin_football():
 
     events = []
     for event in bwin_events:
+        if event['stage'] == 'Live':
+            continue
+
         event_data = {
             'bookmaker': 'bwin',
             'name': event['name']['value'],
