@@ -9,6 +9,8 @@ def betclic_tennis_win_match():
 
     events = []
     for event in resultDict['matches']:
+        if event['is_live'] == 'true':
+            continue
         event_data = {
             'bookmaker': 'betclic',
             'name': event['name'],
@@ -40,6 +42,10 @@ def betclic_football():
 
     events = []
     for event in resultDict['matches']:
+
+        if event['is_live'] == 'true':
+            continue
+
         event_data = {
             'bookmaker': 'betclic',
             'name': event['name'],

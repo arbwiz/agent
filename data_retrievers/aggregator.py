@@ -17,6 +17,7 @@ from data_retrievers.bwin import bwin_football
 from thefuzz import process, fuzz
 import time
 import json
+from datetime import datetime
 
 from utils import compare_strings_with_ratio
 
@@ -197,6 +198,7 @@ def belongs_same_event(existing_events, new_event):
     
 
 def log_aggregate_data_info(aggregate_data):
+    current_time = ("\ntime:"+ str(datetime.now()))
     first_message = ('\nsize before filters:' + str(len(aggregate_data['events'])))
     events_with_two = ('\nevents with two bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 2, aggregate_data['events'])))))
     events_with_tree = ('\nevents with three bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 3, aggregate_data['events'])))))
@@ -205,7 +207,7 @@ def log_aggregate_data_info(aggregate_data):
     events_with_six = ('\nevents with six bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 6, aggregate_data['events'])))))
     last_message = ('\nsize after filters:' + str(len(list(filter(lambda event: len(event["bookmakers"]) > 1, aggregate_data['events'])))))
     
-    print(first_message + events_with_two + events_with_tree + events_with_four + events_with_five + events_with_six + last_message)
+    print(current_time + first_message + events_with_two + events_with_tree + events_with_four + events_with_five + events_with_six + last_message)
 
 def get_matched_event(new_event, existing_events): 
     event_names = [existing_event['name'] for existing_event in existing_events]
