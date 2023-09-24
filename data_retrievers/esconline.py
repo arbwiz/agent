@@ -48,19 +48,99 @@ async def esconline_football():
     event_data = {
         'bookmaker': 'esconline',
         'name': event['EventName'].replace(':', '-'),
-        'selections': [],
+        'markets': [],
         'start_time': event['StartDate'],
         'start_time_ms': round(convert_time(event['StartDate']))
     }
     for market in event['MarketItems']:
       if market['BetType'] == 'P1XP2':
+        market_data = {
+          'name': 'h2h',
+          'selections': []
+        }
+
         for outcome in market['OutcomeItems']:
-          event_data['selections'].append({
+          market_data['selections'].append({
               'name': outcome['Name'],
               'price': outcome['Odd']
           })
-        break
-    if len(event_data['selections']) != 3:
+        
+        if len(market_data['selections']) != 3:
+          continue  
+
+        event_data['markets'].append(market_data)
+
+      if market['BetType'] == 'total-OverUnder':
+        market_data = {
+          'name': 'total_goals',
+          'selections': []
+        }
+
+        for outcome in market['OutcomeItems']:
+          market_data['selections'].append({
+              'name': outcome['Name'] + ' ' + str(outcome['Base']),
+              'price': outcome['Odd']
+          })
+        
+        if len(market_data['selections']) != 2:
+          continue  
+
+        event_data['markets'].append(market_data)
+
+      if market['BetType'] == '1X12X2':
+        h2h_market = find_market_by_id(event_data['markets'], 'h2h')
+
+        if h2h_market is None:
+            continue
+
+        market_data = {
+            'name': '1x 2',
+            'selections': [
+                {
+                    'name': h2h_market['selections'][0]['name'] + ' ou empate',
+                    'price': float(market['OutcomeItems'][0]['Odd'])
+                },
+                {
+                    'name': h2h_market['selections'][2]['name'],
+                    'price': h2h_market['selections'][2]['price']
+                }
+            ]
+        }
+
+        market_data2 = {
+            'name': '1 x2',
+            'selections': [
+                {
+                    'name': h2h_market['selections'][0]['name'],
+                    'price': h2h_market['selections'][0]['price']
+                },
+                {
+                    'name': h2h_market['selections'][2]['name'] + ' ou empate',
+                    'price': float(market['OutcomeItems'][1]['Odd'])
+                }
+            ]
+        }
+
+        market_data3 = {
+            'name': '12 x',
+            'selections': [
+                {
+                    'name': h2h_market['selections'][0]['name'] + " ou " + h2h_market['selections'][2]['name'],
+                    'price': float(market['OutcomeItems'][2]['Odd'])
+                },
+                {
+                    'name': h2h_market['selections'][1]['name'],
+                    'price': h2h_market['selections'][1]['price']
+                }
+            
+            ]
+        }
+
+        event_data['markets'].append(market_data)
+        event_data['markets'].append(market_data2)
+        event_data['markets'].append(market_data3)
+
+    if len(event_data['markets']) < 1:
          continue  
     events.append(event_data)
   return events
@@ -105,3 +185,7 @@ def generate_str_uuid():
 def convert_time(isoFormat):
     dt = datetime.datetime.fromisoformat(isoFormat)
     return(dt.timestamp()*1000)
+
+def find_market_by_id(markets, id): 
+    found = [market for market in markets if market['name'] == id]
+    return found[0] if len(found) == 1 else None

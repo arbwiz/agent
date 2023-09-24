@@ -68,17 +68,8 @@ async def main():
       }
    ]
 
-    #await esconline_football()
-
-    #arbitrage_possibilities = calculate_arbitrage_3_websites(odds)
-
-    #print(json.dumps(arbitrage_possibilities, indent=4))
-
-    #twentytwobet_football()
-
-    
-    #betclic_football()
-   betano_football()
+   #betano_football()
+   await esconline_football()
 
 
 def test():
