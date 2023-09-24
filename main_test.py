@@ -14,8 +14,8 @@ from thefuzz import process
 import json
 from data_retrievers.aggregator import get_matched_event
 from data_retrievers.aggregator import merge_data_sets
-from data_retrievers.lebull import lebull_football
-from data_retrievers.bwin import bwin_football
+from data_retrievers.lebull import lebull_football, lebull_tennis
+from data_retrievers.bwin import bwin_football, bwin_tennis
 from model.event import calculate_arbitrage_stakes
 
 async def main():
@@ -76,20 +76,20 @@ async def main():
 
     #twentytwobet_football()
 
-   message = calculate_arbitrage_stakes(100, {
-      'name': "name a",
-      'odd': 2
-      },
-      {
-      'name': "name b",
-      'odd': 4
-      },
-      {
-      'name': "name c",
-      'odd': 5
-      })
-    
-   print(message)
+   # message = calculate_arbitrage_stakes(100, {
+   #    'name': "name a",
+   #    'odd': 2
+   #    },
+   #    {
+   #    'name': "name b",
+   #    'odd': 4
+   #    },
+   #    {
+   #    'name': "name c",
+   #    'odd': 5
+   #    })
+   result = lebull_tennis()
+   print(result)
     
 def test():
    aggregated_file = open('output/aggregated_tennis.json')

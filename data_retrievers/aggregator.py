@@ -10,9 +10,9 @@ from data_retrievers.twentytwobet import twentytwobet_football
 from data_retrievers.esconline import esconline_tennis_win_match_24h
 from data_retrievers.esconline import esconline_football
 
-from data_retrievers.lebull import lebull_football
+from data_retrievers.lebull import lebull_football, lebull_tennis
 
-from data_retrievers.bwin import bwin_football
+from data_retrievers.bwin import bwin_football, bwin_tennis
 
 from thefuzz import process, fuzz
 import time
@@ -36,9 +36,16 @@ async def get_tenis_data():
 
     esconline = await esconline_tennis_win_match_24h()
     with open("output/esconline_tennis.json", 'w') as outfile:
-        outfile.write(json.dumps(esconline, indent=4)) 
+        outfile.write(json.dumps(esconline, indent=4))
 
-    data = aggregate_data([betclic, betano, esconline, twentytwo], 'tennis')
+    bwin = bwin_tennis()
+    with open("output/bwin_tennis.json", 'w') as outfile:
+        outfile.write(json.dumps(esconline, indent=4))
+
+    lebull = lebull_tennis()
+    with open("output/lebull_tennis.json", 'w') as outfile:
+        outfile.write(json.dumps(esconline, indent=4))
+    data = aggregate_data([betclic, betano, esconline, twentytwo, bwin, lebull], 'tennis')
 
     with open("output/aggregated_tennis.json", 'w') as outfile:
         outfile.write(json.dumps(data, indent = 4)) 
@@ -85,7 +92,8 @@ def aggregate_data(all_sport_data, sport_name):
     aggregate_data = []
     for sport_data in all_sport_data:
         aggregate_data = merge_data_sets(aggregate_data, sport_data, sport_name)
-        
+
+    print('\n======' + sport_name + '=======')
     log_aggregate_data_info(aggregate_data)
         
     data_with_at_least_two_bookmakers = list(filter(lambda event: len(event["bookmakers"]) > 1, aggregate_data['events']))
@@ -198,7 +206,7 @@ def belongs_same_event(existing_events, new_event):
     
 
 def log_aggregate_data_info(aggregate_data):
-    current_time = ("\ntime:"+ str(datetime.now()))
+    current_time = ("time:"+ str(datetime.now()))
     first_message = ('\nsize before filters:' + str(len(aggregate_data['events'])))
     events_with_two = ('\nevents with two bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 2, aggregate_data['events'])))))
     events_with_tree = ('\nevents with three bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 3, aggregate_data['events'])))))
