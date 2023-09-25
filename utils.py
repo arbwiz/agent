@@ -1,6 +1,8 @@
 import difflib
 import json
 
+market_types = ['h2h', 'total_goals_1.5', 'total_goals_2.5', 'total_goals_3.5', '1x 2', '1 x2', '12 x']
+
 def is_two_way_market_surebet(odd1, odd2):
   """
   This function checks if two odds are a surebet.
@@ -139,3 +141,4 @@ def calculate_arbitrage_3_websites(odds):
 
 def print_properly(data):
   print(json.dumps(data, indent = 4))
+

@@ -74,10 +74,15 @@ def betano_football():
                     event_data['markets'].append(market_data)
 
                 if market['type'] == 'HCTG':
+
+                    if market['handicap'] != 2.5:
+                        continue
+
                     market_data = {
-                        'name': 'total_goals',
+                        'name': 'total_goals_2.5',
                         'selections': []
                     }
+                    
                     for selection in market['selections']:
                         market_data['selections'].append({
                             #adicionar handicap? 

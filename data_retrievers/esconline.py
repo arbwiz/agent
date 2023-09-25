@@ -71,8 +71,12 @@ async def esconline_football():
         event_data['markets'].append(market_data)
 
       if market['BetType'] == 'total-OverUnder':
+
+        if market['Base'] != 2.5:
+           continue
+        
         market_data = {
-          'name': 'total_goals',
+          'name': 'total_goals_2.5',
           'selections': []
         }
 
@@ -116,7 +120,7 @@ async def esconline_football():
                 },
                 {
                     'name': h2h_market['selections'][2]['name'] + ' ou empate',
-                    'price': float(market['OutcomeItems'][1]['Odd'])
+                    'price': float(market['OutcomeItems'][2]['Odd'])
                 }
             ]
         }
@@ -126,7 +130,7 @@ async def esconline_football():
             'selections': [
                 {
                     'name': h2h_market['selections'][0]['name'] + " ou " + h2h_market['selections'][2]['name'],
-                    'price': float(market['OutcomeItems'][2]['Odd'])
+                    'price': float(market['OutcomeItems'][1]['Odd'])
                 },
                 {
                     'name': h2h_market['selections'][1]['name'],

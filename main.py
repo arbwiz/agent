@@ -27,7 +27,7 @@ async def execute():
     #send_telegram_message('\nExecuting...')
     await run("football")
     await asyncio.sleep(5)
-    await run("tennis")
+    #await run("tennis")
     # Schedule the task to be run again in 40-70 seconds
     seconds_to_wait = random.randint(123, 341)
     #send_telegram_message('\nEnded execution, waiting ' + str(seconds_to_wait) + ' seconds to run again')

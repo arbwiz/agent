@@ -120,19 +120,22 @@ def get_h2h_market(event):
     return market
 
 def get_total_goals_market(event):
-    market = {
-        'name': 'total_goals',
-        'selections': []
-    }
-
     if len(event['grouped_markets']) == 0 or len(event['grouped_markets'][0]['markets']) == 0:
         return None
 
     if event['grouped_markets'][0]['markets'][0]['market_type_code'] != 'Ftb_10' or len(event['grouped_markets'][0]['markets'][0]['selections'][0]) != 2:
         return None
-    
+
+    market = {
+        'name': 'total_goals_2.5',
+        'selections': []
+    }
+
     for selection in event['grouped_markets'][0]['markets'][0]['selections'][0]:
         if len(selection) == 0:
+            break
+
+        if '2.5' not in selection['name']:
             break
 
         market['selections'].append({

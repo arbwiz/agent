@@ -21,23 +21,33 @@ def lebull_football():
         event_data = {
             'bookmaker': 'lebull',
             'name': event['teamA'] + ' - ' + event['teamB'],
-            'selections': [],
+            'markets': [],
             'start_time': str(convert_time(event['timestamp'])),
             'start_time_ms': event['timestamp']
+        }
+
+        market_data = {
+            'name' : 'h2h',
+            'selections' : []
         }
 
         for stakeType in event['stakeTypes']:
             if stakeType['stakeTypeName'] == '1X2':
                 for selection in stakeType['stakes']:
-                    event_data['selections'].append({
+                    market_data['selections'].append({
                         'name': selection['stakeName'],
                         'price': float(selection['betFactor'])
                     })
-        if len(event_data['selections']) != 3:
+        if len(market_data['selections']) != 3:
             continue
+        event_data['markets'] = [market_data]
         events.append(event_data)
     return events
         
 def convert_time(millis):
     dt = datetime.datetime.fromtimestamp(millis/1000)
     return(dt.isoformat())
+
+def find_market_by_id(markets, id): 
+    found = [market for market in markets if market['name'] == id]
+    return found[0] if len(found) == 1 else None

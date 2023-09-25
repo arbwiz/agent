@@ -16,25 +16,32 @@ def twentytwobet_tennis_win_match():
         event_data = {
             'bookmaker': '22bet',
             'name': event['O1'] + ' - ' + event['O2'],
-            'selections': [],
+            'markets': [],
             'start_time': str(convert_time(event['S'])),
             'start_time_ms': event['S']*1000
         }
+
+        market_data = {
+            'name': 'h2h',
+            'selections': []
+        }
+
         for selection in event['E']:
             if selection['T'] == 1:
-                event_data['selections'].insert(0, {
+                market_data['selections'].insert(0, {
                     'name': event['O1'],
                     'price': float(selection['C'])
                 })
             
             elif selection['T'] == 3:
-                event_data['selections'].insert(1, {
+                market_data['selections'].insert(1, {
                     'name': event['O2'],
                     'price': float(selection['C'])
                 })
 
-        if len(event_data['selections']) != 2:
+        if len(market_data['selections']) != 2:
             continue
+        event_data['markets'] = [market_data]
 
         events.append(event_data)
     return events
@@ -50,9 +57,14 @@ def twentytwobet_football():
         event_data = {
             'bookmaker': '22bet',
             'name': event['O1'] + ' - ' + event['O2'],
-            'selections': [],
+            'markets': [],
             'start_time': str(convert_time(event['S'])),
             'start_time_ms': event['S']*1000
+        }
+
+        market_data = {
+            'name': 'h2h',
+            'selections': []
         }
         
         if len(event['E']) == 0:
@@ -60,24 +72,25 @@ def twentytwobet_football():
 
         for selection in event['E']:
             if selection['T'] == 1:
-                event_data['selections'].insert(0, ({
+                market_data['selections'].insert(0, ({
                     'name': event['O1'],
                     'price': float(selection['C'])
                 }))
             
             elif selection['T'] == 2:
-                event_data['selections'].insert(1, ({
+                market_data['selections'].insert(1, ({
                     'name': 'Empate',
                     'price': float(selection['C'])
                 }))
             elif selection['T'] == 3:
-                event_data['selections'].insert(2, ({
+                market_data['selections'].insert(2, ({
                     'name': event['O2'],
                     'price': float(selection['C'])
                 }))
 
-        if len(event_data['selections']) != 3  or event_data['selections'][0]['name'] in blacklisted_outcome1  or event_data['selections'][2]['name'] in blacklisted_outcome2:
+        if len(market_data['selections']) != 3  or market_data['selections'][0]['name'] in blacklisted_outcome1  or market_data['selections'][2]['name'] in blacklisted_outcome2:
             continue
+        event_data['markets'] = [market_data]
         
         events.append(event_data)
     return events
@@ -85,3 +98,7 @@ def twentytwobet_football():
 def convert_time(seconds):
     dt = datetime.datetime.fromtimestamp(seconds)
     return(dt.isoformat())
+
+def find_market_by_id(markets, id): 
+    found = [market for market in markets if market['name'] == id]
+    return found[0] if len(found) == 1 else None

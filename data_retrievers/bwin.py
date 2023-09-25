@@ -40,22 +40,28 @@ def bwin_football():
         event_data = {
             'bookmaker': 'bwin',
             'name': event['name']['value'],
-            'selections': [],
+            'markets': [],
             'start_time': event['startDate'],
             'start_time_ms': round(convert_time(event['startDate']))
+        }
+
+        market_data = {
+            'name': 'h2h',
+            'selections': []
         }
 
         for option_market in event['optionMarkets']:
             if option_market['name']['value'] == 'Resultado do jogo':
                 for selection in option_market['options']:
-                    event_data['selections'].append({
+                    market_data['selections'].append({
                         'name': selection['name']['value'],
                         'price': float(selection['price']['odds'])
                     })
             break
 
-        if len(event_data['selections']) != 3:
+        if len(market_data['selections']) != 3:
             continue
+        event_data['markets'] = [market_data]
         events.append(event_data)
     return events
 
@@ -63,3 +69,7 @@ def bwin_football():
 def convert_time(isoFormat):
     dt = datetime.datetime.fromisoformat(isoFormat)
     return(dt.timestamp()*1000)
+
+def find_market_by_id(markets, id): 
+    found = [market for market in markets if market['name'] == id]
+    return found[0] if len(found) == 1 else None

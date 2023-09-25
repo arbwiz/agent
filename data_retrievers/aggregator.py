@@ -18,6 +18,7 @@ from thefuzz import process, fuzz
 import time
 import json
 from datetime import datetime
+from utils import market_types
 
 from utils import compare_strings_with_ratio
 
@@ -106,20 +107,31 @@ def merge_data_sets(aggregate_data, new_data, sport_name):
                     'title': new_event['bookmaker']
                 })
                                 
-                event['bookmakers'][len(event['bookmakers']) - 1]['markets'].append({
-                    'outcomes': [],
-                    'name': 'h2h'
-                })
+                markets = []
 
-                idx = 0
-                for selection in new_event['selections']: 
-                    event['bookmakers'][len(event['bookmakers']) - 1]['markets'][0]['outcomes'].append({
-                        #normalize outcome names
-                        'name': event['bookmakers'][0]['markets'][0]['outcomes'][idx]['name'],
-                        'original_name': selection['name'],
-                        'price': selection['price']
-                    })
-                    idx+=1
+                for index, market_type in enumerate(market_types):
+                    market_found = get_market(new_event['markets'], 'name', market_type)
+                    if market_found is None:
+                        markets.insert(index, [])
+                    else:
+                        outcomes = []
+                        for i, selection in enumerate(market_found['selections']): 
+                            existing_markets = event['bookmakers'][0]['markets'][index]
+                            outcomes.append({
+                                # normalize outcome name, keep the first bookmaker names
+                                'name': selection['name'] if len(existing_markets) == 0 else event['bookmakers'][0]['markets'][index]['outcomes'][i]['name'],
+                                'original_name': selection['name'],
+                                'price': selection['price']
+                            })
+                        market_data = {
+                            'outcomes': outcomes,
+                            'name': market_type
+                        }
+
+                        markets.insert(index, market_data)
+
+                event['bookmakers'][len(event['bookmakers']) - 1]['markets'] = markets
+
             else: 
                 event_data = {
                     'name': new_event['name'],
@@ -135,17 +147,28 @@ def merge_data_sets(aggregate_data, new_data, sport_name):
                     'title': new_event['bookmaker']
                 })
 
-                event_data['bookmakers'][len(event_data['bookmakers']) - 1]['markets'].append({
-                    'outcomes': [],
-                    'name': 'h2h'
-                })
+                markets = []
 
-                for selection in new_event['selections']: 
-                    event_data['bookmakers'][len(event_data['bookmakers']) - 1]['markets'][0]['outcomes'].append({
-                        'name': selection['name'],
-                        'original_name': selection['name'],
-                        'price': selection['price']
-                })
+                for index, market_type in enumerate(market_types):
+                    market_found = get_market(new_event['markets'], 'name', market_type)
+                    if market_found is None:
+                        markets.insert(index, [])
+                    else:
+                        outcomes = []
+                        for selection in market_found['selections']: 
+                            outcomes.append({
+                                'name': selection['name'],
+                                'original_name': selection['name'],
+                                'price': selection['price']
+                            })
+                        market_data = {
+                            'outcomes': outcomes,
+                            'name': market_type
+                        }
+
+                        markets.insert(index, market_data)
+
+                event_data['bookmakers'][len(event_data['bookmakers']) - 1]['markets'] = markets
 
                 aggregate_data['events'].append(event_data)
     else:
@@ -168,17 +191,28 @@ def merge_data_sets(aggregate_data, new_data, sport_name):
                 'title': new_event['bookmaker']
             })
 
-            event_data['bookmakers'][len(event_data['bookmakers']) - 1]['markets'].append({
-                'outcomes': [],
-                'name': 'h2h'
-            })
+            markets = []
 
-            for selection in new_event['selections']: 
-                event_data['bookmakers'][len(event_data['bookmakers']) - 1]['markets'][0]['outcomes'].append({
-                    'name': selection['name'],
-                    'original_name': selection['name'],
-                    'price': selection['price']
-                })
+            for index, market_type in enumerate(market_types):
+                market_found = get_market(new_event['markets'], 'name', market_type)
+                if market_found is None:
+                    markets.insert(index, [])
+                else:
+                    outcomes = []
+                    for selection in market_found['selections']: 
+                        outcomes.append({
+                            'name': selection['name'],
+                            'original_name': selection['name'],
+                            'price': selection['price']
+                        })
+                    market_data = {
+                        'outcomes': outcomes,
+                        'name': market_type
+                    }
+
+                    markets.insert(index, market_data)
+
+            event_data['bookmakers'][len(event_data['bookmakers']) - 1]['markets'] = markets
 
             aggregate_data['events'].append(event_data)
         
@@ -213,7 +247,7 @@ def get_matched_event(new_event, existing_events):
     event_names = [existing_event['name'] for existing_event in existing_events]
     events_found = process.extract(new_event['name'], event_names, limit=10, scorer = fuzz.token_set_ratio)
 
-    number_of_outcomes = len(new_event['selections'])
+    number_of_outcomes = len(new_event['markets'][0]['selections'])
     second_outcome_idx = 1 if number_of_outcomes == 2 else 2
 
     for event in events_found:
@@ -222,9 +256,9 @@ def get_matched_event(new_event, existing_events):
 
         if(event[1] > 70 and dates_match(new_event["start_time_ms"], existing_event["start_time_ms"])):
             if(
-                compare_strings_with_ratio(new_event['selections'][0]['name'],  existing_event["bookmakers"][0]['markets'][0]['outcomes'][0]['name'], 0.6) 
+                compare_strings_with_ratio(new_event['markets'][0]['selections'][0]['name'],  existing_event["bookmakers"][0]['markets'][0]['outcomes'][0]['name'], 0.6) 
                 and 
-                compare_strings_with_ratio(new_event['selections'][second_outcome_idx]['name'],  existing_event["bookmakers"][0]['markets'][0]['outcomes'][second_outcome_idx]['name'], 0.6)
+                compare_strings_with_ratio(new_event['markets'][0]['selections'][second_outcome_idx]['name'],  existing_event["bookmakers"][0]['markets'][0]['outcomes'][second_outcome_idx]['name'], 0.6)
             ):
                 return existing_event
     return None   
@@ -234,3 +268,8 @@ def dates_match(date1, date2):
     dif = abs(date1 - date2)
     # if diff is less than 1 hour, consider a match
     return dif <= 3600000
+
+def get_market(markets, field_name, field_value): 
+    if len(markets) == 0 or markets is None:
+        return None
+    return next((obj for obj in markets if obj is not None and obj.get(field_name) == field_value), None)

@@ -50,9 +50,40 @@ class Event:
         self.best_odds = best_odds
         return best_odds
     
-    def arbitrage(self):
+    def find_best_odds_with_market_info(self, market_info):
+        # number of possible outcomes for a sporting event
+        num_outcomes = market_info['number_of_outcomes']
+        self.num_outcomes = num_outcomes
+
+        # finding the best odds for each outcome in each event
+        best_odds = [[None, None, float('-inf')] for _ in range(num_outcomes)]
+        # [Bookmaker, Name, Price]
+
+        bookmakers = self.data['bookmakers']
+        for index, bookmaker in enumerate(bookmakers):
+
+            # skip bookmaker if this does not have this market
+            if not contains_market(bookmaker['markets'], market_info['name']):
+                continue
+            
+            # determing the odds offered by each bookmaker
+            for outcome in range(num_outcomes):
+
+                # determining if any of the bookmaker odds are better than the current best odds
+                bookmaker_odds = float(bookmaker['markets'][market_info['index']]['outcomes'][outcome]['price'])
+                current_best_odds = best_odds[outcome][ODDS_INDEX]
+
+                if bookmaker_odds > current_best_odds:
+                    best_odds[outcome][BOOKMAKER_INDEX] = bookmaker['title']
+                    best_odds[outcome][NAME_INDEX] = bookmaker['markets'][market_info['index']]['outcomes'][outcome]['name']
+                    best_odds[outcome][ODDS_INDEX] = bookmaker_odds
+                    
+        self.best_odds = best_odds
+        return best_odds
+    
+    def arbitrage(self, best_odds):
         total_arbitrage_percentage = 0
-        for odds in self.best_odds:
+        for odds in best_odds:
             total_arbitrage_percentage += (1.0 / odds[ODDS_INDEX])
             
         self.total_arbitrage_percentage = total_arbitrage_percentage
@@ -68,27 +99,27 @@ class Event:
         if total_arbitrage_percentage < 1:
 
             stakes_message = None
-            if len(self.best_odds) == 2:
+            if len(best_odds) == 2:
                 stakes_message = calculate_arbitrage_stakes(100, {
-                    'name': (f"Outcome: {self.best_odds[0][1]} @ {self.best_odds[0][0]} - "),
-                    'odd': self.best_odds[0][2]
+                    'name': (f"Outcome: {best_odds[0][1]} @ {best_odds[0][0]} - "),
+                    'odd': best_odds[0][2]
                     },
                     {
-                    'name': (f"Outcome: {self.best_odds[1][1]} @ {self.best_odds[1][0]} - "),
-                    'odd': self.best_odds[1][2]
+                    'name': (f"Outcome: {best_odds[1][1]} @ {best_odds[1][0]} - "),
+                    'odd': best_odds[1][2]
                     })
             else:
                 stakes_message = calculate_arbitrage_stakes(100, {
-                    'name': (f"Outcome: {self.best_odds[0][1]} @ {self.best_odds[0][0]} - "),
-                    'odd': self.best_odds[0][2]
+                    'name': (f"Outcome: {best_odds[0][1]} @ {best_odds[0][0]} - "),
+                    'odd': best_odds[0][2]
                     },
                     {
-                    'name': (f"Outcome: {self.best_odds[1][1]}] @ {self.best_odds[1][0]} - "),
-                    'odd': self.best_odds[1][2]
+                    'name': (f"Outcome: {best_odds[1][1]}] @ {best_odds[1][0]} - "),
+                    'odd': best_odds[1][2]
                     },
                     {
-                    'name': (f"Outcome: {self.best_odds[2][1]} @ {self.best_odds[2][0]} - "),
-                    'odd': self.best_odds[2][2]
+                    'name': (f"Outcome: {best_odds[2][1]} @ {best_odds[2][0]} - "),
+                    'odd': best_odds[2][2]
                     })
 
             
@@ -127,7 +158,7 @@ class Event:
         self.bet_amounts = bet_amounts
         return bet_amounts
     
-def calculate_arbitrage_stakes(stake, odds_a, odds_b, odds_c = None):
+def calculate_arbitrage_stakes(stake, odds_a, odds_b, odds_c = None):    
     # Calculate the implied probabilities
     implied_prob_a = 1 / odds_a['odd']
     implied_prob_b = 1 / odds_b['odd']
@@ -166,3 +197,7 @@ def calculate_arbitrage_stakes(stake, odds_a, odds_b, odds_c = None):
         output_string += "\n{}{} \nStake: {stake_b:.2f}".format(odds_b['name'], odds_b['odd'], stake_b = stake_b)
 
         return output_string
+    
+def contains_market(markets, name): 
+    found = [market for market in markets if len(market) != 0 and market['name'] == name]
+    return len(found) >= 1
