@@ -232,3 +232,5 @@ venv.bak/
 output/
 input/
 .DS_Store
+
+.idea/
