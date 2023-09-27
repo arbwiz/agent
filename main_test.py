@@ -1,5 +1,5 @@
 from utils import calculate_arbitrage_3_websites
-from data_retrievers.aggregator import merge_data_sets
+from data_retrievers.aggregator import merge_data_sets, get_football_data, get_tennis_data
 from data_retrievers.twentytwobet import twentytwobet_tennis_win_match
 from data_retrievers.esconline import esconline_tennis_win_match_24h
 from data_retrievers.esconline import esconline_football
@@ -88,9 +88,12 @@ async def main():
    #    'name': "name c",
    #    'odd': 5
    #    })
-   result = lebull_tennis()
-   print(result)
-    
+   # result = lebull_tennis()
+   # print(result)
+   await get_football_data()
+   await get_tennis_data()
+
+
 def test():
    aggregated_file = open('output/aggregated_tennis.json')
    betano_file = open('output/esconline_tennis.json')
