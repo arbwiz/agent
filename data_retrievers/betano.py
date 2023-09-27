@@ -74,26 +74,19 @@ def betano_football():
                     event_data['markets'].append(market_data)
 
                 if market['type'] == 'HCTG':
-
-                    if market['handicap'] != 2.5:
+                    if market['handicap'] == 1.5:
+                        market_data_3_5 = create_market(market, 1.5)
+                        event_data['markets'].append(market_data_3_5)
+                        continue
+                    if market['handicap'] == 2.5:
+                        market_data_3_5 = create_market(market, 2.5)
+                        event_data['markets'].append(market_data_3_5)
+                        continue
+                    if market['handicap'] == 3.5:
+                        market_data_3_5 = create_market(market, 3.5)
+                        event_data['markets'].append(market_data_3_5)
                         continue
 
-                    market_data = {
-                        'name': 'total_goals_2.5',
-                        'selections': []
-                    }
-                    
-                    for selection in market['selections']:
-                        market_data['selections'].append({
-                            #adicionar handicap? 
-                            'name': selection['name'],
-                            'price': float(selection['price'])
-                        })
-
-                    if len((market_data['selections'])) != 2:
-                        continue
-                    
-                    event_data['markets'].append(market_data)
 
                 if market['type'] == 'DBLC':
 
@@ -161,3 +154,30 @@ def convert_time(millis):
 def find_market_by_id(markets, id): 
     found = [market for market in markets if market['name'] == id]
     return found[0] if len(found) == 1 else None
+
+def create_market(market, handicap):    
+    market_data = {
+        'name': 'total_goals_' + str(handicap),
+        'selections': []
+    }
+    
+    for selection in market['selections']:
+        market_data['selections'].append({
+            #adicionar handicap? 
+            'name': selection['name'],
+            'price': float(selection['price'])
+        })
+
+    if len((market_data['selections'])) != 2:
+        return None
+    
+    return market_data
+
+def request_events(market_type_id):
+    url = ("https://offer.cdn.begmedia.com/api/pub/v4/sports/1?application=1024&countrycode=pt&hasSwitchMtc=true&language=pt&limit=300&markettypeId=" + 
+           str(market_type_id) + 
+           "&offset=0&sitecode=ptpt&sortBy=ByLiveRankingPreliveDate")
+    
+    result = requests.get(url)
+    resultDict = json.loads(result.content)
+    return resultDict['matches']

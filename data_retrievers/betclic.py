@@ -49,8 +49,6 @@ def betclic_football():
         total_goals_event = find_event_by_id(total_goals_events, event['id'])
         double_results_event = find_event_by_id(double_result_events, event['id'])
 
-        
-
         event_data = {
             'bookmaker': 'betclic',
             'name': event['name'],
@@ -79,8 +77,13 @@ def get_markets(h2h_event, total_goal_event, double_result_event):
                 markets.append(market)
 
     if total_goal_event is not None:
-        total_goals_market = get_total_goals_market(total_goal_event)
-        markets.append(total_goals_market)
+        total_goals_market_1_5 = get_total_goals_market(total_goal_event, 1.5)
+        total_goals_market_2_5 = get_total_goals_market(total_goal_event, 2.5)
+        total_goals_market_3_5 = get_total_goals_market(total_goal_event, 3.5)
+
+        markets.append(total_goals_market_1_5)
+        markets.append(total_goals_market_2_5)
+        markets.append(total_goals_market_3_5)
     
     return markets
 
@@ -119,7 +122,7 @@ def get_h2h_market(event):
     
     return market
 
-def get_total_goals_market(event):
+def get_total_goals_market(event, handicap):
     if len(event['grouped_markets']) == 0 or len(event['grouped_markets'][0]['markets']) == 0:
         return None
 
@@ -127,7 +130,7 @@ def get_total_goals_market(event):
         return None
 
     market = {
-        'name': 'total_goals_2.5',
+        'name': 'total_goals_' + str(handicap),
         'selections': []
     }
 
@@ -135,7 +138,7 @@ def get_total_goals_market(event):
         if len(selection) == 0:
             break
 
-        if '2.5' not in selection['name']:
+        if str(handicap) not in selection['name']:
             break
 
         market['selections'].append({

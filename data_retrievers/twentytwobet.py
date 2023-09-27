@@ -92,6 +92,12 @@ def twentytwobet_football():
             continue
         event_data['markets'] = [market_data]
         
+        over_under_markets = get_total_over_under_goals_markets(event)
+
+        for m in over_under_markets:
+             event_data['markets'].append(m)
+
+
         events.append(event_data)
     return events
 
@@ -102,3 +108,82 @@ def convert_time(seconds):
 def find_market_by_id(markets, id): 
     found = [market for market in markets if market['name'] == id]
     return found[0] if len(found) == 1 else None
+
+def get_total_over_under_goals_markets(event):
+    selections_1_5 = []
+    selections_2_5 = []
+    selections_3_5 = []
+
+    for selection in event['E']:
+
+        if 'P' in selection:
+            if selection['P'] == 1.5:
+                selections_1_5.append(selection)
+            
+            elif selection['P'] == 2.5:
+                selections_2_5.append(selection)
+
+            elif selection['P'] == 3.5:
+                selections_3_5.append(selection)
+        else:
+            continue
+
+    markets = []
+
+    if(len(selections_1_5) == 2):
+
+        market_data_1_5 = {
+            'name': 'total_goals_1.5',
+            'selections': []
+        }
+
+        market_data_1_5['selections'].insert(0, ({
+                        'name': 'Acima de 1.5',
+                        'price': float(selections_1_5[0]['C'])
+                    }))
+        
+        market_data_1_5['selections'].insert(1, ({
+                        'name': 'Abaixo de 1.5',
+                        'price': float(selections_1_5[1]['C'])
+                    }))
+        
+        markets.append(market_data_1_5)
+
+    if(len(selections_2_5) == 2):
+
+        market_data_2_5 = {
+            'name': 'total_goals_2.5',
+            'selections': []
+        }
+
+        market_data_2_5['selections'].insert(0, ({
+                        'name': 'Acima de 2.5',
+                        'price': float(selections_2_5[0]['C'])
+                    }))
+        
+        market_data_2_5['selections'].insert(1, ({
+                        'name': 'Abaixo de 2.5',
+                        'price': float(selections_2_5[1]['C'])
+                    }))
+        
+        markets.append(market_data_2_5)
+        
+    if(len(selections_3_5) == 2):
+
+        market_data_3_5 = {
+            'name': 'total_goals_3.5',
+            'selections': []
+        }
+
+        market_data_3_5['selections'].insert(0, ({
+                        'name': 'Acima de 3.5',
+                        'price': float(selections_3_5[0]['C'])
+                    }))
+        
+        market_data_3_5['selections'].insert(1, ({
+                        'name': 'Abaixo de 3.5',
+                        'price': float(selections_3_5[1]['C'])
+                    }))
+        
+        markets.append(market_data_3_5)
+    return markets

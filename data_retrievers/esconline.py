@@ -70,26 +70,20 @@ async def esconline_football():
 
         event_data['markets'].append(market_data)
 
-      if market['BetType'] == 'total-OverUnder':
-
-        if market['Base'] != 2.5:
-           continue
+      if market['BetType'] == 'total-OverUnder':   
         
-        market_data = {
-          'name': 'total_goals_2.5',
-          'selections': []
-        }
-
-        for outcome in market['OutcomeItems']:
-          market_data['selections'].append({
-              'name': outcome['Name'] + ' ' + str(outcome['Base']),
-              'price': outcome['Odd']
-          })
-        
-        if len(market_data['selections']) != 2:
-          continue  
-
-        event_data['markets'].append(market_data)
+        if market['Base'] == 1.5:
+            market_data_3_5 = create_market(market, 1.5)
+            event_data['markets'].append(market_data_3_5)
+            continue
+        if market['Base'] == 2.5:
+            market_data_3_5 = create_market(market, 2.5)
+            event_data['markets'].append(market_data_3_5)
+            continue
+        if market['Base'] == 3.5:
+            market_data_3_5 = create_market(market, 3.5)
+            event_data['markets'].append(market_data_3_5)
+            continue
 
       if market['BetType'] == '1X12X2':
         h2h_market = find_market_by_id(event_data['markets'], 'h2h')
@@ -193,3 +187,20 @@ def convert_time(isoFormat):
 def find_market_by_id(markets, id): 
     found = [market for market in markets if market['name'] == id]
     return found[0] if len(found) == 1 else None
+
+def create_market(market, handicap):    
+    market_data = {
+        'name': 'total_goals_' + str(handicap),
+        'selections': []
+    }
+    
+    for outcome in market['OutcomeItems']:
+          market_data['selections'].append({
+              'name': outcome['Name'] + ' ' + str(outcome['Base']),
+              'price': outcome['Odd']
+          })
+
+    if len((market_data['selections'])) != 2:
+        return None
+    
+    return market_data
