@@ -40,17 +40,9 @@ def handle_football(odds_response):
         event.arbitrage(best_odds6)
         event.arbitrage(best_odds7)
 
-    # for event in arbitrage_events:
-    #    event.calculate_arbitrage_bets()
-    #    event.convert_decimal_to_american()
-
 
 def handle_tennis(odds_response):
     for data in odds_response:
         event = Event(data)
         best_odds = event.find_best_odds()
         event.arbitrage(best_odds)
-
-    # for event in arbitrage_events:
-    #    event.calculate_arbitrage_bets()
-    #    event.convert_decimal_to_american()

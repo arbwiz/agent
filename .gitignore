@@ -232,3 +232,8 @@ venv.bak/
 output/
 input/
 .DS_Store
+/.idea/.gitignore
+/.idea/ArbWiz.iml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/vcs.xml

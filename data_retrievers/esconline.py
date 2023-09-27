@@ -17,19 +17,22 @@ async def esconline_tennis_win_match_24h():
     event_data = {
         'bookmaker': 'esconline',
         'name': event['EventName'].replace(':', '-'),
-        'selections': [],
+        'markets': [{
+            'name': 'h2h',
+            'selections': []
+        }],
         'start_time': event['StartDate'],
         'start_time_ms': round(convert_time(event['StartDate']))
     }
     for market in event['MarketItems']:
       if market['MarketName'] == 'Vencedor':
         for outcome in market['OutcomeItems']:
-          event_data['selections'].append({
+          event_data['markets'][0]['selections'].append({
               'name': outcome['Name'],
               'price': outcome['Odd']
           })
         break
-    if len(event_data['selections']) != 2:
+    if len(event_data['markets'][0]['selections']) != 2:
          continue    
     events.append(event_data)
   return events

@@ -20,18 +20,21 @@ def betano_tennis_win_match_24h():
             event_data = {
                 'bookmaker': 'betano',
                 'name': event['name'],
-                'selections': [],
+                'markets': [{
+                    'name': 'h2h',
+                    'selections': []
+                }],
                 'start_time': str(convert_time(event['startTime'])),
                 'start_time_ms': event['startTime']
             }
             for market in event['markets']:
                 if market['name'] == 'Vencedor':
                     for selection in market['selections']:
-                        event_data['selections'].append({
+                        event_data['markets'][0]['selections'].append({
                             'name': selection['name'],
                             'price': float(selection['price'])
                         })
-            if len(event_data['selections']) != 2:
+            if len(event_data['markets'][0]['selections']) != 2:
                 continue
             events.append(event_data)
         return events

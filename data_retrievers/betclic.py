@@ -14,7 +14,10 @@ def betclic_tennis_win_match():
         event_data = {
             'bookmaker': 'betclic',
             'name': event['name'],
-            'selections': [],
+            'markets': [{
+                'name': 'h2h',
+                'selections': []
+            }],
             'start_time': event['date'],
             'start_time_ms': round(convert_time(event['date']))
         }
@@ -26,11 +29,11 @@ def betclic_tennis_win_match():
             if len(selection) == 0:
                 break
 
-            event_data['selections'].append({
+            event_data['markets'][0]['selections'].append({
                 'name': selection[0]['name'],
                 'price': float(selection[0]['odds'])
             })
-        if len(event_data['selections']) != 2:
+        if len(event_data['markets'][0]['selections']) != 2:
             continue
         events.append(event_data)
     return events
