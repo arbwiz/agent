@@ -20,6 +20,7 @@ def handle_football(odds_response):
     for data in odds_response:
         event = (Event(data))
         
+        # check why there are errors on logs
         best_odds1 = event.find_best_odds_with_market_info({'name': 'h2h', 'index': 0, 'number_of_outcomes': 3})
         best_odds2 = event.find_best_odds_with_market_info({'name': 'total_goals_1.5', 'index': 1, 'number_of_outcomes': 2})
         best_odds3 = event.find_best_odds_with_market_info({'name': 'total_goals_2.5', 'index': 2, 'number_of_outcomes': 2})
