@@ -48,6 +48,9 @@ def betclic_football():
     for event in h2h_events:
         if event['is_live'] == 'true':
             continue
+
+        if len(event['grouped_markets']) == 0 or len(event['grouped_markets'][0]['markets']) == 0:
+            continue
         
         total_goals_event = find_event_by_id(total_goals_events, event['id'])
         double_results_event = find_event_by_id(double_result_events, event['id'])
