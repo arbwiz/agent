@@ -20,7 +20,7 @@ from data_retrievers.lebull import lebull_football
 from data_retrievers.bwin import bwin_football
 from model.event import calculate_arbitrage_stakes
 from model.event import Event
-
+from data_retrievers.solverde import solverde_tennis
 
 async def main():
     # betano_data = [
@@ -152,9 +152,10 @@ async def main():
     #     if event.arbitrage():
     #         arbitrage_events.append(event)
 
-    comps_ids = get_competition_ids()
+    #comps_ids = get_competition_ids()
 
-    events = get_events_from_competitions(comps_ids)
+    #events = get_events_from_competitions(comps_ids)
+    await solverde_tennis()
 
 
 def test():

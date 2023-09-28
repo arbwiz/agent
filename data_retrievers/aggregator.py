@@ -51,6 +51,7 @@ async def get_tenis_data():
 async def get_football_data():
     betano = betano_football()
 
+
     with open("output/betano.json", 'w') as outfile:
         outfile.write(json.dumps(betano, indent=4))
 
@@ -79,6 +80,8 @@ async def get_football_data():
 
     data = aggregate_data([betclic, betano, esconline, twentytwo, lebull, bwin], 'football')
 
+    #insert_documents(data)
+
     with open("output/aggregated.json", 'w') as outfile:
         outfile.write(json.dumps(data, indent=4))
 
@@ -106,6 +109,9 @@ def merge_data_sets(aggregate_data, new_data, sport_name):
 
             if matched_event is not None:
                 event = matched_event
+
+                if has_bookmaker_title(event, new_event['bookmaker']):
+                    continue
 
                 event['bookmakers'].append({
                     'markets': [],
@@ -294,3 +300,19 @@ def get_market(markets, field_name, field_value):
     if len(markets) == 0 or markets is None:
         return None
     return next((obj for obj in markets if obj is not None and obj.get(field_name) == field_value), None)
+
+def has_bookmaker_title(event, bookmaker_title):
+    """Checks if the given event has a bookmaker with the given title.
+
+    Args:
+      event: A dictionary representing an event.
+      bookmaker_title: The title of the bookmaker to check for.
+
+    Returns:
+      True if the event has a bookmaker with the given title, False otherwise.
+    """
+
+    for bookmaker in event["bookmakers"]:
+        if bookmaker["title"] == bookmaker_title:
+            return True
+    return False
