@@ -14,6 +14,8 @@ from data_retrievers.lebull import lebull_football
 
 from data_retrievers.bwin import bwin_football
 
+from data_retrievers.solverde import solverde_tennis
+
 from thefuzz import process, fuzz
 import time
 import json
@@ -40,7 +42,11 @@ async def get_tenis_data():
     with open("output/esconline_tennis.json", 'w') as outfile:
         outfile.write(json.dumps(esconline, indent=4))
 
-    data = aggregate_data([betclic, betano, esconline, twentytwo], 'tennis')
+    solverde = await solverde_tennis()
+    with open("output/solverde_tennis.json", 'w') as outfile:
+        outfile.write(json.dumps(solverde, indent=4))
+
+    data = aggregate_data([betclic, betano, esconline, twentytwo, solverde], 'tennis')
 
     with open("output/aggregated_tennis.json", 'w') as outfile:
         outfile.write(json.dumps(data, indent=4))

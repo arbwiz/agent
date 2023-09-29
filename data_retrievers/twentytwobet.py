@@ -6,9 +6,13 @@ blacklisted_outcome1 = ['Home (Apostas especiais)', 'Equipa da Casa']
 blacklisted_outcome2 = ['Convidados (especial)', 'Equipa visitante']
 
 blacklisted_comp_ids = [2150631, 2590430, 2390706, 2322382, 2498900]
+whitelisted_comp_ids = [7067, 8777, 11113, 12821, 12829, 13521, 13709, 16819, 17555, 26031, 27687, 27707, 27731, 28787,
+                        30467, 88637, 96463, 105759, 109313, 110163, 118663, 118737, 127733, 166251, 211661, 214147,
+                        225733, 281719, 828065, 1015483, 1268397, 1471313, 2018750, 2151274, 2284664, 2421233]
 
 
 def twentytwobet_tennis_win_match():
+
     comps_ids = get_competition_ids('tennis')
 
     result_events = get_events_from_competitions(comps_ids, 'tennis')
@@ -300,7 +304,7 @@ def get_competition_ids(sport):
     for comp in comps:
         # if number of games in comp is higher than 15, consider relevant to request
 
-        if comp['LI'] in blacklisted_comp_ids:
+        if comp['LI'] not in whitelisted_comp_ids:
             continue
 
         number_of_games += comp['GC']
