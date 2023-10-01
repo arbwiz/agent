@@ -282,6 +282,9 @@ def get_matched_event(new_event, existing_events):
         idx = event_names.index(event[0])
         existing_event = existing_events[idx]
 
+        if 'outcomes' not in existing_event["bookmakers"][0]['markets'][0]:
+            continue
+        
         if (event[1] > 70 and dates_match(new_event["start_time_ms"], existing_event["start_time_ms"])):
             if (
                     compare_strings_with_ratio(new_event['markets'][0]['selections'][0]['name'],

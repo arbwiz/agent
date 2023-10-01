@@ -3,6 +3,7 @@ import asyncio
 import random
 import time
 from notifications.telegram import send_telegram_message
+import traceback
 
 
 async def main():
@@ -40,7 +41,7 @@ async def execute():
 
         except Exception as ex:
             print('football exception')
-            print(str(ex))
+            traceback.print_exc()
 
         await asyncio.sleep(5)
 
@@ -55,7 +56,7 @@ async def execute():
 
         except Exception as ex:
             print('tennis exception')
-            print(str(ex))
+            traceback.print_exc()
         # Schedule the task to be run again in 40-70 seconds
         seconds_to_wait = random.randint(123, 341)
         await asyncio.sleep(seconds_to_wait)

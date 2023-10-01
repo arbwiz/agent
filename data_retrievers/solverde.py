@@ -42,6 +42,9 @@ async def retrieve_info_websocket(sport_id):
             event_dict = json.loads(
                 event_response[event_response.find("{"):event_response.rfind("}") + 1].replace("\\", ""))
 
+            if 'name' not in event_dict or 'startTime' not in event_dict:
+                continue
+
             event_data = {
                 'bookmaker': 'solverde',
                 'name': event_dict['name'],
@@ -53,12 +56,18 @@ async def retrieve_info_websocket(sport_id):
                 'start_time_ms': round(convert_time(event_dict['startTime']))
             }
 
+            if id_to_get_winner_market not in event_dict['marketTypesToIds']:
+                continue
+
             market_id = event_dict['marketTypesToIds'][id_to_get_winner_market][0]
             await ws.send(single_market_message_template.format(market_id=market_id))
             market_response = await ws.recv()
 
             market = json.loads(
                 market_response[market_response.find("{"):market_response.rfind("}") + 1].replace("\\", ""))
+
+            if 'selections' not in market:
+                continue
 
             for selection in market['selections']:
                 event_data['markets'][0]['selections'].append({
