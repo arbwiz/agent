@@ -2,9 +2,13 @@ import requests
 import json
 import datetime
 
-def betclic_tennis_win_match(): 
-    result = requests.get("https://offer.cdn.begmedia.com/api/pub/v4/sports/2?application=1024&countrycode=pt&hasSwitchMtc=true&language=pt&limit=150&markettypeId=2013&offset=0&sitecode=ptpt&sortBy=ByLiveRankingPreliveDate")
-    
+from data_retrievers.common import is_valid_football_event, is_valid_tennis_event
+
+
+async def betclic_tennis_win_match():
+    result = requests.get(
+        "https://offer.cdn.begmedia.com/api/pub/v4/sports/2?application=1024&countrycode=pt&hasSwitchMtc=true&language=pt&limit=150&markettypeId=2013&offset=0&sitecode=ptpt&sortBy=ByLiveRankingPreliveDate")
+
     resultDict = json.loads(result.content)
 
     events = []
@@ -33,13 +37,13 @@ def betclic_tennis_win_match():
                 'name': selection[0]['name'],
                 'price': float(selection[0]['odds'])
             })
-        if len(event_data['markets'][0]['selections']) != 2:
-            continue
-        events.append(event_data)
+        if is_valid_tennis_event(event_data):
+            events.append(event_data)
     return events
 
-def betclic_football(): 
-    # should make this async
+
+async def betclic_football():
+    print('betclic started')
     h2h_events = request_events(1365)
     total_goals_events = request_events(411)
     double_result_events = request_events(1348)
@@ -51,7 +55,7 @@ def betclic_football():
 
         if len(event['grouped_markets']) == 0 or len(event['grouped_markets'][0]['markets']) == 0:
             continue
-        
+
         total_goals_event = find_event_by_id(total_goals_events, event['id'])
         double_results_event = find_event_by_id(double_result_events, event['id'])
 
@@ -63,11 +67,11 @@ def betclic_football():
             'start_time_ms': round(convert_time(event['date']))
         }
 
-        if len(event_data['markets']) == 0:
-            continue
-        
-        events.append(event_data)
+        if is_valid_football_event(event_data):
+            events.append(event_data)
+    print('betclic finished')
     return events
+
 
 def get_markets(h2h_event, total_goal_event, double_result_event):
     markets = []
@@ -90,17 +94,20 @@ def get_markets(h2h_event, total_goal_event, double_result_event):
         markets.append(total_goals_market_1_5)
         markets.append(total_goals_market_2_5)
         markets.append(total_goals_market_3_5)
-    
+
     return markets
 
+
 def request_events(market_type_id):
-    url = ("https://offer.cdn.begmedia.com/api/pub/v4/sports/1?application=1024&countrycode=pt&hasSwitchMtc=true&language=pt&limit=300&markettypeId=" + 
-           str(market_type_id) + 
-           "&offset=0&sitecode=ptpt&sortBy=ByLiveRankingPreliveDate")
-    
+    url = (
+                "https://offer.cdn.begmedia.com/api/pub/v4/sports/1?application=1024&countrycode=pt&hasSwitchMtc=true&language=pt&limit=300&markettypeId=" +
+                str(market_type_id) +
+                "&offset=0&sitecode=ptpt&sortBy=ByLiveRankingPreliveDate")
+
     result = requests.get(url)
     resultDict = json.loads(result.content)
     return resultDict['matches']
+
 
 def get_h2h_market(event):
     market = {
@@ -111,9 +118,10 @@ def get_h2h_market(event):
     if len(event['grouped_markets']) == 0 or len(event['grouped_markets'][0]['markets']) == 0:
         return None
 
-    if event['grouped_markets'][0]['markets'][0]['market_type_code'] != 'Ftb_Mr3' or len(event['grouped_markets'][0]['markets'][0]['selections']) != 3:
+    if event['grouped_markets'][0]['markets'][0]['market_type_code'] != 'Ftb_Mr3' or len(
+            event['grouped_markets'][0]['markets'][0]['selections']) != 3:
         return None
-    
+
     for selection in event['grouped_markets'][0]['markets'][0]['selections']:
         if len(selection) == 0:
             break
@@ -125,14 +133,16 @@ def get_h2h_market(event):
 
     if len(market['selections']) != 3:
         return None
-    
+
     return market
+
 
 def get_total_goals_market(event, handicap):
     if len(event['grouped_markets']) == 0 or len(event['grouped_markets'][0]['markets']) == 0:
         return None
 
-    if event['grouped_markets'][0]['markets'][0]['market_type_code'] != 'Ftb_10' or len(event['grouped_markets'][0]['markets'][0]['selections'][0]) != 2:
+    if event['grouped_markets'][0]['markets'][0]['market_type_code'] != 'Ftb_10' or len(
+            event['grouped_markets'][0]['markets'][0]['selections'][0]) != 2:
         return None
 
     market = {
@@ -154,17 +164,18 @@ def get_total_goals_market(event, handicap):
 
     if len(market['selections']) != 2:
         return None
-    
+
     return market
 
+
 def get_double_result_markets(event, h2h_market):
-    
     if len(event['grouped_markets']) == 0 or len(event['grouped_markets'][0]['markets']) == 0:
         return []
-    
-    if event['grouped_markets'][0]['markets'][0]['market_type_code'] != 'Ftb_Dbc' or len(event['grouped_markets'][0]['markets'][0]['selections']) != 3:
+
+    if event['grouped_markets'][0]['markets'][0]['market_type_code'] != 'Ftb_Dbc' or len(
+            event['grouped_markets'][0]['markets'][0]['selections']) != 3:
         return []
-    
+
     market = {
         'name': '1x 2',
         'selections': [
@@ -209,13 +220,15 @@ def get_double_result_markets(event, h2h_market):
 
     if len(market['selections']) != 2 or len(market2['selections']) != 2 or len(market3['selections']) != 2:
         return None
-    
+
     return [market, market2, market3]
+
 
 def convert_time(isoFormat):
     dt = datetime.datetime.fromisoformat(isoFormat)
-    return(dt.timestamp()*1000)
+    return (dt.timestamp() * 1000)
 
-def find_event_by_id(events, id): 
+
+def find_event_by_id(events, id):
     found = [event for event in events if event['id'] == id]
     return found[0] if len(found) == 1 else None

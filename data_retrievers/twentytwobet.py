@@ -2,6 +2,8 @@ import requests
 import json
 import datetime
 
+from data_retrievers.common import is_valid_tennis_event, is_valid_football_event
+
 blacklisted_outcome1 = ['Home (Apostas especiais)', 'Equipa da Casa']
 blacklisted_outcome2 = ['Convidados (especial)', 'Equipa visitante']
 
@@ -11,7 +13,7 @@ whitelisted_comp_ids = [7067, 8777, 11113, 12821, 12829, 13521, 13709, 16819, 17
                         225733, 281719, 828065, 1015483, 1268397, 1471313, 2018750, 2151274, 2284664, 2421233]
 
 
-def twentytwobet_tennis_win_match():
+async def twentytwobet_tennis_win_match():
 
     comps_ids = get_competition_ids('tennis')
 
@@ -45,15 +47,15 @@ def twentytwobet_tennis_win_match():
                     'price': float(selection['C'])
                 })
 
-        if len(market_data['selections']) != 2:
-            continue
         event_data['markets'] = [market_data]
 
-        events.append(event_data)
+        if is_valid_tennis_event(event_data):
+            events.append(event_data)
     return events
 
 
-def twentytwobet_football():
+async def twentytwobet_football():
+    print('22bet started')
     # only retrieves 50 events and no pagination
     # result = requests.get(
     #    "https://22win88.com/LineFeed/Get1x2_VZip?sports=1&count=300&lng=pt&tf=3000000&tz=1&mode=4&country=148"
@@ -116,7 +118,9 @@ def twentytwobet_football():
         for dr_market in double_results_markets:
             event_data['markets'].append(dr_market)
 
-        events.append(event_data)
+        if is_valid_football_event(event_data):
+            events.append(event_data)
+    print('22bet finished')
     return events
 
 

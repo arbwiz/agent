@@ -1,8 +1,9 @@
-
 import requests
 import json
 import datetime
 import brotli
+
+from data_retrievers.common import is_valid_tennis_event, is_valid_football_event
 
 SPORT_ID_TENNIS = '5'
 SPORT_ID_FOOTBALL = '4'
@@ -13,7 +14,7 @@ BWIN_URL = "https://sports.bwin.pt/cds-api/bettingoffer/fixtures?x-bwin-accessid
            "=Tags "
 
 
-def bwin_tennis():
+async def bwin_tennis():
     url = BWIN_URL.replace('SPORT_ID', SPORT_ID_TENNIS)
 
     headers = {
@@ -47,7 +48,10 @@ def bwin_tennis():
         event_data = {
             'bookmaker': 'bwin',
             'name': event['name']['value'],
-            'selections': [],
+            'markets': [{
+                'name': 'h2h',
+                'selections': []
+            }],
             'start_time': event['startDate'],
             'start_time_ms': round(convert_time(event['startDate']))
         }
@@ -55,22 +59,20 @@ def bwin_tennis():
         for game in event['games']:
             if game['name']['value'] == 'Vencedor do jogo':
                 for selection in game['results']:
-                    event_data['selections'].append({
+                    event_data['markets'][0]['selections'].append({
                         'name': selection['name']['value'],
                         'price': float(selection['odds'])
                     })
             break
 
-        if len(event_data['selections']) != 2:
-            continue
-        events.append(event_data)
+        if is_valid_tennis_event(event_data):
+            events.append(event_data)
     return events
 
 
-def bwin_football():
-    
+async def bwin_football():
+    print('bwin started')
     url = "https://sports.bwin.pt/cds-api/bettingoffer/fixtures?x-bwin-accessid=YmQwNTFkNDAtNzM3Yi00YWIyLThkNDYtYWFmNGY2N2Y1OWIx&lang=pt&country=PT&userCountry=PT&fixtureTypes=Standard&state=Latest&offerMapping=Filtered&offerCategories=Gridable&fixtureCategories=Gridable&sportIds=4&regionIds=&competitionIds=&conferenceIds=&isPriceBoost=false&statisticsModes=None&skip=0&take=100&sortBy=Tags"
-
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
@@ -88,11 +90,11 @@ def bwin_football():
         'Connection': 'keep-alive',
         'X-Requested-With': 'XMLHttpRequest'
     }
-    
+
     response = requests.get(url, headers=headers)
 
     res_dict = json.loads(response.content)
-    
+
     bwin_events = res_dict['fixtures']
 
     events = []
@@ -125,14 +127,18 @@ def bwin_football():
         if len(market_data['selections']) != 3:
             continue
         event_data['markets'] = [market_data]
-        events.append(event_data)
+
+        if is_valid_football_event(event_data):
+            events.append(event_data)
+    print('bwin finished')
     return events
 
 
-def convert_time(isoFormat):
-    dt = datetime.datetime.fromisoformat(isoFormat)
-    return(dt.timestamp()*1000)
+def convert_time(iso_format):
+    dt = datetime.datetime.fromisoformat(iso_format)
+    return dt.timestamp() * 1000
 
-def find_market_by_id(markets, id): 
+
+def find_market_by_id(markets, id):
     found = [market for market in markets if market['name'] == id]
     return found[0] if len(found) == 1 else None

@@ -2,31 +2,43 @@ import websockets
 import json
 import datetime
 
+from data_retrievers.common import is_valid_tennis_event, is_valid_football_event
+
 
 async def solverde_tennis():
-    tenis_code = "067"
-    return await retrieve_info_websocket(tenis_code)
+    tenis_url = "wss://sportswidget.solverde.pt/api/980/qrvp3bgt/websocket"
+    tennis_events_message = "[\"SUBSCRIBE\\nid:\/api\/eventgroups\/tennis-custom-span-48h-events\\nlocale:pt\\ndestination:\/api\/eventgroups\/tennis-custom-span-48h-events\\n\\n\\u0000\"]"
+    # tennis h2h market is 97
+    id_to_get_winner_market = "97"
+    return await retrieve_info_websocket(tenis_url, id_to_get_winner_market, tennis_events_message, 'tennis')
 
 
-async def retrieve_info_websocket(sport_id):
-    ws = await websockets.connect(f"wss://sportswidget.solverde.pt/api/{sport_id}/j5uargcx/websocket", max_size=5000000)
+async def solverde_football():
+    print('solverde started')
+    football_url = "wss://sportswidget.solverde.pt/api/067/j5uargcx/websocket"
+    football_events_message = "[\"SUBSCRIBE\\nid:\/api\/eventgroups\/soccer-custom-span-48h-events\\nlocale:pt\\ndestination:\/api\/eventgroups\/soccer-custom-span-48h-events\\n\\n\\u0000\"]"
+    # tennis h2h market is 1
+    id_to_get_winner_market = "1"
+    data = await retrieve_info_websocket(football_url, id_to_get_winner_market, football_events_message, 'football')
+    print('solverde finished')
+    return data
+
+
+async def retrieve_info_websocket(url, id_to_get_winner_market, events_message, sport):
+    ws = await websockets.connect(url, max_size=5000000)
     await ws.recv()
 
     init_message = "[\"CONNECT\\nprotocol-version:1.5\\naccept-version:1.0,1.1,1.2\\nheart-beat:10000,10000\\n\\n\\u0000\"]"
     init_message_2 = "[\"SUBSCRIBE\\nid:\/user\/request-response\\ndestination:\/user\/request-response\\n\\n\\u0000\"]"
-    tennis_events_message = "[\"SUBSCRIBE\\nid:\/api\/eventgroups\/tennis-custom-span-48h-events\\nlocale:pt\\ndestination:\/api\/eventgroups\/tennis-custom-span-48h-events\\n\\n\\u0000\"]"
     single_event_message_template = "[\"SUBSCRIBE\\nid:\/api\/events\/{event_id}\\nlocale:pt\\ndestination:\/api\/events\/{event_id}\\n\\n\\u0000\"]"
     single_market_message_template = "[\"SUBSCRIBE\\nid:\/api\/markets\/{market_id}\\nlocale:pt\\ndestination:\/api/markets\/{market_id}\\n\\n\\u0000\"]"
-
-    # h2h market is 97
-    id_to_get_winner_market = "97"
 
     await ws.send(init_message)
     data1 = await ws.recv()
     await ws.send(init_message_2)
     data2 = await ws.recv()
 
-    await ws.send(tennis_events_message)
+    await ws.send(events_message)
     events_response = await ws.recv()
     events = json.loads(events_response[events_response.find("{"):events_response.rfind("}") + 1].replace("\\", ""))
 
@@ -75,19 +87,16 @@ async def retrieve_info_websocket(sport_id):
                     'price': float(selection['prices'][0]['decimalLabel'])
                 })
 
-            if len(event_data['markets'][0]['selections']) != 2:
-                continue
-
-            events_to_return.append(event_data)
+            if sport == 'tennis':
+                if is_valid_tennis_event(event_data):
+                    events_to_return.append(event_data)
+            elif sport == 'football':
+                if is_valid_football_event(event_data):
+                    events_to_return.append(event_data)
 
     return events_to_return
 
 
-def convert_time(isoFormat):
-    dt = datetime.datetime.fromisoformat(isoFormat)
-    return (dt.timestamp() * 1000)
-
-
-def convert_time(isoFormat):
-    dt = datetime.datetime.fromisoformat(isoFormat)
-    return (dt.timestamp() * 1000)
+def convert_time(iso_format):
+    dt = datetime.datetime.fromisoformat(iso_format)
+    return dt.timestamp() * 1000

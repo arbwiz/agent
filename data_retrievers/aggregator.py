@@ -14,7 +14,7 @@ from data_retrievers.lebull import lebull_football, lebull_tennis
 
 from data_retrievers.bwin import bwin_football, bwin_tennis
 
-from data_retrievers.solverde import solverde_tennis
+from data_retrievers.solverde import solverde_tennis, solverde_football
 
 from thefuzz import process, fuzz
 import time
@@ -22,31 +22,59 @@ import json
 from datetime import datetime
 from utils import market_types
 
+import asyncio
+
 from utils import compare_strings_with_ratio
 
-async def get_tennis_data():
-    betano = betano_tennis_win_match_24h()
-    betclic = betclic_tennis_win_match()
-    twentytwo = twentytwobet_tennis_win_match()
-    esconline = await esconline_tennis_win_match_24h()
-    lebull = lebull_tennis()
-    bwin = bwin_tennis()
-    data = aggregate_data([betclic, betano, esconline, twentytwo, bwin, lebull], 'tennis')
 
-    await generate_output_files(betano, betclic, bwin, data, esconline, lebull, twentytwo, 'tennis')
+async def get_tennis_data():
+
+    solverde_t = asyncio.create_task(solverde_tennis())
+    twentytwo_t = asyncio.create_task(twentytwobet_tennis_win_match())
+    esconline_t = asyncio.create_task(esconline_tennis_win_match_24h())
+    betano_t = asyncio.create_task(betano_tennis_win_match_24h())
+    betclic_t = asyncio.create_task(betclic_tennis_win_match())
+    lebull_t = asyncio.create_task(lebull_tennis())
+    bwin_t = asyncio.create_task(bwin_tennis())
+
+
+    betano = await betano_t
+    betclic = await betclic_t
+    twentytwo = await twentytwo_t
+    esconline = await esconline_t
+    lebull = await lebull_t
+    bwin = await bwin_t
+    solverde = await solverde_t
+
+    data = aggregate_data([betclic, betano, esconline, twentytwo, bwin, lebull, solverde], 'tennis')
+
+    await generate_output_files(betano, betclic, bwin, data, esconline, lebull, twentytwo, solverde, 'tennis')
     return data
+
 
 async def get_football_data():
-    betano = betano_football()
-    betclic = betclic_football()
-    twentytwo = twentytwobet_football()
-    esconline = await esconline_football()
-    lebull = lebull_football()
-    bwin = bwin_football()
-    data = aggregate_data([betclic, betano, esconline, twentytwo, lebull, bwin], 'football')
 
-    await generate_output_files(betano, betclic, bwin, data, esconline, lebull, twentytwo, 'football')
+    solverde_t = asyncio.create_task(solverde_football())
+    twentytwo_t = asyncio.create_task(twentytwobet_football())
+    esconline_t = asyncio.create_task(esconline_football())
+    betano_t = asyncio.create_task(betano_football())
+    betclic_t = asyncio.create_task(betclic_football())
+    lebull_t = asyncio.create_task(lebull_football())
+    bwin_t = asyncio.create_task(bwin_football())
+
+    solverde = await solverde_t
+    betano = await betano_t
+    betclic = await betclic_t
+    twentytwo = await twentytwo_t
+    esconline = await esconline_t
+    lebull = await lebull_t
+    bwin = await bwin_t
+
+
+    data = aggregate_data([betclic, betano, esconline, twentytwo, lebull, bwin, solverde], 'football')
+    await generate_output_files(betano, betclic, bwin, data, esconline, lebull, twentytwo, solverde, 'football')
     return data
+
 
 def aggregate_data(all_sport_data, sport_name):
     aggregate_data = []
@@ -195,40 +223,43 @@ def merge_data_sets(aggregate_data, new_data, sport_name):
 def contains_event_name(events, name):
     return compare_strings_with_ratio(events['name'], name, 0.6)
 
-def belongs_same_event(existing_events, new_event):
-    event_names = [event['name'] for event in existing_events]
-
-    event_found = process.extractOne(new_event['name'], event_names)
-
-    idx = event_names.index(event_found[0])
-
-    #TODO finish this
-    
 
 async def write_output_file(file_name, file_data):
     with open("output/" + file_name + ".json", 'w') as outfile:
         outfile.write(json.dumps(file_data, indent=4))
 
-async def generate_output_files(betano, betclic, bwin, data, esconline, lebull, twentytwo, sport_type):
+
+async def generate_output_files(betano, betclic, bwin, data, esconline, lebull, twentytwo, solverde, sport_type):
     await write_output_file('betano_' + sport_type, betano)
     await write_output_file('betlic_' + sport_type, betclic)
     await write_output_file('twentytwo_' + sport_type, twentytwo)
     await write_output_file('esconline_' + sport_type, esconline)
     await write_output_file('bwin_' + sport_type, bwin)
     await write_output_file('lebull_' + sport_type, lebull)
+    await write_output_file('solverde_' + sport_type, solverde)
     await write_output_file('aggregated_' + sport_type, data)
 
+
 def log_aggregate_data_info(aggregate_data):
-    current_time = ("time:"+ str(datetime.now()))
+    current_time = ("time:" + str(datetime.now()))
     first_message = ('\nsize before filters:' + str(len(aggregate_data['events'])))
-    events_with_two = ('\nevents with two bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 2, aggregate_data['events'])))))
-    events_with_tree = ('\nevents with three bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 3, aggregate_data['events'])))))
-    events_with_four = ('\nevents with four bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 4, aggregate_data['events'])))))
-    events_with_five = ('\nevents with five bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 5, aggregate_data['events'])))))
-    events_with_six = ('\nevents with six bookmakers:' + str(len(list(filter(lambda event: len(event["bookmakers"]) == 6, aggregate_data['events'])))))
-    last_message = ('\nsize after filters:' + str(len(list(filter(lambda event: len(event["bookmakers"]) > 1, aggregate_data['events'])))))
-    
-    print(current_time + first_message + events_with_two + events_with_tree + events_with_four + events_with_five + events_with_six + last_message)
+    events_with_two = ('\nevents with two bookmakers:' + str(
+        len(list(filter(lambda event: len(event["bookmakers"]) == 2, aggregate_data['events'])))))
+    events_with_tree = ('\nevents with three bookmakers:' + str(
+        len(list(filter(lambda event: len(event["bookmakers"]) == 3, aggregate_data['events'])))))
+    events_with_four = ('\nevents with four bookmakers:' + str(
+        len(list(filter(lambda event: len(event["bookmakers"]) == 4, aggregate_data['events'])))))
+    events_with_five = ('\nevents with five bookmakers:' + str(
+        len(list(filter(lambda event: len(event["bookmakers"]) == 5, aggregate_data['events'])))))
+    events_with_six = ('\nevents with six bookmakers:' + str(
+        len(list(filter(lambda event: len(event["bookmakers"]) == 6, aggregate_data['events'])))))
+    events_with_seven = ('\nevents with seven bookmakers:' + str(
+        len(list(filter(lambda event: len(event["bookmakers"]) == 7, aggregate_data['events'])))))
+    last_message = ('\nsize after filters:' + str(
+        len(list(filter(lambda event: len(event["bookmakers"]) > 1, aggregate_data['events'])))))
+
+    print(
+        current_time + first_message + events_with_two + events_with_tree + events_with_four + events_with_five + events_with_six + events_with_seven + last_message)
 
 
 def get_matched_event(new_event, existing_events):
@@ -269,6 +300,7 @@ def get_market(markets, field_name, field_value):
     if len(markets) == 0 or markets is None:
         return None
     return next((obj for obj in markets if obj is not None and obj.get(field_name) == field_value), None)
+
 
 def has_bookmaker_title(event, bookmaker_title):
     """Checks if the given event has a bookmaker with the given title.

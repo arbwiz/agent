@@ -2,9 +2,11 @@ import json
 import requests
 import datetime
 from data_retrievers.common import scrape_website
+from data_retrievers.common import is_valid_tennis_event
+from data_retrievers.common import is_valid_football_event
 
 
-def betano_tennis_win_match_24h():
+async def betano_tennis_win_match_24h():
     url = 'https://www.betano.pt/sport/tenis/jogos-de-hoje/'
     soup = scrape_website(url)
 
@@ -12,7 +14,7 @@ def betano_tennis_win_match_24h():
     json_end = data.rfind('}')
     json_start = data.find('{')
 
-    main_data = json.loads(data[json_start:json_end+1])
+    main_data = json.loads(data[json_start:json_end + 1])
 
     events = []
     for block in main_data['data']['blocks']:
@@ -34,13 +36,14 @@ def betano_tennis_win_match_24h():
                             'name': selection['name'],
                             'price': float(selection['price'])
                         })
-            if len(event_data['markets'][0]['selections']) != 2:
-                continue
-            events.append(event_data)
-        return events
+            if is_valid_tennis_event(event_data):
+                events.append(event_data)
+
+    return events
 
 
-def betano_football():
+async def betano_football():
+    print('betano started')
     url = 'https://www.betano.pt/api/sport/futebol/jogos-de-hoje/?sort=Leagues&req=la,s,stnf,c,mb'
 
     result = requests.get(url)
@@ -73,7 +76,7 @@ def betano_football():
 
                     if len((market_data['selections'])) != 3:
                         continue
-                    
+
                     event_data['markets'].append(market_data)
 
                 if market['type'] == 'HCTG':
@@ -89,7 +92,6 @@ def betano_football():
                         market_data_3_5 = create_market(market, 3.5)
                         event_data['markets'].append(market_data_3_5)
                         continue
-
 
                 if market['type'] == 'DBLC':
 
@@ -130,57 +132,62 @@ def betano_football():
                         'name': '12 x',
                         'selections': [
                             {
-                                'name': h2h_market['selections'][0]['name'] + " ou " + h2h_market['selections'][2]['name'],
+                                'name': h2h_market['selections'][0]['name'] + " ou " + h2h_market['selections'][2][
+                                    'name'],
                                 'price': float(market['selections'][2]['price'])
                             },
                             {
                                 'name': h2h_market['selections'][1]['name'],
                                 'price': h2h_market['selections'][1]['price']
                             }
-                        
+
                         ]
                     }
                     event_data['markets'].append(market_data)
                     event_data['markets'].append(market_data2)
                     event_data['markets'].append(market_data3)
 
-            if len(event_data['markets']) < 1:
-                continue
-            events.append(event_data)
+            if is_valid_football_event(event_data):
+                events.append(event_data)
+    print('betano finished')
     return events
 
 
 def convert_time(millis):
-    dt = datetime.datetime.fromtimestamp(millis/1000)
+    dt = datetime.datetime.fromtimestamp(millis / 1000)
     return (dt.isoformat())
 
-def find_market_by_id(markets, id): 
+
+def find_market_by_id(markets, id):
     found = [market for market in markets if market['name'] == id]
     return found[0] if len(found) == 1 else None
 
-def create_market(market, handicap):    
+
+def create_market(market, handicap):
     market_data = {
         'name': 'total_goals_' + str(handicap),
         'selections': []
     }
-    
+
     for selection in market['selections']:
         market_data['selections'].append({
-            #adicionar handicap? 
+            # adicionar handicap?
             'name': selection['name'],
             'price': float(selection['price'])
         })
 
     if len((market_data['selections'])) != 2:
         return None
-    
+
     return market_data
 
+
 def request_events(market_type_id):
-    url = ("https://offer.cdn.begmedia.com/api/pub/v4/sports/1?application=1024&countrycode=pt&hasSwitchMtc=true&language=pt&limit=300&markettypeId=" + 
-           str(market_type_id) + 
-           "&offset=0&sitecode=ptpt&sortBy=ByLiveRankingPreliveDate")
-    
+    url = (
+                "https://offer.cdn.begmedia.com/api/pub/v4/sports/1?application=1024&countrycode=pt&hasSwitchMtc=true&language=pt&limit=300&markettypeId=" +
+                str(market_type_id) +
+                "&offset=0&sitecode=ptpt&sortBy=ByLiveRankingPreliveDate")
+
     result = requests.get(url)
     resultDict = json.loads(result.content)
     return resultDict['matches']
