@@ -1,6 +1,7 @@
 import websockets
 import json
 import datetime
+import websockets
 
 from data_retrievers.common import is_valid_tennis_event, is_valid_football_event
 
@@ -44,37 +45,76 @@ async def retrieve_info_websocket(url, id_to_get_winner_market, events_message, 
 
     event_ids = []
 
-    events_to_return = []
+    event_responses = []
 
     for group in events['groups']:
         for event in group['events']:
             event_ids.append(event['id'])
             await ws.send(single_event_message_template.format(event_id=event['id']))
-            event_response = await ws.recv()
-            event_dict = json.loads(
-                event_response[event_response.find("{"):event_response.rfind("}") + 1].replace("\\", ""))
+            event_response = ws.recv()
+            event_responses.append(event_response)
 
-            if 'name' not in event_dict or 'startTime' not in event_dict:
-                continue
+    return await handle_event_responses(event_responses, id_to_get_winner_market, single_market_message_template, ws,
+                                        sport)
 
-            event_data = {
-                'bookmaker': 'solverde',
-                'name': event_dict['name'],
-                'markets': [{
-                    'name': 'h2h',
-                    'selections': []
-                }],
-                'start_time': event_dict['startTime'],
-                'start_time_ms': round(convert_time(event_dict['startTime']))
-            }
 
-            if id_to_get_winner_market not in event_dict['marketTypesToIds']:
-                continue
+def convert_time(iso_format):
+    dt = datetime.datetime.fromisoformat(iso_format)
+    return dt.timestamp() * 1000
 
-            market_id = event_dict['marketTypesToIds'][id_to_get_winner_market][0]
-            await ws.send(single_market_message_template.format(market_id=market_id))
-            market_response = await ws.recv()
 
+async def handle_event_responses(event_responses_t, id_to_get_winner_market, single_market_message_template, ws, sport):
+    events_to_return = []
+    event_responses = []
+    event_with_markets = []
+    for event_response_t in event_responses_t:
+        event_responses.append(await event_response_t)
+
+    for event_response in event_responses:
+
+        event_dict = json.loads(
+            event_response[event_response.find("{"):event_response.rfind("}") + 1].replace("\\", ""))
+
+        if 'name' not in event_dict or 'startTime' not in event_dict:
+            continue
+
+        event_data = {
+            'bookmaker': 'solverde',
+            'name': event_dict['name'],
+            'markets': [{
+                'name': 'h2h',
+                'selections': []
+            }],
+            'start_time': event_dict['startTime'],
+            'start_time_ms': round(convert_time(event_dict['startTime']))
+        }
+
+        if id_to_get_winner_market not in event_dict['marketTypesToIds']:
+            continue
+
+        market_id = event_dict['marketTypesToIds'][id_to_get_winner_market][0]
+
+        await ws.send(single_market_message_template.format(market_id=market_id))
+        market_response_t = ws.recv()
+
+        event_with_markets.append({
+            "event_data": event_data,
+            "markets_tasks": [market_response_t],
+            "markets_responses": []
+        })
+
+    return await handle_market_responses(event_with_markets, sport)
+
+
+async def handle_market_responses(event_with_markets, sport):
+    events_to_return = []
+
+    for event_with_market in event_with_markets:
+        for market_task in event_with_market['markets_tasks']:
+            event_with_market['markets_responses'].append(await market_task)
+
+    for event_with_market in event_with_markets:
+        for market_response in event_with_market['markets_responses']:
             market = json.loads(
                 market_response[market_response.find("{"):market_response.rfind("}") + 1].replace("\\", ""))
 
@@ -82,21 +122,16 @@ async def retrieve_info_websocket(url, id_to_get_winner_market, events_message, 
                 continue
 
             for selection in market['selections']:
-                event_data['markets'][0]['selections'].append({
+                event_with_market['event_data']['markets'][0]['selections'].append({
                     'name': selection['name'],
                     'price': float(selection['prices'][0]['decimalLabel'])
                 })
 
             if sport == 'tennis':
-                if is_valid_tennis_event(event_data):
-                    events_to_return.append(event_data)
+                if is_valid_tennis_event(event_with_market['event_data']):
+                    events_to_return.append(event_with_market['event_data'])
             elif sport == 'football':
-                if is_valid_football_event(event_data):
-                    events_to_return.append(event_data)
+                if is_valid_football_event(event_with_market['event_data']):
+                    events_to_return.append(event_with_market['event_data'])
 
     return events_to_return
-
-
-def convert_time(iso_format):
-    dt = datetime.datetime.fromisoformat(iso_format)
-    return dt.timestamp() * 1000

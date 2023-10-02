@@ -28,7 +28,6 @@ from utils import compare_strings_with_ratio
 
 
 async def get_tennis_data():
-
     solverde_t = asyncio.create_task(solverde_tennis())
     twentytwo_t = asyncio.create_task(twentytwobet_tennis_win_match())
     esconline_t = asyncio.create_task(esconline_tennis_win_match_24h())
@@ -36,7 +35,6 @@ async def get_tennis_data():
     betclic_t = asyncio.create_task(betclic_tennis_win_match())
     lebull_t = asyncio.create_task(lebull_tennis())
     bwin_t = asyncio.create_task(bwin_tennis())
-
 
     betano = await betano_t
     betclic = await betclic_t
@@ -53,7 +51,6 @@ async def get_tennis_data():
 
 
 async def get_football_data():
-
     solverde_t = asyncio.create_task(solverde_football())
     twentytwo_t = asyncio.create_task(twentytwobet_football())
     esconline_t = asyncio.create_task(esconline_football())
@@ -69,7 +66,6 @@ async def get_football_data():
     esconline = await esconline_t
     lebull = await lebull_t
     bwin = await bwin_t
-
 
     data = aggregate_data([betclic, betano, esconline, twentytwo, lebull, bwin, solverde], 'football')
     await generate_output_files(betano, betclic, bwin, data, esconline, lebull, twentytwo, solverde, 'football')

@@ -157,9 +157,9 @@ async def main():
 
     # events = get_events_from_competitions(comps_ids)
 
-    solverde_task = asyncio.create_task(solverde_football())
-
+    solverde_task = asyncio.create_task(solverde_tennis())
     solverde = await solverde_task
+    print(solverde)
 
 
 def test():
