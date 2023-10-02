@@ -3,6 +3,7 @@ from data_retrievers.betano import betano_football
 
 from data_retrievers.betclic import betclic_tennis_win_match
 from data_retrievers.betclic import betclic_football
+from data_retrievers.placard import placard_tennis, placard_football
 
 from data_retrievers.twentytwobet import twentytwobet_tennis_win_match
 from data_retrievers.twentytwobet import twentytwobet_football
@@ -29,6 +30,7 @@ from utils import compare_strings_with_ratio
 
 async def get_tennis_data():
     solverde_t = asyncio.create_task(solverde_tennis())
+    placard_t = asyncio.create_task(placard_tennis())
     twentytwo_t = asyncio.create_task(twentytwobet_tennis_win_match())
     esconline_t = asyncio.create_task(esconline_tennis_win_match_24h())
     betano_t = asyncio.create_task(betano_tennis_win_match_24h())
@@ -43,10 +45,11 @@ async def get_tennis_data():
     lebull = await lebull_t
     bwin = await bwin_t
     solverde = await solverde_t
+    placard = await placard_t
 
-    data = aggregate_data([betclic, betano, esconline, twentytwo, bwin, lebull, solverde], 'tennis')
+    data = aggregate_data([betclic, betano, esconline, twentytwo, bwin, lebull, solverde, placard], 'tennis')
 
-    await generate_output_files(betano, betclic, bwin, data, esconline, lebull, twentytwo, solverde, 'tennis')
+    await generate_output_files(betano, betclic, bwin, data, esconline, lebull, twentytwo, solverde, placard, 'tennis')
     return data
 
 
@@ -58,6 +61,7 @@ async def get_football_data():
     betclic_t = asyncio.create_task(betclic_football())
     lebull_t = asyncio.create_task(lebull_football())
     bwin_t = asyncio.create_task(bwin_football())
+    placard_t = asyncio.create_task(placard_football())
 
     solverde = await solverde_t
     betano = await betano_t
@@ -66,9 +70,10 @@ async def get_football_data():
     esconline = await esconline_t
     lebull = await lebull_t
     bwin = await bwin_t
+    placard = await placard_t
 
-    data = aggregate_data([betclic, betano, esconline, twentytwo, lebull, bwin, solverde], 'football')
-    await generate_output_files(betano, betclic, bwin, data, esconline, lebull, twentytwo, solverde, 'football')
+    data = aggregate_data([betclic, betano, esconline, twentytwo, lebull, bwin, solverde, placard], 'football')
+    await generate_output_files(betano, betclic, bwin, data, esconline, lebull, twentytwo, solverde, placard, 'football')
     return data
 
 
@@ -225,7 +230,7 @@ async def write_output_file(file_name, file_data):
         outfile.write(json.dumps(file_data, indent=4))
 
 
-async def generate_output_files(betano, betclic, bwin, data, esconline, lebull, twentytwo, solverde, sport_type):
+async def generate_output_files(betano, betclic, bwin, data, esconline, lebull, twentytwo, solverde, placard, sport_type):
     await write_output_file('betano_' + sport_type, betano)
     await write_output_file('betlic_' + sport_type, betclic)
     await write_output_file('twentytwo_' + sport_type, twentytwo)
@@ -233,6 +238,7 @@ async def generate_output_files(betano, betclic, bwin, data, esconline, lebull, 
     await write_output_file('bwin_' + sport_type, bwin)
     await write_output_file('lebull_' + sport_type, lebull)
     await write_output_file('solverde_' + sport_type, solverde)
+    await write_output_file('placard_' + sport_type, placard)
     await write_output_file('aggregated_' + sport_type, data)
 
 

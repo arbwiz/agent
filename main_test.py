@@ -1,3 +1,5 @@
+from data_retrievers.placard import placard_football
+from data_retrievers.placard import placard_tennis
 from utils import calculate_arbitrage_3_websites
 from data_retrievers.aggregator import aggregate_data
 from data_retrievers.twentytwobet import twentytwobet_tennis_win_match
@@ -21,6 +23,7 @@ from data_retrievers.bwin import bwin_football
 from model.event import calculate_arbitrage_stakes
 from model.event import Event
 from data_retrievers.solverde import solverde_tennis, solverde_football
+
 
 
 async def main():
@@ -157,9 +160,9 @@ async def main():
 
     # events = get_events_from_competitions(comps_ids)
 
-    solverde_task = asyncio.create_task(solverde_tennis())
-    solverde = await solverde_task
-    print(solverde)
+    placard_tennis_task = asyncio.create_task(placard_tennis())
+    placard_tennis = await placard_tennis_task
+    print(placard_tennis)
 
 
 def test():
