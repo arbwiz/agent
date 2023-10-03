@@ -128,10 +128,136 @@ async def bwin_football():
             continue
         event_data['markets'] = [market_data]
 
+        dr_markets = get_double_result_markets(event, market_data)
+        ou_markets = get_total_goals_market(event)
+
+        event_data['markets'].extend(dr_markets)
+        event_data['markets'].extend(ou_markets)
+
         if is_valid_football_event(event_data):
             events.append(event_data)
     print('bwin finished')
     return events
+
+
+def get_total_goals_market(event):
+    double_result_markets = [market for market in event['optionMarkets'] if market['name']['value'] == 'Total golos']
+
+    double_result_market_1_5 = [market for market in double_result_markets if
+                                '1,5' in market['options'][0]['name']['value']]
+    double_result_market_2_5 = [market for market in double_result_markets if
+                                '2,5' in market['options'][0]['name']['value']]
+    double_result_market_3_5 = [market for market in double_result_markets if
+                                '3,5' in market['options'][0]['name']['value']]
+
+    markets = []
+    if len(double_result_market_1_5) == 1:
+        market = {
+            'name': 'total_goals_1.5',
+            'selections': []
+        }
+
+        market['selections'].append({
+            'name': 'Over',
+            'price': float(double_result_market_1_5[0]['options'][0]['price']['odds'])
+        })
+
+        market['selections'].append({
+            'name': 'Under',
+            'price': float(double_result_market_1_5[0]['options'][1]['price']['odds'])
+        })
+
+        markets.append(market)
+
+    if len(double_result_market_2_5) == 1:
+        market = {
+            'name': 'total_goals_2.5',
+            'selections': []
+        }
+
+        market['selections'].append({
+            'name': 'Over',
+            'price': float(double_result_market_2_5[0]['options'][0]['price']['odds'])
+        })
+
+        market['selections'].append({
+            'name': 'Under',
+            'price': float(double_result_market_2_5[0]['options'][1]['price']['odds'])
+        })
+
+        markets.append(market)
+
+    if len(double_result_market_3_5) == 1:
+        market = {
+            'name': 'total_goals_3.5',
+            'selections': []
+        }
+
+        market['selections'].append({
+            'name': 'Over',
+            'price': float(double_result_market_3_5[0]['options'][0]['price']['odds'])
+        })
+
+        market['selections'].append({
+            'name': 'Under',
+            'price': float(double_result_market_3_5[0]['options'][1]['price']['odds'])
+        })
+
+        markets.append(market)
+
+    return markets
+
+
+def get_double_result_markets(event, h2h_market):
+    double_result_market = [market for market in event['optionMarkets'] if market['name']['value'] == 'Double Chance'][
+        0]
+
+    market = {
+        'name': '1x 2',
+        'selections': [
+            {
+                'name': double_result_market['options'][0]['name']['value'],
+                'price': float(double_result_market['options'][0]['price']['odds'])
+            },
+            {
+                'name': h2h_market['selections'][2]['name'],
+                'price': h2h_market['selections'][2]['price']
+            }
+        ]
+    }
+
+    market2 = {
+        'name': '1 x2',
+        'selections': [
+            {
+                'name': h2h_market['selections'][0]['name'],
+                'price': h2h_market['selections'][0]['price']
+            },
+            {
+                'name': double_result_market['options'][1]['name']['value'],
+                'price': float(double_result_market['options'][1]['price']['odds'])
+            }
+        ]
+    }
+
+    market3 = {
+        'name': '12 x',
+        'selections': [
+            {
+                'name': double_result_market['options'][2]['name']['value'],
+                'price': float(double_result_market['options'][2]['price']['odds'])
+            },
+            {
+                'name': h2h_market['selections'][1]['name'],
+                'price': h2h_market['selections'][1]['price']
+            }
+        ]
+    }
+
+    if len(market['selections']) != 2 or len(market2['selections']) != 2 or len(market3['selections']) != 2:
+        return None
+
+    return [market, market2, market3]
 
 
 def convert_time(iso_format):
