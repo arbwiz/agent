@@ -7,7 +7,7 @@ from data_retrievers.common import is_valid_tennis_event, is_valid_football_even
 
 blacklisted_outcome1 = ['Home (Apostas especiais)', 'Equipa da Casa']
 blacklisted_outcome2 = ['Convidados (especial)', 'Equipa visitante']
-
+max_comps = 15
 blacklisted_comp_ids = [2150631, 2590430, 2390706, 2322382, 2498900]
 whitelisted_comp_ids = {
     'football': [7067, 8777, 11113, 12821, 12829, 13521, 13709, 16819, 17555, 26031, 27687, 27707, 27731, 28787,
@@ -255,7 +255,7 @@ def get_double_results_markets(event, h2h_market):
         elif selection['T'] == 6:
 
             market_data_1_2x = {
-                'name': '1 2x',
+                'name': '1 x2',
                 'selections': []
             }
 
@@ -341,7 +341,8 @@ async def get_events_from_competitions(competition_ids, sport):
                     "competition_id}&count=50&lng=pt&tf=2880&tz=1&mode=4&country=148&partner=151&getEmpty=true")
     events = []
     results_t = []
-    for ids in competition_ids:
+
+    for ids in competition_ids[:25]:
         url = url_template.format(url_template, sport_id=sport_id, competition_id=','.join(map(str, ids)))
         result_t = asyncio.create_task(req(url))
         results_t.append(result_t)
