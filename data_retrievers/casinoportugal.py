@@ -31,7 +31,7 @@ async def casinoportugal_tennis():
         }
 
         for market in event['markets']:
-            if market['name'] == 'Vencedor':
+            if market['name'] == 'Vencedor' and market['trading_status'] != 'Suspended':
                 for selection in market['selections']:
                     if selection['selection_name'] == 'Home':
                         market_data['selections'].append({
@@ -78,7 +78,7 @@ async def casinoportugal_football():
         }
 
         for market in event['markets']:
-            if market['name'] == '1x2':
+            if market['name'] == '1x2' and market['trading_status'] != 'Suspended':
                 for selection in market['selections']:
                     if selection['selection_name'] == 'Home':
                         market_data['selections'].append({

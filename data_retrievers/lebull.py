@@ -8,7 +8,7 @@ from data_retrievers.common import is_valid_tennis_event, is_valid_football_even
 async def lebull_tennis():
     # might change
     tenant_header = "126dc7bf-288b-4f72-9536-3aa54648c0f4"
-    url = "https://sportsbook-betting-prod.gtdevteam.work/sports/3/leagues/upcoming?leagueTimeFilter=14&languageId=14&stakeTypes=%5B1%2C%2080%2C%20356%2C%20702%2C%20176415%2C%20183254%2C%20217797%2C%20357318%2C%202%2C%203%2C%2026%2C%2037%2C%20545%2C%20144%2C%20724%2C%20274556%2C%20313638%2C%20313639%5D&isStakeGrouped=true&timeZone=1&checkIsActive=true&setParameterOrder=false&getMainMatch=false"
+    url = "https://sportsbook-betting-prod.gtdevteam.work/sports/3/leagues/upcoming?leagueTimeFilter=10&languageId=14&stakeTypes=%5B1%2C%2080%2C%20356%2C%20702%2C%20176415%2C%20183254%2C%20217797%2C%20357318%2C%202%2C%203%2C%2026%2C%2037%2C%20545%2C%20144%2C%20724%2C%20274556%2C%20313638%2C%20313639%5D&isStakeGrouped=true&timeZone=1&checkIsActive=true&setParameterOrder=false&getMainMatch=false"
 
     headers = {'X-Auth-Tenant-Id': tenant_header}
     response = requests.get(url, headers=headers)
@@ -49,7 +49,7 @@ async def lebull_football():
     print('lebull started')
     # might change
     tenant_header = "126dc7bf-288b-4f72-9536-3aa54648c0f4"
-    url = "https://sportsbook-betting-prod.gtdevteam.work/sports/1/leagues/upcoming?leagueTimeFilter=14&languageId=14&stakeTypes=%5B1%2C%2080%2C%20356%2C%20702%2C%20176415%2C%20183254%2C%20217797%2C%20357318%2C%202%2C%203%2C%2026%2C%2037%2C%20545%2C%20144%2C%20724%2C%20274556%2C%20313638%2C%20313639%5D&isStakeGrouped=true&timeZone=1&checkIsActive=true&setParameterOrder=false&getMainMatch=false"
+    url = "https://sportsbook-betting-prod.gtdevteam.work/sports/1/leagues/upcoming?leagueTimeFilter=10&languageId=14&stakeTypes=%5B1%2C%2080%2C%20356%2C%20702%2C%20176415%2C%20183254%2C%20217797%2C%20357318%2C%202%2C%203%2C%2026%2C%2037%2C%20545%2C%20144%2C%20724%2C%20274556%2C%20313638%2C%20313639%5D&isStakeGrouped=true&timeZone=1&checkIsActive=true&setParameterOrder=false&getMainMatch=false"
 
     headers = {'X-Auth-Tenant-Id': tenant_header}
     response = requests.get(url, headers=headers)
