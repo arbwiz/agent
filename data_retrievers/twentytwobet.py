@@ -1,6 +1,7 @@
 import requests
 import json
 import datetime
+import asyncio
 
 from data_retrievers.common import is_valid_tennis_event, is_valid_football_event
 
@@ -8,16 +9,18 @@ blacklisted_outcome1 = ['Home (Apostas especiais)', 'Equipa da Casa']
 blacklisted_outcome2 = ['Convidados (especial)', 'Equipa visitante']
 
 blacklisted_comp_ids = [2150631, 2590430, 2390706, 2322382, 2498900]
-whitelisted_comp_ids = [7067, 8777, 11113, 12821, 12829, 13521, 13709, 16819, 17555, 26031, 27687, 27707, 27731, 28787,
-                        30467, 88637, 96463, 105759, 109313, 110163, 118663, 118737, 127733, 166251, 211661, 214147,
-                        225733, 281719, 828065, 1015483, 1268397, 1471313, 2018750, 2151274, 2284664, 2421233]
+whitelisted_comp_ids = {
+    'football': [7067, 8777, 11113, 12821, 12829, 13521, 13709, 16819, 17555, 26031, 27687, 27707, 27731, 28787,
+                 30467, 88637, 96463, 105759, 109313, 110163, 118663, 118737, 127733, 166251, 211661, 214147,
+                 225733, 281719, 828065, 1015483, 1268397, 1471313, 2018750, 2151274, 2284664, 2421233],
+    'tennis': []
+}
 
 
 async def twentytwobet_tennis_win_match():
-
     comps_ids = get_competition_ids('tennis')
 
-    result_events = get_events_from_competitions(comps_ids, 'tennis')
+    result_events = await get_events_from_competitions(comps_ids, 'tennis')
 
     events = []
     for event in result_events:
@@ -65,7 +68,7 @@ async def twentytwobet_football():
 
     comps_ids = get_competition_ids('football')
 
-    result_events = get_events_from_competitions(comps_ids, 'football')
+    result_events = await get_events_from_competitions(comps_ids, 'football')
 
     events = []
     for event in result_events:
@@ -277,14 +280,14 @@ def get_double_results_markets(event, h2h_market):
     return markets
 
 
-def get_competition_ids(sport):
+def get_competition_ids(sport_arg):
     sport_id = 1
     sport_name = 'Football'
 
-    if sport == 'football':
+    if sport_arg == 'football':
         sport_id = 1
         sport_name = 'Football'
-    elif sport == 'tennis':
+    elif sport_arg == 'tennis':
         sport_id = 4
         sport_name = 'Tennis'
 
@@ -308,12 +311,13 @@ def get_competition_ids(sport):
     for comp in comps:
         # if number of games in comp is higher than 15, consider relevant to request
 
-        if comp['LI'] not in whitelisted_comp_ids:
+        if sport_arg == 'football' and comp['LI'] not in whitelisted_comp_ids[sport_arg]:
             continue
 
         number_of_games += comp['GC']
 
         if number_of_games >= 50:
+            ids.append(comp['LI'])
             ids.sort()
             grouped_ids.append(ids)
             ids = []
@@ -321,10 +325,13 @@ def get_competition_ids(sport):
         else:
             ids.append(comp['LI'])
 
+    if len(grouped_ids) == 0:
+        ids.sort()
+        grouped_ids.append(ids)
     return grouped_ids
 
 
-def get_events_from_competitions(competition_ids, sport):
+async def get_events_from_competitions(competition_ids, sport):
     if sport == 'football':
         sport_id = 1
     elif sport == 'tennis':
@@ -333,12 +340,22 @@ def get_events_from_competitions(competition_ids, sport):
     url_template = ("https://22win88.com/LineFeed/Get1x2_VZip?sports={sport_id}&champs={"
                     "competition_id}&count=50&lng=pt&tf=2880&tz=1&mode=4&country=148&partner=151&getEmpty=true")
     events = []
-
+    results_t = []
     for ids in competition_ids:
         url = url_template.format(url_template, sport_id=sport_id, competition_id=','.join(map(str, ids)))
-        result = requests.get(url)
-        result_dict = json.loads(result.content)
+        result_t = asyncio.create_task(req(url))
+        results_t.append(result_t)
 
+    results = []
+    for result_t in results_t:
+        results.append(await result_t)
+
+    for result in results:
+        result_dict = json.loads(result.content)
         events.extend(result_dict['Value'])
 
     return events
+
+
+async def req(url):
+    return requests.get(url)

@@ -42,13 +42,14 @@ async def get_tennis_data():
 
     betano = await betano_t
     betclic = await betclic_t
-    twentytwo = await twentytwo_t
     esconline = await esconline_t
     lebull = await lebull_t
     bwin = await bwin_t
     solverde = await solverde_t
     placard = await placard_t
+    twentytwo = await twentytwo_t
     casinoportugal = await casinoportugal_t
+
 
     data = aggregate_data([betclic, betano, esconline, twentytwo, bwin, lebull, solverde, placard, casinoportugal], 'tennis')
 
@@ -70,11 +71,11 @@ async def get_football_data():
     solverde = await solverde_t
     betano = await betano_t
     betclic = await betclic_t
-    twentytwo = await twentytwo_t
     esconline = await esconline_t
     lebull = await lebull_t
     bwin = await bwin_t
     placard = await placard_t
+    twentytwo = await twentytwo_t
     casinoportugal = await casinoportugal_t
 
     data = aggregate_data([betclic, betano, esconline, twentytwo, lebull, bwin, solverde, placard, casinoportugal], 'football')

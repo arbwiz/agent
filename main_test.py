@@ -161,7 +161,8 @@ async def main():
 
     # events = get_events_from_competitions(comps_ids)
 
-    events = await casinoportugal_tennis()
+    events = await twentytwobet_football()
+    events_tennis = await twentytwobet_tennis_win_match()
     print(events)
 
 
