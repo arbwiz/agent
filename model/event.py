@@ -96,7 +96,7 @@ class Event:
             return False
 
         # if the sum of the reciprocals of the odds is less than 1, there is opportunity for arbitrage
-        if total_arbitrage_percentage < 0.992:
+        if total_arbitrage_percentage < 0.999:
 
             stakes_message = None
             if len(best_odds) == 2:
