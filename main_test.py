@@ -1,3 +1,4 @@
+from data_retrievers.casinoportugal import casinoportugal_football, casinoportugal_tennis
 from data_retrievers.placard import placard_football
 from data_retrievers.placard import placard_tennis
 from utils import calculate_arbitrage_3_websites
@@ -160,9 +161,8 @@ async def main():
 
     # events = get_events_from_competitions(comps_ids)
 
-    placard_tennis_task = asyncio.create_task(placard_tennis())
-    placard_tennis = await placard_tennis_task
-    print(placard_tennis)
+    events = await casinoportugal_tennis()
+    print(events)
 
 
 def test():
