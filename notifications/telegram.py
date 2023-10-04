@@ -8,7 +8,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # 6480489284
 def send_telegram_message(message):
     send_telegram_message_complex(message,
-                                  "-4010862393",
+                                  "4010862393",
                                   "6613908503:AAGLsuazZhBmwHbPCEZzx-tJGQHLOtEcZy0")
 
 
