@@ -7,7 +7,7 @@ from data_retrievers.common import is_valid_tennis_event, is_valid_football_even
 
 blacklisted_outcome1 = ['Home (Apostas especiais)', 'Equipa da Casa']
 blacklisted_outcome2 = ['Convidados (especial)', 'Equipa visitante']
-max_comps = 15
+max_comps = 10
 blacklisted_comp_ids = [2150631, 2590430, 2390706, 2322382, 2498900]
 whitelisted_comp_ids = {
     'football': [7067, 8777, 11113, 12821, 12829, 13521, 13709, 16819, 17555, 26031, 27687, 27707, 27731, 28787,
@@ -308,6 +308,10 @@ def get_competition_ids(sport_arg):
 
     number_of_games = 0
     ids = []
+
+    if sport_arg == 'tennis':
+        comps = comps[:max_comps]
+
     for comp in comps:
         # if number of games in comp is higher than 15, consider relevant to request
 
@@ -342,7 +346,7 @@ async def get_events_from_competitions(competition_ids, sport):
     events = []
     results_t = []
 
-    for ids in competition_ids[:25]:
+    for ids in competition_ids:
         url = url_template.format(url_template, sport_id=sport_id, competition_id=','.join(map(str, ids)))
         result_t = asyncio.create_task(req(url))
         results_t.append(result_t)

@@ -40,15 +40,18 @@ async def get_tennis_data():
     bwin_t = asyncio.create_task(bwin_tennis())
     casinoportugal_t = asyncio.create_task(casinoportugal_tennis())
 
+
+    
+    
     betano = await betano_t
     betclic = await betclic_t
-    esconline = await esconline_t
     lebull = await lebull_t
     bwin = await bwin_t
-    solverde = await solverde_t
-    placard = await placard_t
     twentytwo = await twentytwo_t
     casinoportugal = await casinoportugal_t
+    solverde = await solverde_t
+    esconline = await esconline_t
+    placard = await placard_t
 
 
     data = aggregate_data([betclic, betano, esconline, twentytwo, bwin, lebull, solverde, placard, casinoportugal], 'tennis')
@@ -68,15 +71,15 @@ async def get_football_data():
     placard_t = asyncio.create_task(placard_football())
     casinoportugal_t = asyncio.create_task(casinoportugal_football())
 
-    solverde = await solverde_t
     betano = await betano_t
     betclic = await betclic_t
-    esconline = await esconline_t
     lebull = await lebull_t
     bwin = await bwin_t
-    placard = await placard_t
     twentytwo = await twentytwo_t
     casinoportugal = await casinoportugal_t
+    placard = await placard_t
+    esconline = await esconline_t
+    solverde = await solverde_t
 
     data = aggregate_data([betclic, betano, esconline, twentytwo, lebull, bwin, solverde, placard, casinoportugal], 'football')
     await generate_output_files(betano, betclic, bwin, data, esconline, lebull, twentytwo, solverde, placard, casinoportugal, 'football')
