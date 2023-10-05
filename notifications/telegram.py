@@ -1,6 +1,7 @@
 import requests
 import json
 import urllib3
+import os
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -8,7 +9,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # 6480489284
 def send_telegram_message(message):
     send_telegram_message_complex(message,
-                                  "4010862393",
+                                  os.environ['TELEGRAM_CHANNEL_ID'],
                                   "6613908503:AAGLsuazZhBmwHbPCEZzx-tJGQHLOtEcZy0")
 
 

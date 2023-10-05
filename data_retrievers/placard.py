@@ -5,6 +5,8 @@ import websockets
 
 from data_retrievers.common import is_valid_tennis_event, is_valid_football_event
 
+from data_retrievers.solverde import retrieve_info_websocket as asd
+
 
 async def placard_tennis():
     tenis_url = "wss://sportswidget.placard.pt/api/479/o3i4dxwb/websocket"
@@ -15,12 +17,15 @@ async def placard_tennis():
 
 
 async def placard_football():
+
+    id_to_get_double_result_market = '2'
+    id_to_get_total_goals_markets = '18'
     print('placard started')
     football_url = "wss://sportswidget.placard.pt/api/309/22n13kga/websocket"
     football_events_message = "[\"SUBSCRIBE\\nid:\/api\/eventgroups\/soccer-custom-span-48h-events\\nlocale:pt\\ndestination:\/api\/eventgroups\/soccer-custom-span-48h-events\\n\\n\\u0000\"]"
     # tennis h2h market is 1
     id_to_get_winner_market = "1"
-    data = await retrieve_info_websocket(football_url, id_to_get_winner_market, football_events_message, 'football')
+    data = await asd("placard", football_url, id_to_get_winner_market, football_events_message, 'football', id_to_get_total_goals_markets, id_to_get_double_result_market)
     print('placard finished')
     return data
 
