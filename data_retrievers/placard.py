@@ -5,7 +5,7 @@ import websockets
 
 from data_retrievers.common import is_valid_tennis_event, is_valid_football_event
 
-from data_retrievers.solverde import retrieve_info_websocket as asd
+from data_retrievers.solverde import retrieve_info_websocket_football
 
 
 async def placard_tennis():
@@ -13,7 +13,7 @@ async def placard_tennis():
     tennis_events_message = "[\"SUBSCRIBE\\nid:\/api\/eventgroups\/tennis-custom-span-48h-events\\nlocale:pt\\ndestination:\/api\/eventgroups\/tennis-custom-span-48h-events\\n\\n\\u0000\"]"
     # tennis h2h market is 97
     id_to_get_winner_market = "97"
-    return await retrieve_info_websocket(tenis_url, id_to_get_winner_market, tennis_events_message, 'tennis')
+    return await retrieve_info_websocket_tennis('placard', tenis_url, id_to_get_winner_market, tennis_events_message, 'tennis')
 
 
 async def placard_football():
@@ -25,12 +25,12 @@ async def placard_football():
     football_events_message = "[\"SUBSCRIBE\\nid:\/api\/eventgroups\/soccer-custom-span-48h-events\\nlocale:pt\\ndestination:\/api\/eventgroups\/soccer-custom-span-48h-events\\n\\n\\u0000\"]"
     # tennis h2h market is 1
     id_to_get_winner_market = "1"
-    data = await asd("placard", football_url, id_to_get_winner_market, football_events_message, 'football', id_to_get_total_goals_markets, id_to_get_double_result_market)
+    data = await retrieve_info_websocket_football("placard", football_url, id_to_get_winner_market, football_events_message, 'football', id_to_get_total_goals_markets, id_to_get_double_result_market)
     print('placard finished')
     return data
 
 
-async def retrieve_info_websocket(url, id_to_get_winner_market, events_message, sport):
+async def retrieve_info_websocket_tennis(bookmaker, url, id_to_get_winner_market, events_message, sport):
     ws = await websockets.connect(url, max_size=5000000)
     await ws.recv()
 
@@ -59,7 +59,7 @@ async def retrieve_info_websocket(url, id_to_get_winner_market, events_message, 
             event_response = ws.recv()
             event_responses.append(event_response)
 
-    return await handle_event_responses(event_responses, id_to_get_winner_market, single_market_message_template, ws,
+    return await handle_event_responses(bookmaker, event_responses, id_to_get_winner_market, single_market_message_template, ws,
                                         sport)
 
 
@@ -68,7 +68,7 @@ def convert_time(iso_format):
     return dt.timestamp() * 1000
 
 
-async def handle_event_responses(event_responses_t, id_to_get_winner_market, single_market_message_template, ws, sport):
+async def handle_event_responses(bookmaker, event_responses_t, id_to_get_winner_market, single_market_message_template, ws, sport):
     events_to_return = []
     event_responses = []
     event_with_markets = []
@@ -84,7 +84,7 @@ async def handle_event_responses(event_responses_t, id_to_get_winner_market, sin
             continue
 
         event_data = {
-            'bookmaker': 'placard',
+            'bookmaker': bookmaker,
             'name': event_dict['name'],
             'markets': [{
                 'name': 'h2h',

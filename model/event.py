@@ -17,7 +17,7 @@ FIRST = 0
 import json
 from notifications.telegram import send_telegram_message
 
-
+cache = []
 class Event:
     def __init__(self, data):
         self.data = data
@@ -123,10 +123,12 @@ class Event:
                                                                 'name': (
                                                                     f"Outcome: {best_odds[2][1]} @ {best_odds[2][0]} - "),
                                                                 'odd': best_odds[2][2]
-                                                            })
 
+                                                            })
+            cache.append(best_odds)
             message = "\nEvent name: {} \nProfit %: {profit:.3f}\n---\n{stake}".format(str(self.data['name']), profit=(
                         (1 - self.total_arbitrage_percentage) * 100), stake=stakes_message)
+
 
             send_telegram_message(message)
             print(message)

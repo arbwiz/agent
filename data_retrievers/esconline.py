@@ -1,3 +1,5 @@
+import asyncio
+
 import websockets
 import json
 import uuid
@@ -8,7 +10,7 @@ from data_retrievers.common import is_valid_tennis_event, is_valid_football_even
 
 async def esconline_tennis_win_match_24h():
     tenis_code = 848
-    data = await retrieve_info_websocket(tenis_code)
+    data = await asyncio.wait_for(retrieve_info_websocket(tenis_code), 20)
 
     content = json.loads(json.loads(data['Message'])['Requests'][0]['Content'])
 
@@ -45,7 +47,7 @@ async def esconline_tennis_win_match_24h():
 async def esconline_football():
     print('esconline started')
     football_code = 844
-    data = await retrieve_info_websocket(football_code)
+    data = await asyncio.wait_for(retrieve_info_websocket(football_code), 20)
 
     content = json.loads(json.loads(data['Message'])['Requests'][0]['Content'])
 

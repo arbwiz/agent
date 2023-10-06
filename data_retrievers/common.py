@@ -10,6 +10,8 @@ def scrape_website(url):
 
 
 def is_valid_tennis_event(event):
+    if len(event['markets']) < 1:
+        return False
     # event has h2h market
     if len(event['markets'][0]['selections']) != 2:
         return False
@@ -23,6 +25,8 @@ def is_valid_tennis_event(event):
 
 
 def is_valid_football_event(event):
+    if len(event['markets']) < 1:
+        return False
     # event has h2h market
     if len(event['markets'][0]['selections']) != 3:
         return False
