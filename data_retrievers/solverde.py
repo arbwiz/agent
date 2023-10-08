@@ -4,7 +4,16 @@ import datetime
 import websockets
 import asyncio
 
-from data_retrievers.common import is_valid_tennis_event, is_valid_football_event
+from data_retrievers.common import is_valid_tennis_event, is_valid_football_event, is_valid_basket_event
+
+
+async def solverde_basket():
+    basket_url = "wss://sportswidget.solverde.pt/api/147/apffea14/websocket"
+    basket_events_message = "[\"SUBSCRIBE\\nid:\/api\/eventgroups\/basketball-custom-span-48h-events\\nlocale:pt\\ndestination:\/api\/eventgroups\/basketball-custom-span-48h-events\\n\\n\\u0000\"]"
+    # tennis h2h market is 97
+    id_to_get_winner_market = "97"
+    return await retrieve_info_websocket_tennis("solverde", basket_url, id_to_get_winner_market, basket_events_message,
+                                                'basket')
 
 
 async def solverde_tennis():
@@ -17,7 +26,6 @@ async def solverde_tennis():
 
 
 async def solverde_football():
-    print('solverde started')
     football_url = "wss://sportswidget.solverde.pt/api/067/j5uargcx/websocket"
     football_events_message = "[\"SUBSCRIBE\\nid:\/api\/eventgroups\/soccer-custom-span-48h-events\\nlocale:pt\\ndestination:\/api\/eventgroups\/soccer-custom-span-48h-events\\n\\n\\u0000\"]"
     # tennis h2h market is 1
@@ -30,7 +38,6 @@ async def solverde_football():
                                          'football',
                                          id_to_get_total_goals_markets,
                                          id_to_get_double_result_market)
-    print('solverde finished')
     return data
 
 async def retrieve_info_websocket_tennis(bookmaker, url, id_to_get_winner_market, events_message, sport):
@@ -361,6 +368,9 @@ async def handle_market_responses_tennis(event_with_markets, sport):
                     events_to_return.append(event_with_market['event_data'])
             elif sport == 'football':
                 if is_valid_football_event(event_with_market['event_data']):
+                    events_to_return.append(event_with_market['event_data'])
+            elif sport == 'basket':
+                if is_valid_basket_event(event_with_market['event_data']):
                     events_to_return.append(event_with_market['event_data'])
 
     return events_to_return

@@ -43,7 +43,7 @@ async def execute():
             print('football exception')
             traceback.print_exc()
 
-        await asyncio.sleep(5)
+        await asyncio.sleep(3)
 
         try:
             print('\nrunning for tennis')
@@ -56,6 +56,21 @@ async def execute():
 
         except Exception as ex:
             print('tennis exception')
+            traceback.print_exc()
+
+        await asyncio.sleep(3)
+
+        try:
+            print('\nrunning for basket')
+            start_time = time.time()
+            await run("basket")
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            print('basket done')
+            print("elapsed time: {:.2f}s".format(elapsed_time))
+
+        except Exception as ex:
+            print('basket exception')
             traceback.print_exc()
         # Schedule the task to be run again in 40-70 seconds
         seconds_to_wait = random.randint(123, 341)

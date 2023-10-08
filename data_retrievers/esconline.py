@@ -5,7 +5,7 @@ import json
 import uuid
 import datetime
 
-from data_retrievers.common import is_valid_tennis_event, is_valid_football_event
+from data_retrievers.common import is_valid_tennis_event, is_valid_football_event, is_valid_basket_event
 
 
 async def esconline_tennis_win_match_24h():
@@ -43,9 +43,42 @@ async def esconline_tennis_win_match_24h():
             events.append(event_data)
     return events
 
+async def esconline_basket():
+    basket_code = 850
+    data = await asyncio.wait_for(retrieve_info_websocket(basket_code), 20)
+
+    content = json.loads(json.loads(data['Message'])['Requests'][0]['Content'])
+
+    parsed_events = [event for league_item in content['LeagueDataSource']['LeagueItems'] for event in
+                     league_item['EventItems']]
+
+    events = []
+
+    for event in parsed_events:
+        event_data = {
+            'bookmaker': 'esconline',
+            'name': event['EventName'].replace(':', '-'),
+            'markets': [{
+                'name': 'h2h',
+                'selections': []
+            }],
+            'start_time': event['StartDate'],
+            'start_time_ms': round(convert_time(event['StartDate']))
+        }
+        for market in event['MarketItems']:
+            if market['MarketName'] == 'Vencedor (inclui prolongamento)':
+                for outcome in market['OutcomeItems']:
+                    event_data['markets'][0]['selections'].append({
+                        'name': outcome['Name'],
+                        'price': outcome['Odd']
+                    })
+                break
+
+        if is_valid_basket_event(event_data):
+            events.append(event_data)
+    return events
 
 async def esconline_football():
-    print('esconline started')
     football_code = 844
     data = await asyncio.wait_for(retrieve_info_websocket(football_code), 20)
 
@@ -152,7 +185,6 @@ async def esconline_football():
 
         if is_valid_football_event(event_data):
             events.append(event_data)
-    print('esconline finished')
     return events
 
 

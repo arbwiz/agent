@@ -1,7 +1,7 @@
 import json
 import requests
 import datetime
-from data_retrievers.common import scrape_website
+from data_retrievers.common import scrape_website, is_valid_basket_event
 from data_retrievers.common import is_valid_tennis_event
 from data_retrievers.common import is_valid_football_event
 
@@ -42,8 +42,38 @@ async def betano_tennis_win_match_24h():
     return events
 
 
+async def betano_basket():
+    url = 'https://www.betano.pt/api/sport/basquetebol/jogos-de-hoje/?sort=Leagues&req=la,s,stnf,c,mb'
+    result = requests.get(url)
+    main_data = json.loads(result.content)
+
+    events = []
+    for block in main_data['data']['blocks']:
+        for event in block['events']:
+            event_data = {
+                'bookmaker': 'betano',
+                'name': event['name'],
+                'markets': [{
+                    'name': 'h2h',
+                    'selections': []
+                }],
+                'start_time': str(convert_time(event['startTime'])),
+                'start_time_ms': event['startTime']
+            }
+            for market in event['markets']:
+                if market['name'] == 'Vencedor':
+                    for selection in market['selections']:
+                        event_data['markets'][0]['selections'].append({
+                            'name': selection['name'],
+                            'price': float(selection['price'])
+                        })
+            if is_valid_basket_event(event_data):
+                events.append(event_data)
+
+    return events
+
+
 async def betano_football():
-    print('betano started')
     url = 'https://www.betano.pt/api/sport/futebol/jogos-de-hoje/?sort=Leagues&req=la,s,stnf,c,mb'
 
     result = requests.get(url)
@@ -149,7 +179,6 @@ async def betano_football():
 
             if is_valid_football_event(event_data):
                 events.append(event_data)
-    print('betano finished')
     return events
 
 
@@ -184,9 +213,9 @@ def create_market(market, handicap):
 
 def request_events(market_type_id):
     url = (
-                "https://offer.cdn.begmedia.com/api/pub/v4/sports/1?application=1024&countrycode=pt&hasSwitchMtc=true&language=pt&limit=300&markettypeId=" +
-                str(market_type_id) +
-                "&offset=0&sitecode=ptpt&sortBy=ByLiveRankingPreliveDate")
+            "https://offer.cdn.begmedia.com/api/pub/v4/sports/1?application=1024&countrycode=pt&hasSwitchMtc=true&language=pt&limit=300&markettypeId=" +
+            str(market_type_id) +
+            "&offset=0&sitecode=ptpt&sortBy=ByLiveRankingPreliveDate")
 
     result = requests.get(url)
     resultDict = json.loads(result.content)

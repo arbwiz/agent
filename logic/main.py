@@ -1,6 +1,7 @@
 from model.event import Event
-from data_retrievers.aggregator import get_tennis_data
+from data_retrievers.aggregator import get_tennis_data, get_basket_data
 from data_retrievers.aggregator import get_football_data
+
 
 async def run(sport):
     match sport:
@@ -9,6 +10,9 @@ async def run(sport):
             handle_football(odds_response)
         case 'tennis':
             odds_response = await get_tennis_data()
+            handle_tennis(odds_response)
+        case 'basket':
+            odds_response = await get_basket_data()
             handle_tennis(odds_response)
         case _:
             odds_response = await get_tennis_data()

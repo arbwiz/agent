@@ -3,7 +3,7 @@ import json
 import datetime
 import asyncio
 
-from data_retrievers.common import is_valid_tennis_event, is_valid_football_event
+from data_retrievers.common import is_valid_tennis_event, is_valid_football_event, is_valid_basket_event
 
 blacklisted_outcome1 = ['Home (Apostas especiais)', 'Equipa da Casa']
 blacklisted_outcome2 = ['Convidados (especial)', 'Equipa visitante']
@@ -56,9 +56,49 @@ async def twentytwobet_tennis_win_match():
             events.append(event_data)
     return events
 
+async def twentytwobet_basket():
+    comps_ids = get_competition_ids('basket')
+
+    result_events = await get_events_from_competitions(comps_ids, 'basket')
+
+    events = []
+    for event in result_events:
+        event_data = {
+            'bookmaker': '22bet',
+            'name': event['O1'] + ' - ' + event['O2'],
+            'markets': [],
+            'start_time': str(convert_time(event['S'])),
+            'start_time_ms': event['S'] * 1000
+        }
+
+        market_data = {
+            'name': 'h2h',
+            'selections': []
+        }
+
+        for selection in event['E']:
+            if selection['T'] == 401:
+                market_data['selections'].insert(0, {
+                    'name': event['O1'],
+                    'price': float(selection['C'])
+                })
+
+            elif selection['T'] == 402:
+                market_data['selections'].insert(1, {
+                    'name': event['O2'],
+                    'price': float(selection['C'])
+                })
+            else:
+                continue
+
+        event_data['markets'] = [market_data]
+
+        if is_valid_basket_event(event_data):
+            events.append(event_data)
+    return events
+
 
 async def twentytwobet_football():
-    print('22bet started')
     # only retrieves 50 events and no pagination
     # result = requests.get(
     #    "https://22win88.com/LineFeed/Get1x2_VZip?sports=1&count=300&lng=pt&tf=3000000&tz=1&mode=4&country=148"
@@ -123,7 +163,6 @@ async def twentytwobet_football():
 
         if is_valid_football_event(event_data):
             events.append(event_data)
-    print('22bet finished')
     return events
 
 
@@ -290,6 +329,9 @@ def get_competition_ids(sport_arg):
     elif sport_arg == 'tennis':
         sport_id = 4
         sport_name = 'Tennis'
+    elif sport_arg == 'basket':
+        sport_id = 3
+        sport_name = 'Basketball'
 
     comps_url = (
         f"https://22win88.com/LineFeed/GetSportsShortZip?sports={sport_id}&lng=pt&tf=2880&country=148&partner=151"
@@ -337,17 +379,22 @@ def get_competition_ids(sport_arg):
 
 async def get_events_from_competitions(competition_ids, sport):
     if sport == 'football':
+        mode_id = 4
         sport_id = 1
     elif sport == 'tennis':
         sport_id = 4
+        mode_id = 4
+    elif sport == 'basket':
+        sport_id = 3
+        mode_id = 1
 
     url_template = ("https://22win88.com/LineFeed/Get1x2_VZip?sports={sport_id}&champs={"
-                    "competition_id}&count=50&lng=pt&tf=2880&tz=1&mode=4&country=148&partner=151&getEmpty=true")
+                    "competition_id}&count=50&lng=pt&tf=2880&tz=1&mode={mode_id}&country=148&partner=151&getEmpty=true")
     events = []
     results_t = []
 
     for ids in competition_ids:
-        url = url_template.format(url_template, sport_id=sport_id, competition_id=','.join(map(str, ids)))
+        url = url_template.format(url_template, sport_id=sport_id, competition_id=','.join(map(str, ids)), mode_id=mode_id)
         result_t = asyncio.create_task(req(url))
         results_t.append(result_t)
 

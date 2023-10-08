@@ -1,13 +1,12 @@
-from data_retrievers.casinoportugal import casinoportugal_football, casinoportugal_tennis
-from data_retrievers.placard import placard_football
+from data_retrievers.casinoportugal import casinoportugal_football, casinoportugal_tennis, casinoportugal_basket
+from data_retrievers.placard import placard_football, placard_basket
 from data_retrievers.placard import placard_tennis
 from utils import calculate_arbitrage_3_websites
-from data_retrievers.aggregator import aggregate_data
-from data_retrievers.twentytwobet import twentytwobet_tennis_win_match
-from data_retrievers.esconline import esconline_tennis_win_match_24h
+from data_retrievers.twentytwobet import twentytwobet_tennis_win_match, twentytwobet_basket
+from data_retrievers.esconline import esconline_tennis_win_match_24h, esconline_basket
 from data_retrievers.esconline import esconline_football
-from data_retrievers.betano import betano_football
-from data_retrievers.betclic import betclic_football
+from data_retrievers.betano import betano_football, betano_basket
+from data_retrievers.betclic import betclic_football, betclic_basket
 from data_retrievers.twentytwobet import twentytwobet_football
 from data_retrievers.twentytwobet import get_competition_ids
 from data_retrievers.twentytwobet import get_events_from_competitions
@@ -19,12 +18,11 @@ from thefuzz import process
 import json
 from data_retrievers.aggregator import get_matched_event
 from data_retrievers.aggregator import merge_data_sets
-from data_retrievers.lebull import lebull_football
-from data_retrievers.bwin import bwin_football
+from data_retrievers.lebull import lebull_football, lebull_basket
+from data_retrievers.bwin import bwin_football, bwin_basket
 from model.event import calculate_arbitrage_stakes
 from model.event import Event
-from data_retrievers.solverde import solverde_tennis, solverde_football
-
+from data_retrievers.solverde import solverde_tennis, solverde_football, solverde_basket
 
 
 async def main():
@@ -161,7 +159,17 @@ async def main():
 
     # events = get_events_from_competitions(comps_ids)
 
-    events = await solverde_football()
+    #events = await betclic_basket()
+    #events = await betano_basket()
+    #events = await bwin_basket()
+    #does not work
+    #events = await casinoportugal_basket()
+    #events = await lebull_basket()
+    #events = await lebull_basket()
+    #events = await placard_basket()
+    #events = await solverde_basket()
+    events = await twentytwobet_basket()
+
     print(events)
 
 

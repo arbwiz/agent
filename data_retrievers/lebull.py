@@ -2,7 +2,7 @@ import requests
 import json
 import datetime
 
-from data_retrievers.common import is_valid_tennis_event, is_valid_football_event
+from data_retrievers.common import is_valid_tennis_event, is_valid_football_event, is_valid_basket_event
 
 
 async def lebull_tennis():
@@ -44,9 +44,46 @@ async def lebull_tennis():
             events.append(event_data)
     return events
 
+async def lebull_basket():
+    # might change
+    tenant_header = "126dc7bf-288b-4f72-9536-3aa54648c0f4"
+    url = "https://sportsbook-betting-prod.gtdevteam.work/sports/4/leagues/upcoming?languageId=14&isStakeGrouped=true&timeZone=1&checkIsActive=true&setParameterOrder=false&leagueTimeFilter=10&getMainMatch=false"
+
+    headers = {'X-Auth-Tenant-Id': tenant_header}
+    response = requests.get(url, headers=headers)
+
+    res_dict = json.loads(response.content)
+
+    lebull_events = [event for league in res_dict for event in league['games']]
+
+    events = []
+    for event in lebull_events:
+        if event['isLive'] == 'true':
+            continue
+        event_data = {
+            'bookmaker': 'lebull',
+            'name': event['teamA'] + ' - ' + event['teamB'],
+            'markets': [{
+                'name': 'h2h',
+                'selections': []
+            }],
+            'start_time': str(convert_time(event['timestamp'])),
+            'start_time_ms': event['timestamp']
+        }
+
+        for stakeType in event['stakeTypes']:
+            if stakeType['stakeTypeName'] == 'Vencedor':
+                for selection in stakeType['stakes']:
+                    event_data['markets'][0]['selections'].append({
+                        'name': selection['stakeName'],
+                        'price': float(selection['betFactor'])
+                    })
+
+        if is_valid_basket_event(event_data):
+            events.append(event_data)
+    return events
 
 async def lebull_football():
-    print('lebull started')
     # might change
     tenant_header = "126dc7bf-288b-4f72-9536-3aa54648c0f4"
     url = "https://sportsbook-betting-prod.gtdevteam.work/sports/1/leagues/upcoming?leagueTimeFilter=10&languageId=14&stakeTypes=%5B1%2C%2080%2C%20356%2C%20702%2C%20176415%2C%20183254%2C%20217797%2C%20357318%2C%202%2C%203%2C%2026%2C%2037%2C%20545%2C%20144%2C%20724%2C%20274556%2C%20313638%2C%20313639%5D&isStakeGrouped=true&timeZone=1&checkIsActive=true&setParameterOrder=false&getMainMatch=false"
@@ -88,7 +125,6 @@ async def lebull_football():
 
         if is_valid_football_event(event_data):
             events.append(event_data)
-    print('lebull finished')
     return events
 
 

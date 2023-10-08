@@ -126,8 +126,9 @@ class Event:
 
                                                             })
 
-            message = "\nEvent name: {} \nProfit %: {profit:.3f}\n---\n{stake}".format(str(self.data['name']), profit=(
-                    (1 - self.total_arbitrage_percentage) * 100), stake=stakes_message)
+            message = "\nEvent: {} \nSport: {} \nProfit %: {profit:.3f}\n---\n{stake}".format(str(self.data['name']),
+                                                                                              str(self.data['sport_key']),
+                                                                                              profit=((1 - self.total_arbitrage_percentage) * 100), stake=stakes_message)
             print(message)
 
             if best_odds_to_names(best_odds) not in Event.cache:

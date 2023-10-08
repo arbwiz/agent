@@ -2,7 +2,7 @@ import requests
 import json
 import datetime
 
-from data_retrievers.common import is_valid_tennis_event, is_valid_football_event
+from data_retrievers.common import is_valid_tennis_event, is_valid_football_event, is_valid_basket_event
 
 
 async def casinoportugal_tennis():
@@ -50,9 +50,54 @@ async def casinoportugal_tennis():
             events.append(event_data)
     return events
 
+async def casinoportugal_basket():
+    url = "https://odds.casinoportugal.pt/redis/fixtures?take=100&type=both&countMarkets=true&lang=pt&sportId=1282"
+
+    response = requests.get(url)
+
+    res_dict = json.loads(response.content)
+
+    events = []
+    for event in res_dict['fixtures']:
+        if event['in_play'] == 1:
+            continue
+
+        event_data = {
+            'bookmaker': 'casinoportugal',
+            'name': event['home_name'] + ' - ' + event['away_name'],
+            'markets': [],
+            'start_time': event['start_time_utc'] + 'Z',
+            'start_time_ms': convert_time(event['start_time_utc'] + 'Z')
+        }
+
+        market_data = {
+            'name': 'h2h',
+            'selections': []
+        }
+
+        for market in event['markets']:
+            if market['name'] == '1x2' and market['trading_status'] != 'Suspended':
+                for selection in market['selections']:
+                    if selection['selection_name'] == 'Home':
+                        market_data['selections'].append({
+                            'name':  event['home_name'],
+                            'price': float(selection['decimal'])
+                        })
+                    elif selection['selection_name'] == 'Away':
+                        market_data['selections'].append({
+                            'name':  event['away_name'],
+                            'price': float(selection['decimal'])
+                        })
+                    else:
+                        continue
+
+        event_data['markets'] = [market_data]
+
+        if is_valid_basket_event(event_data):
+            events.append(event_data)
+    return events
 
 async def casinoportugal_football():
-    print('casinoportugal started')
     url = "https://odds.casinoportugal.pt/redis/fixtures?take=100&type=both&countMarkets=true&lang=pt&sportId=1174"
 
     response = requests.get(url)
@@ -100,7 +145,6 @@ async def casinoportugal_football():
 
         if is_valid_football_event(event_data):
             events.append(event_data)
-    print('casinoportugal finished')
     return events
 
 

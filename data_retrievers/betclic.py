@@ -2,7 +2,7 @@ import requests
 import json
 import datetime
 
-from data_retrievers.common import is_valid_football_event, is_valid_tennis_event
+from data_retrievers.common import is_valid_football_event, is_valid_tennis_event, is_valid_basket_event
 
 
 async def betclic_tennis_win_match():
@@ -43,10 +43,9 @@ async def betclic_tennis_win_match():
 
 
 async def betclic_football():
-    print('betclic started')
-    h2h_events = request_events(1365)
-    total_goals_events = request_events(411)
-    double_result_events = request_events(1348)
+    h2h_events = request_events(1, 1365)
+    total_goals_events = request_events(1, 411)
+    double_result_events = request_events(1, 1348)
 
     events = []
     for event in h2h_events:
@@ -69,7 +68,41 @@ async def betclic_football():
 
         if is_valid_football_event(event_data):
             events.append(event_data)
-    print('betclic finished')
+    return events
+
+
+async def betclic_basket():
+    h2h_events = request_events(4, 1115)
+
+    events = []
+    for event in h2h_events:
+        if event['is_live'] == 'true':
+            continue
+        event_data = {
+            'bookmaker': 'betclic',
+            'name': event['name'],
+            'markets': [{
+                'name': 'h2h',
+                'selections': []
+            }],
+            'start_time': event['date'],
+            'start_time_ms': round(convert_time(event['date']))
+        }
+
+        if len(event['grouped_markets']) == 0 or len(event['grouped_markets'][0]['markets']) == 0:
+            continue
+
+        for selection in event['grouped_markets'][0]['markets'][0]['selections']:
+            if len(selection) == 0:
+                break
+
+            event_data['markets'][0]['selections'].append({
+                'name': selection[0]['name'],
+                'price': float(selection[0]['odds'])
+            })
+
+        if is_valid_basket_event(event_data):
+            events.append(event_data)
     return events
 
 
@@ -98,11 +131,12 @@ def get_markets(h2h_event, total_goal_event, double_result_event):
     return markets
 
 
-def request_events(market_type_id):
+def request_events(sport_id, market_type_id):
     url = (
-                "https://offer.cdn.begmedia.com/api/pub/v4/sports/1?application=1024&countrycode=pt&hasSwitchMtc=true&language=pt&limit=300&markettypeId=" +
-                str(market_type_id) +
-                "&offset=0&sitecode=ptpt&sortBy=ByLiveRankingPreliveDate")
+            "https://offer.cdn.begmedia.com/api/pub/v4/sports/" + str(
+        sport_id) + "?application=1024&countrycode=pt&hasSwitchMtc=true&language=pt&limit=300&markettypeId=" +
+            str(market_type_id) +
+            "&offset=0&sitecode=ptpt&sortBy=ByLiveRankingPreliveDate")
 
     result = requests.get(url)
     resultDict = json.loads(result.content)

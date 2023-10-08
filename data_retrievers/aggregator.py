@@ -1,22 +1,22 @@
-from data_retrievers.betano import betano_tennis_win_match_24h
+from data_retrievers.betano import betano_tennis_win_match_24h, betano_basket
 from data_retrievers.betano import betano_football
 
-from data_retrievers.betclic import betclic_tennis_win_match
+from data_retrievers.betclic import betclic_tennis_win_match, betclic_basket
 from data_retrievers.betclic import betclic_football
 from data_retrievers.casinoportugal import casinoportugal_tennis, casinoportugal_football
-from data_retrievers.placard import placard_tennis, placard_football
+from data_retrievers.placard import placard_tennis, placard_football, placard_basket
 
-from data_retrievers.twentytwobet import twentytwobet_tennis_win_match
+from data_retrievers.twentytwobet import twentytwobet_tennis_win_match, twentytwobet_basket
 from data_retrievers.twentytwobet import twentytwobet_football
 
-from data_retrievers.esconline import esconline_tennis_win_match_24h
+from data_retrievers.esconline import esconline_tennis_win_match_24h, esconline_basket
 from data_retrievers.esconline import esconline_football
 
-from data_retrievers.lebull import lebull_football, lebull_tennis
+from data_retrievers.lebull import lebull_football, lebull_tennis, lebull_basket
 
-from data_retrievers.bwin import bwin_football, bwin_tennis
+from data_retrievers.bwin import bwin_football, bwin_tennis, bwin_basket
 
-from data_retrievers.solverde import solverde_tennis, solverde_football
+from data_retrievers.solverde import solverde_tennis, solverde_football, solverde_basket
 
 from thefuzz import process, fuzz
 import time
@@ -59,6 +59,34 @@ async def get_tennis_data():
     await generate_output_files(betano, betclic, bwin, data, esconline, lebull, twentytwo, solverde, placard, casinoportugal, 'tennis')
     return data
 
+
+async def get_basket_data():
+    solverde_t = asyncio.create_task(solverde_basket())
+    placard_t = asyncio.create_task(placard_basket())
+    twentytwo_t = asyncio.create_task(twentytwobet_basket())
+    esconline_t = asyncio.create_task(esconline_basket())
+    betano_t = asyncio.create_task(betano_basket())
+    betclic_t = asyncio.create_task(betclic_basket())
+    lebull_t = asyncio.create_task(lebull_basket())
+    bwin_t = asyncio.create_task(bwin_basket())
+    # not supported yet due to default winner market having draw option
+    #casinoportugal_t = asyncio.create_task(casinoportugal_basket())
+
+    betano = await betano_t
+    betclic = await betclic_t
+    lebull = await lebull_t
+    bwin = await bwin_t
+    twentytwo = await twentytwo_t
+    #casinoportugal = await casinoportugal_t
+    solverde = await solverde_t
+    esconline = await esconline_t
+    placard = await placard_t
+
+
+    data = aggregate_data([betclic, betano, esconline, bwin, lebull, twentytwo, solverde, placard], 'basket')
+
+    await generate_output_files_basket(betano, betclic, bwin, data, esconline, lebull, twentytwo, solverde, placard, 'basket')
+    return data
 
 async def get_football_data():
     solverde_t = asyncio.create_task(solverde_football())
@@ -238,6 +266,17 @@ async def write_output_file(file_name, file_data):
     with open("output/" + file_name + ".json", 'w') as outfile:
         outfile.write(json.dumps(file_data, indent=4))
 
+
+async def generate_output_files_basket(betano, betclic, bwin, data, esconline, lebull, twentytwo, solverde, placard, sport_type):
+    await write_output_file('betano_' + sport_type, betano)
+    await write_output_file('betlic_' + sport_type, betclic)
+    await write_output_file('esconline_' + sport_type, esconline)
+    await write_output_file('bwin_' + sport_type, bwin)
+    await write_output_file('lebull_' + sport_type, lebull)
+    await write_output_file('twentytwo_' + sport_type, twentytwo)
+    await write_output_file('solverde_' + sport_type, solverde)
+    await write_output_file('placard_' + sport_type, placard)
+    await write_output_file('aggregated_' + sport_type, data)
 
 async def generate_output_files(betano, betclic, bwin, data, esconline, lebull, twentytwo, solverde, placard, casinoportugal, sport_type):
     await write_output_file('betano_' + sport_type, betano)
