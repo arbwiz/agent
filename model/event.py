@@ -17,8 +17,8 @@ FIRST = 0
 import json
 from notifications.telegram import send_telegram_message
 
-cache = []
 class Event:
+    cache = []
     def __init__(self, data):
         self.data = data
         self.sport_key = data['sport_key']
@@ -125,13 +125,16 @@ class Event:
                                                                 'odd': best_odds[2][2]
 
                                                             })
-            cache.append(best_odds)
+
             message = "\nEvent name: {} \nProfit %: {profit:.3f}\n---\n{stake}".format(str(self.data['name']), profit=(
-                        (1 - self.total_arbitrage_percentage) * 100), stake=stakes_message)
-
-
-            send_telegram_message(message)
+                    (1 - self.total_arbitrage_percentage) * 100), stake=stakes_message)
             print(message)
+
+            if best_odds_to_names(best_odds) not in Event.cache:
+                Event.cache.append(best_odds_to_names(best_odds))
+            else:
+                # notify only if its not the first time this opportunity appears
+                send_telegram_message(message)
             return True
         return False
 
@@ -208,3 +211,9 @@ def calculate_arbitrage_stakes(stake, odds_a, odds_b, odds_c=None):
 def contains_market(markets, name):
     found = [market for market in markets if len(market) != 0 and market['name'] == name]
     return len(found) >= 1
+
+def best_odds_to_names(best_odds):
+    if len(best_odds) == 2:
+        return [best_odds[0][1], best_odds[1][1]]
+    elif len(best_odds) == 3:
+        return [best_odds[0][1], best_odds[1][1], best_odds[2][1]]

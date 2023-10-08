@@ -128,11 +128,14 @@ async def bwin_football():
             continue
         event_data['markets'] = [market_data]
 
+
         dr_markets = get_double_result_markets(event, market_data)
         ou_markets = get_total_goals_market(event)
 
-        event_data['markets'].extend(dr_markets)
-        event_data['markets'].extend(ou_markets)
+        if dr_markets is not None:
+            event_data['markets'].extend(dr_markets)
+        if ou_markets is not None:
+            event_data['markets'].extend(ou_markets)
 
         if is_valid_football_event(event_data):
             events.append(event_data)
@@ -209,8 +212,12 @@ def get_total_goals_market(event):
 
 
 def get_double_result_markets(event, h2h_market):
-    double_result_market = [market for market in event['optionMarkets'] if market['name']['value'] == 'Double Chance'][
-        0]
+
+    double_result_market_r = [market for market in event['optionMarkets'] if market['name']['value'] == 'Double Chance']
+    if len(double_result_market_r) > 0:
+        double_result_market = double_result_market_r[0]
+    else:
+        return None
 
     market = {
         'name': '1x 2',
