@@ -1,3 +1,4 @@
+from data_retrievers.betseven import betseven_tennis
 from data_retrievers.casinoportugal import casinoportugal_football, casinoportugal_tennis, casinoportugal_basket
 from data_retrievers.placard import placard_football, placard_basket
 from data_retrievers.placard import placard_tennis
@@ -168,7 +169,9 @@ async def main():
     #events = await lebull_basket()
     #events = await placard_basket()
     #events = await solverde_basket()
-    events = await twentytwobet_basket()
+    #events = await twentytwobet_basket()
+
+    events = await betseven_tennis()
 
     print(events)
 
