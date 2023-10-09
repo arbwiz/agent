@@ -35,12 +35,12 @@ async def casinoportugal_tennis():
                 for selection in market['selections']:
                     if selection['selection_name'] == 'Home':
                         market_data['selections'].append({
-                            'name':  event['home_name'],
+                            'name': event['home_name'],
                             'price': float(selection['decimal'])
                         })
                     elif selection['selection_name'] == 'Away':
                         market_data['selections'].append({
-                            'name':  event['away_name'],
+                            'name': event['away_name'],
                             'price': float(selection['decimal'])
                         })
 
@@ -49,6 +49,7 @@ async def casinoportugal_tennis():
         if is_valid_tennis_event(event_data):
             events.append(event_data)
     return events
+
 
 async def casinoportugal_basket():
     url = "https://odds.casinoportugal.pt/redis/fixtures?take=100&type=both&countMarkets=true&lang=pt&sportId=1282"
@@ -80,12 +81,12 @@ async def casinoportugal_basket():
                 for selection in market['selections']:
                     if selection['selection_name'] == 'Home':
                         market_data['selections'].append({
-                            'name':  event['home_name'],
+                            'name': event['home_name'],
                             'price': float(selection['decimal'])
                         })
                     elif selection['selection_name'] == 'Away':
                         market_data['selections'].append({
-                            'name':  event['away_name'],
+                            'name': event['away_name'],
                             'price': float(selection['decimal'])
                         })
                     else:
@@ -96,6 +97,7 @@ async def casinoportugal_basket():
         if is_valid_basket_event(event_data):
             events.append(event_data)
     return events
+
 
 async def casinoportugal_football():
     url = "https://odds.casinoportugal.pt/redis/fixtures?take=100&type=both&countMarkets=true&lang=pt&sportId=1174"
@@ -127,12 +129,12 @@ async def casinoportugal_football():
                 for selection in market['selections']:
                     if selection['selection_name'] == 'Home':
                         market_data['selections'].append({
-                            'name':  event['home_name'],
+                            'name': event['home_name'],
                             'price': float(selection['decimal'])
                         })
                     elif selection['selection_name'] == 'Away':
                         market_data['selections'].append({
-                            'name':  event['away_name'],
+                            'name': event['away_name'],
                             'price': float(selection['decimal'])
                         })
                     else:
@@ -150,13 +152,14 @@ async def casinoportugal_football():
 
 def convert_time(millis):
     dt = datetime.datetime.fromtimestamp(millis / 1000)
-    return (dt.isoformat())
+    return dt.isoformat()
 
 
 def find_market_by_id(markets, id):
     found = [market for market in markets if market['name'] == id]
     return found[0] if len(found) == 1 else None
 
+
 def convert_time(iso_format):
     dt = datetime.datetime.fromisoformat(iso_format)
-    return (dt.timestamp() * 1000)
+    return dt.timestamp() * 1000

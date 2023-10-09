@@ -3,7 +3,7 @@ from data_retrievers.betano import betano_football
 
 from data_retrievers.betclic import betclic_tennis_win_match, betclic_basket
 from data_retrievers.betclic import betclic_football
-from data_retrievers.betseven import betseven_tennis
+from data_retrievers.betseven import betseven_tennis, betseven_basket, betseven_football
 from data_retrievers.casinoportugal import casinoportugal_tennis, casinoportugal_football
 from data_retrievers.placard import placard_tennis, placard_football, placard_basket
 
@@ -41,7 +41,7 @@ async def get_tennis_data():
     bwin_t = asyncio.create_task(bwin_tennis())
     casinoportugal_t = asyncio.create_task(casinoportugal_tennis())
     betseven_t = asyncio.create_task(betseven_tennis())
-    
+
     betano = await betano_t
     betclic = await betclic_t
     lebull = await lebull_t
@@ -53,10 +53,12 @@ async def get_tennis_data():
     esconline = await esconline_t
     placard = await placard_t
 
+    bookmakers = [betclic, betano, esconline, twentytwo, bwin, lebull, solverde, placard, casinoportugal, betseven]
 
-    data = aggregate_data([betclic, betano, esconline, twentytwo, bwin, lebull, solverde, placard, casinoportugal, betseven], 'tennis')
+    data = aggregate_data(bookmakers, 'tennis')
 
-    await generate_output_files(betano, betclic, bwin, data, esconline, lebull, twentytwo, solverde, placard, casinoportugal, betseven, 'tennis')
+    await generate_output_files(bookmakers, data, 'tennis')
+
     return data
 
 
@@ -70,23 +72,26 @@ async def get_basket_data():
     lebull_t = asyncio.create_task(lebull_basket())
     bwin_t = asyncio.create_task(bwin_basket())
     # not supported yet due to default winner market having draw option
-    #casinoportugal_t = asyncio.create_task(casinoportugal_basket())
+    # casinoportugal_t = asyncio.create_task(casinoportugal_basket())
+    betseven_t = asyncio.create_task(betseven_basket())
 
     betano = await betano_t
     betclic = await betclic_t
     lebull = await lebull_t
     bwin = await bwin_t
     twentytwo = await twentytwo_t
-    #casinoportugal = await casinoportugal_t
+    # casinoportugal = await casinoportugal_t
     solverde = await solverde_t
     esconline = await esconline_t
     placard = await placard_t
+    betseven = await betseven_t
 
+    bookmakers = [betclic, betano, esconline, bwin, lebull, twentytwo, solverde, placard, betseven]
+    data = aggregate_data(bookmakers, 'basket')
 
-    data = aggregate_data([betclic, betano, esconline, bwin, lebull, twentytwo, solverde, placard], 'basket')
-
-    await generate_output_files_basket(betano, betclic, bwin, data, esconline, lebull, twentytwo, solverde, placard, 'basket')
+    await generate_output_files(bookmakers, data, 'basket')
     return data
+
 
 async def get_football_data():
     solverde_t = asyncio.create_task(solverde_football())
@@ -98,6 +103,7 @@ async def get_football_data():
     bwin_t = asyncio.create_task(bwin_football())
     placard_t = asyncio.create_task(placard_football())
     casinoportugal_t = asyncio.create_task(casinoportugal_football())
+    betseven_t = asyncio.create_task(betseven_football())
 
     betano = await betano_t
     betclic = await betclic_t
@@ -108,9 +114,14 @@ async def get_football_data():
     placard = await placard_t
     esconline = await esconline_t
     solverde = await solverde_t
+    betseven = await betseven_t
 
-    data = aggregate_data([betclic, betano, esconline, twentytwo, lebull, bwin, solverde, placard, casinoportugal], 'football')
-    await generate_output_files(betano, betclic, bwin, data, esconline, lebull, twentytwo, solverde, placard, casinoportugal, [], 'football')
+    bookmakers = [betclic, betano, esconline, twentytwo, lebull, bwin, solverde, placard, casinoportugal, betseven]
+
+    data = aggregate_data(bookmakers, 'football')
+
+    await generate_output_files(bookmakers, data, 'football')
+
     return data
 
 
@@ -261,36 +272,18 @@ def merge_data_sets(aggregate_data, new_data, sport_name):
 def contains_event_name(events, name):
     return compare_strings_with_ratio(events['name'], name, 0.6)
 
+async def generate_output_files(bookmakers, aggregated, sport_type):
+
+    await write_output_file(f"aggregated_{sport_type}", aggregated)
+    for bookmaker in bookmakers:
+        if len(bookmaker) > 0:
+            await write_output_file(f"{bookmaker[0]['bookmaker']}_{sport_type}", bookmaker)
+
 
 async def write_output_file(file_name, file_data):
     with open("output/" + file_name + ".json", 'w') as outfile:
         outfile.write(json.dumps(file_data, indent=4))
-
-
-async def generate_output_files_basket(betano, betclic, bwin, data, esconline, lebull, twentytwo, solverde, placard, sport_type):
-    await write_output_file('betano_' + sport_type, betano)
-    await write_output_file('betlic_' + sport_type, betclic)
-    await write_output_file('esconline_' + sport_type, esconline)
-    await write_output_file('bwin_' + sport_type, bwin)
-    await write_output_file('lebull_' + sport_type, lebull)
-    await write_output_file('twentytwo_' + sport_type, twentytwo)
-    await write_output_file('solverde_' + sport_type, solverde)
-    await write_output_file('placard_' + sport_type, placard)
-    await write_output_file('aggregated_' + sport_type, data)
-
-async def generate_output_files(betano, betclic, bwin, data, esconline, lebull, twentytwo, solverde, placard, casinoportugal, betseven, sport_type):
-    await write_output_file('betano_' + sport_type, betano)
-    await write_output_file('betlic_' + sport_type, betclic)
-    await write_output_file('twentytwo_' + sport_type, twentytwo)
-    await write_output_file('esconline_' + sport_type, esconline)
-    await write_output_file('bwin_' + sport_type, bwin)
-    await write_output_file('lebull_' + sport_type, lebull)
-    await write_output_file('solverde_' + sport_type, solverde)
-    await write_output_file('placard_' + sport_type, placard)
-    await write_output_file('casinoportugal_' + sport_type, casinoportugal)
-    await write_output_file('betseven_' + sport_type, betseven)
-    await write_output_file('aggregated_' + sport_type, data)
-
+    outfile.close()
 
 def log_aggregate_data_info(aggregate_data):
     current_time = ("time:" + str(datetime.now()))
@@ -315,7 +308,8 @@ def log_aggregate_data_info(aggregate_data):
         len(list(filter(lambda event: len(event["bookmakers"]) > 1, aggregate_data['events'])))))
 
     print(
-        current_time + first_message + events_with_two + events_with_tree + events_with_four + events_with_five + events_with_six + events_with_seven, events_with_eight, events_with_nine + last_message)
+        current_time + first_message + events_with_two + events_with_tree + events_with_four + events_with_five + events_with_six + events_with_seven,
+        events_with_eight, events_with_nine + last_message)
 
 
 def get_matched_event(new_event, existing_events):
@@ -332,7 +326,7 @@ def get_matched_event(new_event, existing_events):
         if 'outcomes' not in existing_event["bookmakers"][0]['markets'][0]:
             continue
 
-        if (event[1] > 70 and dates_match(new_event["start_time_ms"], existing_event["start_time_ms"])):
+        if event[1] > 70 and dates_match(new_event["start_time_ms"], existing_event["start_time_ms"]):
             if (
                     compare_strings_with_ratio(new_event['markets'][0]['selections'][0]['name'],
                                                existing_event["bookmakers"][0]['markets'][0]['outcomes'][0]['name'],

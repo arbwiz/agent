@@ -1,3 +1,5 @@
+import traceback
+
 import websockets
 import json
 import datetime
