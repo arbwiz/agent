@@ -360,10 +360,11 @@ async def handle_market_responses_tennis(event_with_markets, sport):
                 continue
 
             for selection in market['selections']:
-                event_with_market['event_data']['markets'][0]['selections'].append({
-                    'name': selection['name'],
-                    'price': float(selection['prices'][0]['decimalLabel'])
-                })
+                if 'name' in selection and 'prices' in selection:
+                    event_with_market['event_data']['markets'][0]['selections'].append({
+                        'name': selection['name'],
+                        'price': float(selection['prices'][0]['decimalLabel'])
+                    })
 
             if sport == 'tennis':
                 if is_valid_tennis_event(event_with_market['event_data']):

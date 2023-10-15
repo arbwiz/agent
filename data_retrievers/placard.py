@@ -1,3 +1,5 @@
+import asyncio
+
 import websockets
 import json
 import datetime
@@ -36,7 +38,7 @@ async def placard_football():
 
 
 async def retrieve_info_websocket_tennis(bookmaker, url, id_to_get_winner_market, events_message, sport):
-    ws = await websockets.connect(url, max_size=5000000)
+    ws = await asyncio.wait_for(websockets.connect(url, max_size=5000000), 20)
     await ws.recv()
 
     init_message = "[\"CONNECT\\nprotocol-version:1.5\\naccept-version:1.0,1.1,1.2\\nheart-beat:10000,10000\\n\\n\\u0000\"]"
@@ -132,10 +134,11 @@ async def handle_market_responses(event_with_markets, sport):
                 continue
 
             for selection in market['selections']:
-                event_with_market['event_data']['markets'][0]['selections'].append({
-                    'name': selection['name'],
-                    'price': float(selection['prices'][0]['decimalLabel'])
-                })
+                if 'name' in selection and 'prices' in selection:
+                    event_with_market['event_data']['markets'][0]['selections'].append({
+                        'name': selection['name'],
+                        'price': float(selection['prices'][0]['decimalLabel'])
+                    })
 
             if sport == 'tennis':
                 if is_valid_tennis_event(event_with_market['event_data']):
