@@ -1,3 +1,5 @@
+import time
+
 SPORT = 'upcoming'  # use the sport_key from the /sports endpoint below, or use 'upcoming' to see the next 8 games across all sports
 
 REGIONS = 'us'  # uk | us | eu | au. Multiple can be specified if comma delimited
@@ -17,8 +19,10 @@ FIRST = 0
 import json
 from notifications.telegram import send_telegram_message
 
+
 class Event:
-    cache = []
+    cache = {}
+
     def __init__(self, data):
         self.data = data
         self.sport_key = data['sport_key']
@@ -127,13 +131,21 @@ class Event:
                                                             })
 
             message = "\nEvent: {} \nSport: {} \nProfit %: {profit:.3f}\n---\n{stake}".format(str(self.data['name']),
-                                                                                              str(self.data['sport_key']),
-                                                                                              profit=((1 - self.total_arbitrage_percentage) * 100), stake=stakes_message)
+                                                                                              str(self.data[
+                                                                                                      'sport_key']),
+                                                                                              profit=((
+                                                                                                                  1 - self.total_arbitrage_percentage) * 100),
+                                                                                              stake=stakes_message)
             print(message)
 
-            if best_odds_to_names(best_odds) not in Event.cache:
-                Event.cache.append(best_odds_to_names(best_odds))
+            event_name = best_odds_to_names(best_odds)
+            if event_name not in Event.cache:
+                Event.cache[event_name] = time.time()
             else:
+                # event expires in cache after 30 minutes
+                if time.time() - 1800 > Event.cache[event_name]:
+                    del Event.cache[event_name]
+
                 # notify only if its not the first time this opportunity appears
                 send_telegram_message(message)
             return True
@@ -184,10 +196,6 @@ def calculate_arbitrage_stakes(stake, odds_a, odds_b, odds_c=None):
         stake_b = (stake / total_implied_prob) * implied_prob_b
         stake_c = (stake / total_implied_prob) * implied_prob_c
 
-        profit_a = stake_a * odds_a['odd']
-        profit_b = stake_b * odds_b['odd']
-        profit_c = stake_c * odds_c['odd']
-
         output_string = "{}{} \nStake: {stake_a:.2f}".format(odds_a['name'], odds_a['odd'], stake_a=stake_a)
         output_string += "\n{}{} \nStake: {stake_b:.2f}".format(odds_b['name'], odds_b['odd'], stake_b=stake_b)
         output_string += "\n{}{} \nStake: {stake_c:.2f}".format(odds_c['name'], odds_c['odd'], stake_c=stake_c)
@@ -198,9 +206,6 @@ def calculate_arbitrage_stakes(stake, odds_a, odds_b, odds_c=None):
         # Calculate the stakes for each outcome
         stake_a = (stake / total_implied_prob) * implied_prob_a
         stake_b = (stake / total_implied_prob) * implied_prob_b
-
-        profit_a = stake_a * odds_a['odd']
-        profit_b = stake_b * odds_b['odd']
 
         output_string = "For a total stake of: {}\n{}{} \nStake: {stake_a:.2f}".format(stake, odds_a['name'],
                                                                                        odds_a['odd'], stake_a=stake_a)
@@ -213,8 +218,9 @@ def contains_market(markets, name):
     found = [market for market in markets if len(market) != 0 and market['name'] == name]
     return len(found) >= 1
 
+
 def best_odds_to_names(best_odds):
     if len(best_odds) == 2:
-        return [best_odds[0][1], best_odds[1][1]]
+        return str([best_odds[0][1], best_odds[1][1]])
     elif len(best_odds) == 3:
-        return [best_odds[0][1], best_odds[1][1], best_odds[2][1]]
+        return str([best_odds[0][1], best_odds[1][1], best_odds[2][1]])

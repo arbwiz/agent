@@ -4,6 +4,7 @@ from data_retrievers.betano import betano_football
 from data_retrievers.betclic import betclic_tennis_win_match, betclic_basket
 from data_retrievers.betclic import betclic_football
 from data_retrievers.betseven import betseven_tennis, betseven_basket, betseven_football
+from data_retrievers.bettilt import bettilt_tennis, bettilt_basket, bettilt_football
 from data_retrievers.casinoportugal import casinoportugal_tennis, casinoportugal_football
 from data_retrievers.placard import placard_tennis, placard_football, placard_basket
 
@@ -41,6 +42,8 @@ async def get_tennis_data():
     bwin_t = asyncio.create_task(bwin_tennis())
     casinoportugal_t = asyncio.create_task(casinoportugal_tennis())
     betseven_t = asyncio.create_task(betseven_tennis())
+    bettilt_t = asyncio.create_task(bettilt_tennis())
+
 
     betano = await betano_t
     betclic = await betclic_t
@@ -52,8 +55,9 @@ async def get_tennis_data():
     solverde = await solverde_t
     esconline = await esconline_t
     placard = await placard_t
+    bettilt = await bettilt_t
 
-    bookmakers = [betclic, betano, esconline, twentytwo, bwin, lebull, solverde, placard, casinoportugal, betseven]
+    bookmakers = [betclic, betano, esconline, twentytwo, bwin, lebull, solverde, placard, casinoportugal, betseven, bettilt]
 
     data = aggregate_data(bookmakers, 'tennis')
 
@@ -74,6 +78,7 @@ async def get_basket_data():
     # not supported yet due to default winner market having draw option
     # casinoportugal_t = asyncio.create_task(casinoportugal_basket())
     betseven_t = asyncio.create_task(betseven_basket())
+    bettilt_t = asyncio.create_task(bettilt_basket())
 
     betano = await betano_t
     betclic = await betclic_t
@@ -85,8 +90,9 @@ async def get_basket_data():
     esconline = await esconline_t
     placard = await placard_t
     betseven = await betseven_t
+    bettilt = await bettilt_t
 
-    bookmakers = [betclic, betano, esconline, bwin, lebull, twentytwo, solverde, placard, betseven]
+    bookmakers = [betclic, betano, esconline, bwin, lebull, twentytwo, solverde, placard, betseven, bettilt]
     data = aggregate_data(bookmakers, 'basket')
 
     await generate_output_files(bookmakers, data, 'basket')
@@ -104,6 +110,7 @@ async def get_football_data():
     placard_t = asyncio.create_task(placard_football())
     casinoportugal_t = asyncio.create_task(casinoportugal_football())
     betseven_t = asyncio.create_task(betseven_football())
+    bettilt_t = asyncio.create_task(bettilt_football())
 
     betano = await betano_t
     betclic = await betclic_t
@@ -115,8 +122,9 @@ async def get_football_data():
     esconline = await esconline_t
     solverde = await solverde_t
     betseven = await betseven_t
+    bettilt = await bettilt_t
 
-    bookmakers = [betclic, betano, esconline, twentytwo, lebull, bwin, solverde, placard, casinoportugal, betseven]
+    bookmakers = [betclic, betano, esconline, twentytwo, lebull, bwin, solverde, placard, casinoportugal, betseven, bettilt]
 
     data = aggregate_data(bookmakers, 'football')
 
