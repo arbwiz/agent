@@ -97,6 +97,46 @@ async def twentytwobet_basket():
             events.append(event_data)
     return events
 
+async def twentytwobet_volley():
+    comps_ids = get_competition_ids('volleyball')
+
+    result_events = await get_events_from_competitions(comps_ids, 'volleyball')
+
+    events = []
+    for event in result_events:
+        event_data = {
+            'bookmaker': '22bet',
+            'name': event['O1'] + ' - ' + event['O2'],
+            'markets': [],
+            'start_time': str(convert_time(event['S'])),
+            'start_time_ms': event['S'] * 1000
+        }
+
+        market_data = {
+            'name': 'h2h',
+            'selections': []
+        }
+
+        for selection in event['E']:
+            if selection['T'] == 1:
+                market_data['selections'].insert(0, {
+                    'name': event['O1'],
+                    'price': float(selection['C'])
+                })
+
+            elif selection['T'] == 3:
+                market_data['selections'].insert(1, {
+                    'name': event['O2'],
+                    'price': float(selection['C'])
+                })
+            else:
+                continue
+
+        event_data['markets'] = [market_data]
+
+        if is_valid_basket_event(event_data):
+            events.append(event_data)
+    return events
 
 async def twentytwobet_football():
     # only retrieves 50 events and no pagination
@@ -332,6 +372,9 @@ def get_competition_ids(sport_arg):
     elif sport_arg == 'basket':
         sport_id = 3
         sport_name = 'Basketball'
+    elif sport_arg == 'volleyball':
+        sport_id = 6
+        sport_name = 'Volleyball'
 
     comps_url = (
         f"https://22win88.com/LineFeed/GetSportsShortZip?sports={sport_id}&lng=pt&tf=2880&country=148&partner=151"
@@ -386,6 +429,9 @@ async def get_events_from_competitions(competition_ids, sport):
         mode_id = 4
     elif sport == 'basket':
         sport_id = 3
+        mode_id = 1
+    elif sport == 'volleyball':
+        sport_id = 6
         mode_id = 1
 
     url_template = ("https://22win88.com/LineFeed/Get1x2_VZip?sports={sport_id}&champs={"

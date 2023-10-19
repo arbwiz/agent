@@ -1,14 +1,14 @@
 from data_retrievers.betseven import betseven_tennis, betseven_basket, betseven_football
-from data_retrievers.bettilt import get_all_events, bettilt_tennis, bettilt_football
+from data_retrievers.bettilt import get_all_events, bettilt_tennis, bettilt_football, bettilt_volley
 from data_retrievers.casinoportugal import casinoportugal_football, casinoportugal_tennis, casinoportugal_basket
 from data_retrievers.placard import placard_football, placard_basket
 from data_retrievers.placard import placard_tennis
 from utils import calculate_arbitrage_3_websites
-from data_retrievers.twentytwobet import twentytwobet_tennis_win_match, twentytwobet_basket
+from data_retrievers.twentytwobet import twentytwobet_tennis_win_match, twentytwobet_basket, twentytwobet_volley
 from data_retrievers.esconline import esconline_tennis_win_match_24h, esconline_basket
 from data_retrievers.esconline import esconline_football
-from data_retrievers.betano import betano_football, betano_basket
-from data_retrievers.betclic import betclic_football, betclic_basket
+from data_retrievers.betano import betano_football, betano_basket, betano_volley
+from data_retrievers.betclic import betclic_football, betclic_basket, betclic_volley
 from data_retrievers.twentytwobet import twentytwobet_football
 from data_retrievers.twentytwobet import get_competition_ids
 from data_retrievers.twentytwobet import get_events_from_competitions
@@ -28,152 +28,8 @@ from data_retrievers.solverde import solverde_tennis, solverde_football, solverd
 
 
 async def main():
-    # betano_data = [
-    #     {
-    #         "bookmaker": "betano",
-    #         "name": "Sporting CP - Rio Ave FC",
-    #         "markets": [
-    #             {
-    #                 "name": "h2h",
-    #                 "selections": [
-    #                     {"name": "Sporting CP", "price": 1.17},
-    #                     {"name": "Empate", "price": 6.7},
-    #                     {"name": "Rio Ave FC", "price": 14.5},
-    #                 ],
-    #             },
-    #             {
-    #                 "name": "total_goals_1.5",
-    #                 "selections": [
-    #                     {"name": "Over", "price": 1.17},
-    #                     {"name": "Under", "price": 6.7},
-    #                 ],
-    #             },
-    #             {
-    #                 "name": "1x 2",
-    #                 "selections": [
-    #                     {"name": "Sporting CP ou Empate", "price": 1.17},
-    #                     {"name": "Rio Ave FC", "price": 14.5},
-    #                 ],
-    #             },
-    #         ],
-    #         "start_time": "2023-09-25T20:15:00",
-    #         "start_time_ms": 1695669300000,
-    #     },
-    #     {
-    #         "bookmaker": "betano",
-    #         "name": "FC Famalic\u00e3o Sub-23 - Academico Viseu Sub-23",
-    #         "markets": [
-    #             {
-    #                 "name": "h2h",
-    #                 "selections": [
-    #                     {"name": "FC Famalic\u00e3o Sub-23", "price": 1.5},
-    #                     {"name": "Empate", "price": 3.55},
-    #                     {"name": "Academico Viseu Sub-23", "price": 4.2},
-    #                 ],
-    #             }
-    #         ],
-    #         "start_time": "2023-09-25T16:00:00",
-    #         "start_time_ms": 1695654000000,
-    #     },
-    #     {
-    #         "bookmaker": "betano",
-    #         "name": "Coventry City - Huddersfield Town",
-    #         "markets": [
-    #             {
-    #                 "name": "h2h",
-    #                 "selections": [
-    #                     {"name": "Coventry City", "price": 1.75},
-    #                     {"name": "Empate", "price": 3.65},
-    #                     {"name": "Huddersfield Town", "price": 4.3},
-    #                 ],
-    #             }
-    #         ],
-    #         "start_time": "2023-09-25T20:00:00",
-    #         "start_time_ms": 1695668400000,
-    #     },
-    # ]
-    #
-    # betclic_data = [
-    #     {
-    #         "bookmaker": "betclic",
-    #         "name": "Sporting - Rio Ave",
-    #         "markets": [
-    #             {
-    #                 "name": "h2h",
-    #                 "selections": [
-    #                     {"name": "Sporting", "price": 1.18},
-    #                     {"name": "Empate", "price": 6.8},
-    #                     {"name": "Rio Ave", "price": 12.75},
-    #                 ],
-    #             },
-    #             {
-    #                 "name": "1 x2",
-    #                 "selections": [
-    #                     {"name": "Sporting CP", "price": 1.17},
-    #                     {"name": "Empate ou Rio Ave FC", "price": 14.5},
-    #                 ],
-    #             },
-    #             {
-    #                 "name": "1x 2",
-    #                 "selections": [
-    #                     {"name": "Sporting CP ou Empate", "price": 3},
-    #                     {"name": "Rio Ave FC", "price": 5},
-    #                 ],
-    #             },
-    #         ],
-    #         "start_time": "2023-09-25T19:15:00Z",
-    #         "start_time_ms": 1695669300000,
-    #     },
-    #     {
-    #         "bookmaker": "betclic",
-    #         "name": "Breidablik Kopavogur - Vikingur Reykjavik",
-    #         "markets": [
-    #             {
-    #                 "name": "h2h",
-    #                 "selections": [
-    #                     {"name": "Breidablik Kopavogur", "price": 2.65},
-    #                     {"name": "Empate", "price": 3.23},
-    #                     {"name": "Vikingur Reykjavik", "price": 1.87},
-    #                 ],
-    #             },
-    #         ],
-    #         "start_time": "2023-09-25T19:15:00Z",
-    #         "start_time_ms": 1695669300000,
-    #     },
-    # ]
-    #
-    # # betano_football()
-    # # await bwin_football()
-    #
-    # aggs = aggregate_data([betano_data, betclic_data], "football")
-    #
-    # events = []
-    # for data in aggs:
-    #     events.append(Event(data))
-    #
-    # arbitrage_events = []
-    # for event in events:
-    #     best_odds = event.find_best_odds()
-    #     if event.arbitrage():
-    #         arbitrage_events.append(event)
 
-    # comps_ids = get_competition_ids()
-
-    # events = get_events_from_competitions(comps_ids)
-
-    #events = await betclic_basket()
-    #events = await betano_basket()
-    #events = await bwin_basket()
-    #does not work
-    #events = await casinoportugal_basket()
-    #events = await lebull_basket()
-    #events = await lebull_basket()
-    #events = await placard_basket()
-    #events = await solverde_basket()
-    #events = await twentytwobet_basket()
-
-    events = await bettilt_football()
-
+    events = await twentytwobet_volley()
     print(events)
 
 

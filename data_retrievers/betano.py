@@ -72,6 +72,36 @@ async def betano_basket():
 
     return events
 
+async def betano_volley():
+    url = 'https://www.betano.pt/api/sport/voleibol/jogos-de-hoje/?sort=Leagues&req=la,s,stnf,c,mb'
+    result = requests.get(url)
+    main_data = json.loads(result.content)
+
+    events = []
+    for block in main_data['data']['blocks']:
+        for event in block['events']:
+            event_data = {
+                'bookmaker': 'betano',
+                'name': event['name'],
+                'markets': [{
+                    'name': 'h2h',
+                    'selections': []
+                }],
+                'start_time': str(convert_time(event['startTime'])),
+                'start_time_ms': event['startTime']
+            }
+            for market in event['markets']:
+                if market['name'] == 'Vencedor do jogo':
+                    for selection in market['selections']:
+                        event_data['markets'][0]['selections'].append({
+                            'name': selection['name'],
+                            'price': float(selection['price'])
+                        })
+            if is_valid_basket_event(event_data):
+                events.append(event_data)
+
+    return events
+
 
 async def betano_football():
     url = 'https://www.betano.pt/api/sport/futebol/jogos-de-hoje/?sort=Leagues&req=la,s,stnf,c,mb'

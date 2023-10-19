@@ -1,14 +1,14 @@
-from data_retrievers.betano import betano_tennis_win_match_24h, betano_basket
+from data_retrievers.betano import betano_tennis_win_match_24h, betano_basket, betano_volley
 from data_retrievers.betano import betano_football
 
-from data_retrievers.betclic import betclic_tennis_win_match, betclic_basket
+from data_retrievers.betclic import betclic_tennis_win_match, betclic_basket, betclic_volley
 from data_retrievers.betclic import betclic_football
 from data_retrievers.betseven import betseven_tennis, betseven_basket, betseven_football
-from data_retrievers.bettilt import bettilt_tennis, bettilt_basket, bettilt_football
+from data_retrievers.bettilt import bettilt_tennis, bettilt_basket, bettilt_football, bettilt_volley
 from data_retrievers.casinoportugal import casinoportugal_tennis, casinoportugal_football
 from data_retrievers.placard import placard_tennis, placard_football, placard_basket
 
-from data_retrievers.twentytwobet import twentytwobet_tennis_win_match, twentytwobet_basket
+from data_retrievers.twentytwobet import twentytwobet_tennis_win_match, twentytwobet_basket, twentytwobet_volley
 from data_retrievers.twentytwobet import twentytwobet_football
 
 from data_retrievers.esconline import esconline_tennis_win_match_24h, esconline_basket
@@ -30,6 +30,25 @@ import asyncio
 
 from utils import compare_strings_with_ratio
 
+async def get_volley_data():
+    twentytwo_t = asyncio.create_task(twentytwobet_volley())
+    betano_t = asyncio.create_task(betano_volley())
+    betclic_t = asyncio.create_task(betclic_volley())
+    bettilt_t = asyncio.create_task(bettilt_volley())
+
+
+    betano = await betano_t
+    betclic = await betclic_t
+    twentytwo = await twentytwo_t
+    bettilt = await bettilt_t
+
+    bookmakers = [betclic, betano, twentytwo, bettilt]
+
+    data = aggregate_data(bookmakers, 'volleyball')
+
+    await generate_output_files(bookmakers, data, 'volleyball')
+
+    return data
 
 async def get_tennis_data():
     solverde_t = asyncio.create_task(solverde_tennis())

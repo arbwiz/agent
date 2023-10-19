@@ -34,6 +34,10 @@ async def get_all_events():
         {
             'name': 'basketball',
             'events': {}
+        },
+        {
+            'name': 'volleyball',
+            'events': {}
         }
     ]
 
@@ -161,6 +165,37 @@ async def bettilt_tennis():
             events.append(event_data)
     return events
 
+async def bettilt_volley():
+    events = []
+    for event_id, event in all_data['volleyball']['events'].items():
+
+        event_data = {
+            'bookmaker': 'bettilt',
+            'name': event['name'],
+            'markets': [{
+                'name': 'h2h',
+                'selections': []
+            }],
+            'start_time': str(convert_time(event['start_time_ms'] * 1000)),
+            'start_time_ms': event['start_time_ms'] * 1000,
+            'link': f'https://www.bettilt363.com/pt/sportsbook?page=/event/{event_id}?isLive=false'
+        }
+
+        for market in event['markets']:
+            if '' in market:
+                event_data['markets'][0]['selections'].append({
+                    'name': event['participant_a'],
+                    'price': float(market['']['4']['k'])
+                })
+
+                event_data['markets'][0]['selections'].append({
+                    'name': event['participant_b'],
+                    'price': float(market['']['5']['k'])
+                })
+
+        if is_valid_tennis_event(event_data):
+            events.append(event_data)
+    return events
 
 async def bettilt_basket():
     events = []
