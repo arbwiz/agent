@@ -26,11 +26,17 @@ async def betseven_tennis():
 
         for market in event['markets']:
             if market['name'] == 'Vencedor':
-                for selection in market['odds']:
-                    market_data['selections'].append({
-                        'name': selection['name'],
-                        'price': float(selection['value'])
-                    })
+                for odd in market['odds']:
+                    if odd['type'] == 1:
+                        market_data['selections'].insert(0, {
+                            'name': odd['name'],
+                            'price': float(odd['value'])
+                        })
+                    elif odd['type'] == 2:
+                        market_data['selections'].insert(1, {
+                            'name': odd['name'],
+                            'price': float(odd['value'])
+                        })
 
         event_data['markets'] = [market_data]
 
@@ -59,11 +65,18 @@ async def betseven_basket():
 
         for market in event['markets']:
             if market['name'] == 'Vencedor (incluindo prorrogação)':
-                for selection in market['odds']:
-                    market_data['selections'].append({
-                        'name': selection['name'],
-                        'price': float(selection['value'])
-                    })
+
+                for odd in market['odds']:
+                    if odd['type'] == 1:
+                        market_data['selections'].insert(0, {
+                            'name': odd['name'],
+                            'price': float(odd['value'])
+                        })
+                    elif odd['type'] == 2:
+                        market_data['selections'].insert(1, {
+                            'name': odd['name'],
+                            'price': float(odd['value'])
+                        })
 
         event_data['markets'] = [market_data]
 
