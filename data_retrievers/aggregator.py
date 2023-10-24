@@ -36,13 +36,18 @@ async def get_volley_data():
     betclic_t = asyncio.create_task(betclic_volley())
     bettilt_t = asyncio.create_task(bettilt_volley())
 
+    bookmakers = []
 
-    betano = await betano_t
-    betclic = await betclic_t
-    twentytwo = await twentytwo_t
-    bettilt = await bettilt_t
-
-    bookmakers = [betclic, betano, twentytwo, bettilt]
+    for func in [["twentytwo", twentytwo_t],
+                 ["betano", betano_t],
+                 ["betclic", betclic_t],
+                 ["bettilt", bettilt_t]]:
+        try:
+            result = await func[1]
+        except Exception as e:
+            print(f"Error at volley for provider: [{func[0]}] with exception: [{e}]")
+            result = []
+        bookmakers.append(result)
 
     data = aggregate_data(bookmakers, 'volleyball')
 
@@ -63,20 +68,25 @@ async def get_tennis_data():
     betseven_t = asyncio.create_task(betseven_tennis())
     bettilt_t = asyncio.create_task(bettilt_tennis())
 
+    bookmakers = []
 
-    betano = await betano_t
-    betclic = await betclic_t
-    lebull = await lebull_t
-    bwin = await bwin_t
-    twentytwo = await twentytwo_t
-    casinoportugal = await casinoportugal_t
-    betseven = await betseven_t
-    solverde = await solverde_t
-    esconline = await esconline_t
-    placard = await placard_t
-    bettilt = await bettilt_t
-
-    bookmakers = [betclic, betano, esconline, twentytwo, bwin, lebull, solverde, placard, casinoportugal, betseven, bettilt]
+    for func in [["solverde", solverde_t],
+                 ["placard", placard_t],
+                 ["twentytwo", twentytwo_t],
+                 ["esconline", esconline_t],
+                 ["betano", betano_t],
+                 ["betclic", betclic_t],
+                 ["lebull", lebull_t],
+                 ["bwin", bwin_t],
+                 ["casinoportugal", casinoportugal_t],
+                 ["betseven", betseven_t],
+                 ["bettilt", bettilt_t]]:
+        try:
+            result = await func[1]
+        except Exception as e:
+            print(f"Error at tennis for provider: [{func[0]}] with exception: [{e}]")
+            result = []
+        bookmakers.append(result)
 
     data = aggregate_data(bookmakers, 'tennis')
 
@@ -99,19 +109,25 @@ async def get_basket_data():
     betseven_t = asyncio.create_task(betseven_basket())
     bettilt_t = asyncio.create_task(bettilt_basket())
 
-    betano = await betano_t
-    betclic = await betclic_t
-    lebull = await lebull_t
-    bwin = await bwin_t
-    twentytwo = await twentytwo_t
-    # casinoportugal = await casinoportugal_t
-    solverde = await solverde_t
-    esconline = await esconline_t
-    placard = await placard_t
-    betseven = await betseven_t
-    bettilt = await bettilt_t
+    bookmakers = []
 
-    bookmakers = [betclic, betano, esconline, bwin, lebull, twentytwo, solverde, placard, betseven, bettilt]
+    for func in [["solverde", solverde_t],
+                 ["twentytwo", twentytwo_t],
+                 ["esconline", esconline_t],
+                 ["betano", betano_t],
+                 ["betclic", betclic_t],
+                 ["lebull", lebull_t],
+                 ["bwin", bwin_t],
+                 ["placard", placard_t],
+                 ["betseven", betseven_t],
+                 ["bettilt", bettilt_t]]:
+        try:
+            result = await func[1]
+        except Exception as e:
+            print(f"Error at basket for provider: [{func[0]}] with exception: [{e}]")
+            result = []
+        bookmakers.append(result)
+
     data = aggregate_data(bookmakers, 'basket')
 
     await generate_output_files(bookmakers, data, 'basket')
@@ -131,19 +147,26 @@ async def get_football_data():
     betseven_t = asyncio.create_task(betseven_football())
     bettilt_t = asyncio.create_task(bettilt_football())
 
-    betano = await betano_t
-    betclic = await betclic_t
-    lebull = await lebull_t
-    bwin = await bwin_t
-    twentytwo = await twentytwo_t
-    casinoportugal = await casinoportugal_t
-    placard = await placard_t
-    esconline = await esconline_t
-    solverde = await solverde_t
-    betseven = await betseven_t
-    bettilt = await bettilt_t
+    bookmakers = []
 
-    bookmakers = [betclic, betano, esconline, twentytwo, lebull, bwin, solverde, placard, casinoportugal, betseven, bettilt]
+    for func in [["solverde", solverde_t],
+                 ["placard", placard_t],
+                 ["twentytwo", twentytwo_t],
+                 ["esconline", esconline_t],
+                 ["betano", betano_t],
+                 ["betclic", betclic_t],
+                 ["lebull", lebull_t],
+                 ["bwin", bwin_t],
+                 ["casinoportugal", casinoportugal_t],
+                 ["betseven", betseven_t],
+                 ["bettilt", bettilt_t]]:
+
+        try:
+            result = await func[1]
+        except Exception as e:
+            print(f"Error at football for provider: [{func[0]}] with exception: [{e}]")
+            result = []
+        bookmakers.append(result)
 
     data = aggregate_data(bookmakers, 'football')
 

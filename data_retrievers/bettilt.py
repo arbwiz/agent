@@ -76,7 +76,8 @@ async def get_all_events():
 
         if item[0][1] == 'market' and not skip:
             event_id = item[0][0]
-            sports_dict[sport_name]['events'][event_id]['markets'].append(item[1])
+            if event_id in sports_dict[sport_name]['events']:
+                sports_dict[sport_name]['events'][event_id]['markets'].append(item[1])
 
     return sports_dict
 

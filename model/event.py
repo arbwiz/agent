@@ -138,16 +138,17 @@ class Event:
                                                                                               stake=stakes_message)
             print(message)
 
-            event_name = best_odds_to_names(best_odds)
-            if event_name not in Event.cache:
-                Event.cache[event_name] = time.time()
-            else:
+            #event_name = best_odds_to_names(best_odds)
+            #if event_name not in Event.cache:
+            #    Event.cache[event_name] = time.time()
+            #else:
                 # event expires in cache after 30 minutes
-                if time.time() - 1800 > Event.cache[event_name]:
-                    del Event.cache[event_name]
+            #    if time.time() - 1800 > Event.cache[event_name]:
+            #        del Event.cache[event_name]
 
                 # notify only if its not the first time this opportunity appears
-                send_telegram_message(message)
+            #    send_telegram_message(message)
+            send_telegram_message(message)
             return True
         return False
 
