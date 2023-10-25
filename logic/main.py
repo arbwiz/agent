@@ -9,7 +9,7 @@ from data_retrievers.aggregator import get_football_data
 from notifications.telegram import send_telegram_message
 
 # -5 should only be use to test
-MIN_PROFIT_MARGIN = -1
+MIN_PROFIT_MARGIN = 0
 
 
 # MIN_PROFIT_MARGIN = 0
