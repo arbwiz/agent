@@ -126,11 +126,11 @@ async def handle_event_responses(bookmaker, event_responses_t,
                                  sport):
     base_url = ""
     if sport == 'football':
-        base_url = 'https://www.placard.pt/apostas/sports/soccer/events/'
+        base_url = f'https://www.{bookmaker}.pt/apostas/sports/soccer/events/'
     elif sport == 'basket':
-        base_url = 'https://www.placard.pt/apostas/sports/basketball/events/'
+        base_url = f'https://www.{bookmaker}.pt/apostas/sports/basketball/events/'
     elif sport == 'tennis':
-        base_url = 'https://www.placard.pt/apostas/sports/tennis/events/'
+        base_url = f'https://www.{bookmaker}.pt/apostas/sports/tennis/events/'
 
     event_responses = []
     event_with_markets = []

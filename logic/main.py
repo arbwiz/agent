@@ -161,6 +161,6 @@ def send_surebets_data(creation_timestamp, sport, surebets):
 
     url = f'http://localhost:8080/surebets'
 
-    requests.post(url,
-                  data=json.dumps(data),
-                  headers={'Content-Type': 'application/json'})
+    #requests.post(url,
+     #             data=json.dumps(data),
+       #           headers={'Content-Type': 'application/json'})
