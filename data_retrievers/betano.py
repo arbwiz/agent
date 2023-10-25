@@ -21,13 +21,15 @@ async def betano_tennis_win_match_24h():
         for event in block['events']:
             event_data = {
                 'bookmaker': 'betano',
+                'competition': event['leagueDescription'],
                 'name': event['name'],
                 'markets': [{
                     'name': 'h2h',
                     'selections': []
                 }],
                 'start_time': str(convert_time(event['startTime'])),
-                'start_time_ms': event['startTime']
+                'start_time_ms': event['startTime'],
+                'url': 'https://www.betano.pt' + event['url']
             }
             for market in event['markets']:
                 if market['name'] == 'Vencedor':
@@ -52,13 +54,15 @@ async def betano_basket():
         for event in block['events']:
             event_data = {
                 'bookmaker': 'betano',
+                'competition': event['regionName'],
                 'name': event['name'],
                 'markets': [{
                     'name': 'h2h',
                     'selections': []
                 }],
                 'start_time': str(convert_time(event['startTime'])),
-                'start_time_ms': event['startTime']
+                'start_time_ms': event['startTime'],
+                'url': 'https://www.betano.pt' + event['url']
             }
             for market in event['markets']:
                 if market['name'] == 'Vencedor':
@@ -82,13 +86,15 @@ async def betano_volley():
         for event in block['events']:
             event_data = {
                 'bookmaker': 'betano',
+                'competition': event['regionName'],
                 'name': event['name'],
                 'markets': [{
                     'name': 'h2h',
                     'selections': []
                 }],
                 'start_time': str(convert_time(event['startTime'])),
-                'start_time_ms': event['startTime']
+                'start_time_ms': event['startTime'],
+                'url': 'https://www.betano.pt' + event['url']
             }
             for market in event['markets']:
                 if market['name'] == 'Vencedor do jogo':
@@ -115,10 +121,12 @@ async def betano_football():
         for event in block['events']:
             event_data = {
                 'bookmaker': 'betano',
+                'competition': event['leagueDescription'],
                 'name': event['name'],
                 'markets': [],
                 'start_time': str(convert_time(event['startTime'])),
-                'start_time_ms': event['startTime']
+                'start_time_ms': event['startTime'],
+                'url': 'https://www.betano.pt' + event['matchComboUrl']
             }
             if not event['markets']:
                 break
@@ -164,11 +172,11 @@ async def betano_football():
                         'name': '1x 2',
                         'selections': [
                             {
-                                'name': h2h_market['selections'][0]['name'] + ' ou empate',
+                                'name': '1x',
                                 'price': float(market['selections'][0]['price'])
                             },
                             {
-                                'name': h2h_market['selections'][2]['name'],
+                                'name': '2',
                                 'price': h2h_market['selections'][2]['price']
                             }
                         ]
@@ -178,11 +186,11 @@ async def betano_football():
                         'name': '1 x2',
                         'selections': [
                             {
-                                'name': h2h_market['selections'][0]['name'],
+                                'name': '1',
                                 'price': h2h_market['selections'][0]['price']
                             },
                             {
-                                'name': h2h_market['selections'][2]['name'] + ' ou empate',
+                                'name': 'x2',
                                 'price': float(market['selections'][1]['price'])
                             }
                         ]
@@ -192,12 +200,11 @@ async def betano_football():
                         'name': '12 x',
                         'selections': [
                             {
-                                'name': h2h_market['selections'][0]['name'] + " ou " + h2h_market['selections'][2][
-                                    'name'],
+                                'name': '12',
                                 'price': float(market['selections'][2]['price'])
                             },
                             {
-                                'name': h2h_market['selections'][1]['name'],
+                                'name': 'x',
                                 'price': h2h_market['selections'][1]['price']
                             }
 
@@ -229,11 +236,16 @@ def create_market(market, handicap):
     }
 
     for selection in market['selections']:
-        market_data['selections'].append({
-            # adicionar handicap?
-            'name': selection['name'],
-            'price': float(selection['price'])
-        })
+        if 'Mais' in selection['name']:
+            market_data['selections'].append({
+                'name': 'Over ' + str(handicap),
+                'price': float(selection['price'])
+            })
+        elif 'Menos' in selection['name']:
+            market_data['selections'].append({
+                'name': 'Under ' + str(handicap),
+                'price': float(selection['price'])
+            })
 
     if len((market_data['selections'])) != 2:
         return None

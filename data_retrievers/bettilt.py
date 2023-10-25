@@ -91,6 +91,7 @@ async def bettilt_football():
 
         event_data = {
             'bookmaker': 'bettilt',
+            'competition': event['competition'],
             'name': event['name'],
             'markets': [{
                 'name': 'h2h',
@@ -98,7 +99,7 @@ async def bettilt_football():
             }],
             'start_time': str(convert_time(event['start_time_ms'] * 1000)),
             'start_time_ms': event['start_time_ms'] * 1000,
-            'link': f'https://www.bettilt363.com/pt/sportsbook?page=/event/{event_id}?isLive=false'
+            'url': f'https://www.bettilt363.com/pt/sportsbook?page=/event/{event_id}?isLive=false'
         }
 
         if len(event['markets']) >= 6:
@@ -140,6 +141,7 @@ async def bettilt_tennis():
 
         event_data = {
             'bookmaker': 'bettilt',
+            'competition': event['competition'],
             'name': event['name'],
             'markets': [{
                 'name': 'h2h',
@@ -147,7 +149,7 @@ async def bettilt_tennis():
             }],
             'start_time': str(convert_time(event['start_time_ms'] * 1000)),
             'start_time_ms': event['start_time_ms'] * 1000,
-            'link': f'https://www.bettilt363.com/pt/sportsbook?page=/event/{event_id}?isLive=false'
+            'url': f'https://www.bettilt363.com/pt/sportsbook?page=/event/{event_id}?isLive=false'
         }
 
         for market in event['markets']:
@@ -172,6 +174,7 @@ async def bettilt_volley():
 
         event_data = {
             'bookmaker': 'bettilt',
+            'competition': event['competition'],
             'name': event['name'],
             'markets': [{
                 'name': 'h2h',
@@ -179,7 +182,7 @@ async def bettilt_volley():
             }],
             'start_time': str(convert_time(event['start_time_ms'] * 1000)),
             'start_time_ms': event['start_time_ms'] * 1000,
-            'link': f'https://www.bettilt363.com/pt/sportsbook?page=/event/{event_id}?isLive=false'
+            'url': f'https://www.bettilt363.com/pt/sportsbook?page=/event/{event_id}?isLive=false'
         }
 
         for market in event['markets']:
@@ -204,6 +207,7 @@ async def bettilt_basket():
 
         event_data = {
             'bookmaker': 'bettilt',
+            'competition': event['competition'],
             'name': event['name'],
             'markets': [{
                 'name': 'h2h',
@@ -211,7 +215,7 @@ async def bettilt_basket():
             }],
             'start_time': str(convert_time(event['start_time_ms'] * 1000)),
             'start_time_ms': event['start_time_ms'] * 1000,
-            'link': f'https://www.bettilt363.com/pt/sportsbook?page=/event/{event_id}?isLive=false'
+            'url': f'https://www.bettilt363.com/pt/sportsbook?page=/event/{event_id}?isLive=false'
         }
 
         for market in event['markets']:
@@ -253,11 +257,11 @@ def get_double_result_markets(double_result_market, h2h_market):
         'name': '1x 2',
         'selections': [
             {
-                'name': h2h_market['selections'][0]['name'] + ' ou Empate',
+                'name': '1x',
                 'price': float(double_result_market['']['9']['k'])
             },
             {
-                'name': h2h_market['selections'][2]['name'],
+                'name': '2',
                 'price': h2h_market['selections'][2]['price']
             }
         ]
@@ -267,11 +271,11 @@ def get_double_result_markets(double_result_market, h2h_market):
         'name': '1 x2',
         'selections': [
             {
-                'name': h2h_market['selections'][0]['name'],
+                'name': '1',
                 'price': h2h_market['selections'][0]['price']
             },
             {
-                'name': 'Empate ou ' + h2h_market['selections'][2]['name'],
+                'name': 'x2',
                 'price': float(double_result_market['']['11']['k'])
             }
         ]
@@ -281,11 +285,11 @@ def get_double_result_markets(double_result_market, h2h_market):
         'name': '12 x',
         'selections': [
             {
-                'name': h2h_market['selections'][0]['name'] + ' ou ' + h2h_market['selections'][2]['name'],
+                'name': '12',
                 'price': float(double_result_market['']['10']['k'])
             },
             {
-                'name': h2h_market['selections'][1]['name'],
+                'name': 'x',
                 'price': h2h_market['selections'][1]['price']
             }
         ]

@@ -26,10 +26,12 @@ async def twentytwobet_tennis_win_match():
     for event in result_events:
         event_data = {
             'bookmaker': '22bet',
+            'competition': event['LE'],
             'name': event['O1'] + ' - ' + event['O2'],
             'markets': [],
             'start_time': str(convert_time(event['S'])),
-            'start_time_ms': event['S'] * 1000
+            'start_time_ms': event['S'] * 1000,
+            'url': 'https://22win88.com/line/tennis/' + format_url(event)
         }
 
         market_data = {
@@ -56,6 +58,7 @@ async def twentytwobet_tennis_win_match():
             events.append(event_data)
     return events
 
+
 async def twentytwobet_basket():
     comps_ids = get_competition_ids('basket')
 
@@ -65,10 +68,12 @@ async def twentytwobet_basket():
     for event in result_events:
         event_data = {
             'bookmaker': '22bet',
+            'competition': event['LE'],
             'name': event['O1'] + ' - ' + event['O2'],
             'markets': [],
             'start_time': str(convert_time(event['S'])),
-            'start_time_ms': event['S'] * 1000
+            'start_time_ms': event['S'] * 1000,
+            'url': 'https://22win88.com/line/basketball/' + format_url(event)
         }
 
         market_data = {
@@ -106,10 +111,12 @@ async def twentytwobet_volley():
     for event in result_events:
         event_data = {
             'bookmaker': '22bet',
+            'competition': event['LE'],
             'name': event['O1'] + ' - ' + event['O2'],
             'markets': [],
             'start_time': str(convert_time(event['S'])),
-            'start_time_ms': event['S'] * 1000
+            'start_time_ms': event['S'] * 1000,
+            'url': 'https://22win88.com/line/volleyball/' + format_url(event)
         }
 
         market_data = {
@@ -154,10 +161,12 @@ async def twentytwobet_football():
     for event in result_events:
         event_data = {
             'bookmaker': '22bet',
+            'competition': event['LE'],
             'name': event['O1'] + ' - ' + event['O2'],
             'markets': [],
             'start_time': str(convert_time(event['S'])),
-            'start_time_ms': event['S'] * 1000
+            'start_time_ms': event['S'] * 1000,
+            'url': 'https://22win88.com/line/football/' + format_url(event)
         }
 
         market_data = {
@@ -244,12 +253,12 @@ def get_total_over_under_goals_markets(event):
         }
 
         market_data_1_5['selections'].insert(0, ({
-            'name': 'Acima de 1.5',
+            'name': 'Over  1.5',
             'price': float(selections_1_5[0]['C'])
         }))
 
         market_data_1_5['selections'].insert(1, ({
-            'name': 'Abaixo de 1.5',
+            'name': 'Under 1.5',
             'price': float(selections_1_5[1]['C'])
         }))
 
@@ -262,12 +271,12 @@ def get_total_over_under_goals_markets(event):
         }
 
         market_data_2_5['selections'].insert(0, ({
-            'name': 'Acima de 2.5',
+            'name': 'Over 2.5',
             'price': float(selections_2_5[0]['C'])
         }))
 
         market_data_2_5['selections'].insert(1, ({
-            'name': 'Abaixo de 2.5',
+            'name': 'Under 2.5',
             'price': float(selections_2_5[1]['C'])
         }))
 
@@ -280,12 +289,12 @@ def get_total_over_under_goals_markets(event):
         }
 
         market_data_3_5['selections'].insert(0, ({
-            'name': 'Acima de 3.5',
+            'name': 'Over 3.5',
             'price': float(selections_3_5[0]['C'])
         }))
 
         market_data_3_5['selections'].insert(1, ({
-            'name': 'Abaixo de 3.5',
+            'name': 'Under 3.5',
             'price': float(selections_3_5[1]['C'])
         }))
 
@@ -306,12 +315,12 @@ def get_double_results_markets(event, h2h_market):
             }
 
             market_data_1x_2['selections'].insert(0, ({
-                'name': event['O1'] + " ou Empate",
+                'name': '1x',
                 'price': float(selection['C'])
             }))
 
             market_data_1x_2['selections'].insert(1, ({
-                'name': event['O2'],
+                'name': '2',
                 'price': float(h2h_market['selections'][2]['price'])
             }))
 
@@ -322,12 +331,12 @@ def get_double_results_markets(event, h2h_market):
             }
 
             market_data_12_x['selections'].insert(0, ({
-                'name': event['O1'] + " ou " + event['O2'],
+                'name': '12',
                 'price': float(selection['C'])
             }))
 
             market_data_12_x['selections'].insert(1, ({
-                'name': "Empate",
+                'name': 'x',
                 'price': float(h2h_market['selections'][1]['price'])
             }))
 
@@ -339,12 +348,12 @@ def get_double_results_markets(event, h2h_market):
             }
 
             market_data_1_2x['selections'].insert(0, ({
-                'name': event['O1'],
+                'name': '1',
                 'price': float(h2h_market['selections'][0]['price'])
             }))
 
             market_data_1_2x['selections'].insert(1, ({
-                'name': event['O2'] + " ou Empate",
+                'name': 'x2',
                 'price': float(selection['C'])
             }))
 
@@ -440,7 +449,8 @@ async def get_events_from_competitions(competition_ids, sport):
     results_t = []
 
     for ids in competition_ids:
-        url = url_template.format(url_template, sport_id=sport_id, competition_id=','.join(map(str, ids)), mode_id=mode_id)
+        url = url_template.format(url_template, sport_id=sport_id, competition_id=','.join(map(str, ids)),
+                                  mode_id=mode_id)
         result_t = asyncio.create_task(req(url))
         results_t.append(result_t)
 
@@ -457,3 +467,17 @@ async def get_events_from_competitions(competition_ids, sport):
 
 async def req(url):
     return requests.get(url)
+
+
+def format_url(event):
+    return (
+            str(event['LI']) +
+            '-' +
+            event['LE'].lower().replace(' ', '-').replace('.', '') +
+            '/' +
+            str(event['CI']) +
+            '-' +
+            event['O1'].lower().replace(' ', '-').replace('.', '') +
+            '-' +
+            event['O2'].lower().replace(' ', '-').replace('.', '')
+    )

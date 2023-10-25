@@ -19,10 +19,12 @@ async def casinoportugal_tennis():
 
         event_data = {
             'bookmaker': 'casinoportugal',
+            'competition': event['region_name'] + ' - ' + event['comp_name'],
             'name': event['home_name'] + ' - ' + event['away_name'],
             'markets': [],
             'start_time': event['start_time_utc'] + 'Z',
-            'start_time_ms': convert_time(event['start_time_utc'] + 'Z')
+            'start_time_ms': convert_time(event['start_time_utc'] + 'Z'),
+            'url': 'https://www.casinoportugal.pt/desportos/mercados/' + str(event['id'])
         }
 
         market_data = {
@@ -65,10 +67,12 @@ async def casinoportugal_basket():
 
         event_data = {
             'bookmaker': 'casinoportugal',
+            'competition': event['region_name'] + ' - ' + event['comp_name'],
             'name': event['home_name'] + ' - ' + event['away_name'],
             'markets': [],
             'start_time': event['start_time_utc'] + 'Z',
-            'start_time_ms': convert_time(event['start_time_utc'] + 'Z')
+            'start_time_ms': convert_time(event['start_time_utc'] + 'Z'),
+            'url': 'https://www.casinoportugal.pt/desportos/mercados/' + str(event['id'])
         }
 
         market_data = {
@@ -113,10 +117,12 @@ async def casinoportugal_football():
 
         event_data = {
             'bookmaker': 'casinoportugal',
+            'competition': event['region_name'] + ' - ' + event['comp_name'],
             'name': event['home_name'] + ' - ' + event['away_name'],
             'markets': [],
             'start_time': event['start_time_utc'] + 'Z',
-            'start_time_ms': convert_time(event['start_time_utc'] + 'Z')
+            'start_time_ms': convert_time(event['start_time_utc'] + 'Z'),
+            'url': 'https://www.casinoportugal.pt/desportos/mercados/' + str(event['id'])
         }
 
         market_data = {

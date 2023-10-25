@@ -124,6 +124,14 @@ async def handle_event_responses(bookmaker, event_responses_t,
                                  single_market_message_template,
                                  ws,
                                  sport):
+    base_url = ""
+    if sport == 'football':
+        base_url = 'https://www.placard.pt/apostas/sports/soccer/events/'
+    elif sport == 'basket':
+        base_url = 'https://www.placard.pt/apostas/sports/basketball/events/'
+    elif sport == 'tennis':
+        base_url = 'https://www.placard.pt/apostas/sports/tennis/events/'
+
     event_responses = []
     event_with_markets = []
     for event_response_t in event_responses_t:
@@ -139,10 +147,12 @@ async def handle_event_responses(bookmaker, event_responses_t,
 
         event_data = {
             'bookmaker': bookmaker,
+            'competition': event_dict['canonicalTypeName'] + ' - ' + event_dict['canonicalClassName'],
             'name': event_dict['name'],
             'markets': [],
             'start_time': event_dict['startTime'],
-            'start_time_ms': round(convert_time(event_dict['startTime']))
+            'start_time_ms': round(convert_time(event_dict['startTime'])),
+            'url': base_url + str(event_dict['id'])
         }
 
         if id_to_get_winner_market not in event_dict['marketTypesToIds']:
@@ -243,11 +253,11 @@ def handle_additional_market(market, h2h_market):
             'name': '1x 2',
             'selections': [
                 {
-                    'name': market['selections'][0]['name'],
+                    'name': '1x',
                     'price': float(market['selections'][0]['prices'][0]['decimalLabel'])
                 },
                 {
-                    'name': h2h_market['selections'][2]['name'],
+                    'name': '2',
                     'price': h2h_market['selections'][2]['price']
                 }
             ]
@@ -257,11 +267,11 @@ def handle_additional_market(market, h2h_market):
             'name': '1 x2',
             'selections': [
                 {
-                    'name': h2h_market['selections'][0]['name'],
+                    'name': '1',
                     'price': h2h_market['selections'][0]['price']
                 },
                 {
-                    'name': market['selections'][2]['name'],
+                    'name': 'x2',
                     'price': float(market['selections'][2]['prices'][0]['decimalLabel'])
                 }
             ]
@@ -271,11 +281,11 @@ def handle_additional_market(market, h2h_market):
             'name': '12 x',
             'selections': [
                 {
-                    'name': market['selections'][1]['name'],
+                    'name': '12',
                     'price': float(market['selections'][1]['prices'][0]['decimalLabel'])
                 },
                 {
-                    'name': h2h_market['selections'][1]['name'],
+                    'name': 'x',
                     'price': h2h_market['selections'][1]['price']
                 }
             ]
@@ -290,12 +300,12 @@ def get_total_goals_market(m, handicap):
     }
 
     market['selections'].append({
-        'name': 'Over',
+        'name': 'Over ' + str(handicap),
         'price': float(m['selections'][0]['prices'][0]['decimalLabel'])
     })
 
     market['selections'].append({
-        'name': 'Under',
+        'name': 'Under ' + str(handicap),
         'price': float(m['selections'][1]['prices'][0]['decimalLabel'])
     })
 
@@ -303,6 +313,14 @@ def get_total_goals_market(m, handicap):
 
 # tenis
 async def handle_event_responses_tennis(bookmaker, event_responses_t, id_to_get_winner_market, single_market_message_template, ws, sport):
+    base_url = ""
+    if sport == 'football':
+        base_url = 'https://www.placard.pt/apostas/sports/soccer/events/'
+    elif sport == 'basket':
+        base_url = 'https://www.placard.pt/apostas/sports/basketball/events/'
+    elif sport == 'tennis':
+        base_url = 'https://www.placard.pt/apostas/sports/tennis/events/'
+
     event_responses = []
     event_with_markets = []
     for event_response_t in event_responses_t:
@@ -318,13 +336,15 @@ async def handle_event_responses_tennis(bookmaker, event_responses_t, id_to_get_
 
         event_data = {
             'bookmaker': bookmaker,
+            'competition': event_dict['canonicalTypeName'] + ' - ' + event_dict['canonicalClassName'],
             'name': event_dict['name'],
             'markets': [{
                 'name': 'h2h',
                 'selections': []
             }],
             'start_time': event_dict['startTime'],
-            'start_time_ms': round(convert_time(event_dict['startTime']))
+            'start_time_ms': round(convert_time(event_dict['startTime'])),
+            'url': base_url + str(event_dict['id'])
         }
 
         if id_to_get_winner_market not in event_dict['marketTypesToIds']:

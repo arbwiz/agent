@@ -17,18 +17,27 @@ async def esconline_tennis_win_match_24h():
     parsed_events = [event for league_item in content['LeagueDataSource']['LeagueItems'] for event in
                      league_item['EventItems']]
 
+    enriched_events = []
+    for e in content['LeagueDataSource']['LeagueItems']:
+        for i_e in e['EventItems']:
+            event = i_e
+            event['competition'] = e['LeagueName']
+            enriched_events.append(event)
+
     events = []
 
-    for event in parsed_events:
+    for event in enriched_events:
         event_data = {
             'bookmaker': 'esconline',
+            'competition': event['competition'],
             'name': event['EventName'].replace(':', '-'),
             'markets': [{
                 'name': 'h2h',
                 'selections': []
             }],
             'start_time': event['StartDate'],
-            'start_time_ms': round(convert_time(event['StartDate']))
+            'start_time_ms': round(convert_time(event['StartDate'])),
+            'url': 'https://www.estorilsolcasinos.pt/pt/apostas/event/' + str(event['Url'])
         }
         for market in event['MarketItems']:
             if market['MarketName'] == 'Vencedor':
@@ -52,18 +61,28 @@ async def esconline_basket():
     parsed_events = [event for league_item in content['LeagueDataSource']['LeagueItems'] for event in
                      league_item['EventItems']]
 
+    enriched_events = []
+    for e in content['LeagueDataSource']['LeagueItems']:
+        for i_e in e['EventItems']:
+            event = i_e
+            event['competition'] = e['LeagueName']
+            enriched_events.append(event)
+
     events = []
 
-    for event in parsed_events:
+    for event in enriched_events:
         event_data = {
             'bookmaker': 'esconline',
+            'competition': event['competition'],
             'name': event['EventName'].replace(':', '-'),
             'markets': [{
                 'name': 'h2h',
                 'selections': []
             }],
             'start_time': event['StartDate'],
-            'start_time_ms': round(convert_time(event['StartDate']))
+            'start_time_ms': round(convert_time(event['StartDate'])),
+            'url': 'https://www.estorilsolcasinos.pt/pt/apostas/event/' + str(event['Url'])
+
         }
         for market in event['MarketItems']:
             if market['MarketName'] == 'Vencedor (inclui prolongamento)':
@@ -87,15 +106,24 @@ async def esconline_football():
     parsed_events = [event for league_item in content['LeagueDataSource']['LeagueItems'] for event in
                      league_item['EventItems']]
 
+    enriched_events = []
+    for e in content['LeagueDataSource']['LeagueItems']:
+        for i_e in e['EventItems']:
+            event = i_e
+            event['competition'] = e['LeagueName']
+            enriched_events.append(event)
+
     events = []
 
-    for event in parsed_events:
+    for event in enriched_events:
         event_data = {
             'bookmaker': 'esconline',
+            'competition': event['competition'],
             'name': event['EventName'].replace(':', '-'),
             'markets': [],
             'start_time': event['StartDate'],
-            'start_time_ms': round(convert_time(event['StartDate']))
+            'start_time_ms': round(convert_time(event['StartDate'])),
+            'url': 'https://www.estorilsolcasinos.pt/pt/apostas/event/' + str(event['Url'])
         }
         for market in event['MarketItems']:
             if market['BetType'] == 'P1XP2':
@@ -140,11 +168,11 @@ async def esconline_football():
                     'name': '1x 2',
                     'selections': [
                         {
-                            'name': h2h_market['selections'][0]['name'] + ' ou empate',
+                            'name': '1x',
                             'price': float(market['OutcomeItems'][0]['Odd'])
                         },
                         {
-                            'name': h2h_market['selections'][2]['name'],
+                            'name': '2',
                             'price': h2h_market['selections'][2]['price']
                         }
                     ]
@@ -154,11 +182,11 @@ async def esconline_football():
                     'name': '1 x2',
                     'selections': [
                         {
-                            'name': h2h_market['selections'][0]['name'],
+                            'name': '1',
                             'price': h2h_market['selections'][0]['price']
                         },
                         {
-                            'name': h2h_market['selections'][2]['name'] + ' ou empate',
+                            'name': 'x2',
                             'price': float(market['OutcomeItems'][2]['Odd'])
                         }
                     ]
@@ -168,11 +196,11 @@ async def esconline_football():
                     'name': '12 x',
                     'selections': [
                         {
-                            'name': h2h_market['selections'][0]['name'] + " ou " + h2h_market['selections'][2]['name'],
+                            'name': '12',
                             'price': float(market['OutcomeItems'][1]['Odd'])
                         },
                         {
-                            'name': h2h_market['selections'][1]['name'],
+                            'name': 'x',
                             'price': h2h_market['selections'][1]['price']
                         }
 
@@ -244,10 +272,16 @@ def create_market(market, handicap):
     }
 
     for outcome in market['OutcomeItems']:
-        market_data['selections'].append({
-            'name': outcome['Name'] + ' ' + str(outcome['Base']),
-            'price': outcome['Odd']
-        })
+        if 'Mais' in outcome:
+            market_data['selections'].append({
+                'name': 'Over ' + str(outcome['Base']),
+                'price': outcome['Odd']
+            })
+        elif 'Menos' in outcome:
+            market_data['selections'].append({
+                'name': 'Under ' + str(outcome['Base']),
+                'price': outcome['Odd']
+            })
 
     if len((market_data['selections'])) != 2:
         return None

@@ -21,10 +21,10 @@ async def main():
 
 
 async def is_alive():
-    send_telegram_message('Started...')
+    #send_telegram_message('Started...')
     while True:
         await asyncio.sleep(3600)
-        send_telegram_message('Still alive...')
+        #send_telegram_message('Still alive...')
 
 
 async def execute():

@@ -203,7 +203,8 @@ def merge_data_sets(aggregate_data, new_data, sport_name):
 
                 event['bookmakers'].append({
                     'markets': [],
-                    'title': new_event['bookmaker']
+                    'title': new_event['bookmaker'],
+                    'url': new_event['url']
                 })
 
                 markets = []
@@ -237,6 +238,7 @@ def merge_data_sets(aggregate_data, new_data, sport_name):
                     'name': new_event['name'],
                     'bookmakers': [],
                     'sport_key': sport_name,
+                    'competition': new_event['competition'],
                     'id': time.time(),
                     'start_time': new_event['start_time'],
                     'start_time_ms': new_event['start_time_ms']
@@ -244,7 +246,8 @@ def merge_data_sets(aggregate_data, new_data, sport_name):
 
                 event_data['bookmakers'].append({
                     'markets': [],
-                    'title': new_event['bookmaker']
+                    'title': new_event['bookmaker'],
+                    'url': new_event['url']
                 })
 
                 markets = []
@@ -281,6 +284,7 @@ def merge_data_sets(aggregate_data, new_data, sport_name):
                 'name': new_event['name'],
                 'bookmakers': [],
                 'sport_key': sport_name,
+                'competition': new_event['competition'],
                 'id': time.time(),
                 'start_time': new_event['start_time'],
                 'start_time_ms': new_event['start_time_ms']
@@ -288,7 +292,8 @@ def merge_data_sets(aggregate_data, new_data, sport_name):
 
             event_data['bookmakers'].append({
                 'markets': [],
-                'title': new_event['bookmaker']
+                'title': new_event['bookmaker'],
+                'url': new_event['url']
             })
 
             markets = []

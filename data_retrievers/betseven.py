@@ -13,10 +13,12 @@ async def betseven_tennis():
     for event in result_events:
         event_data = {
             'bookmaker': 'betseven',
+            'competition': event['competition'],
             'name': event['participants']['home']['name'] + ' - ' + event['participants']['away']['name'],
             'markets': [],
             'start_time': event['startTime'],
-            'start_time_ms': convert_time(event['startTime'])
+            'start_time_ms': convert_time(event['startTime']),
+            'url': 'https://www.bet7.com/sportsbook/5/events/' + str(event['id'])
         }
 
         market_data = {
@@ -52,10 +54,12 @@ async def betseven_basket():
     for event in result_events:
         event_data = {
             'bookmaker': 'betseven',
+            'competition': event['competition'],
             'name': event['participants']['home']['name'] + ' - ' + event['participants']['away']['name'],
             'markets': [],
             'start_time': event['startTime'],
-            'start_time_ms': convert_time(event['startTime'])
+            'start_time_ms': convert_time(event['startTime']),
+            'url': 'https://www.bet7.com/sportsbook/2/events/' + str(event['id'])
         }
 
         market_data = {
@@ -92,10 +96,12 @@ async def betseven_football():
     for event in result_events:
         event_data = {
             'bookmaker': 'betseven',
+            'competition': event['competition'],
             'name': event['participants']['home']['name'] + ' - ' + event['participants']['away']['name'],
             'markets': [],
             'start_time': event['startTime'],
-            'start_time_ms': convert_time(event['startTime'])
+            'start_time_ms': convert_time(event['startTime']),
+            'url': 'https://www.bet7.com/sportsbook/1/events/' + str(event['id'])
         }
 
         market_data = {
@@ -187,7 +193,12 @@ async def get_events(sport_arg):
 
     for t in tournaments:
         if 'events' in t:
-            events.extend(t['events'])
+            enriched_events = []
+            for e in t['events']:
+                e['competition'] = t['categoryName'] + ' - ' + t['name']
+                enriched_events.append(e)
+
+            events.extend(enriched_events)
 
     return events
 
@@ -216,12 +227,12 @@ def get_total_goals_market(event):
         over_selection = [odd for odd in double_result_market_1_5[0]['odds'] if 'mais' in odd['name']][0]
 
         market['selections'].append({
-            'name': over_selection['name'],
+            'name': 'Over 1.5',
             'price': float(over_selection['value'])
         })
 
         market['selections'].append({
-            'name': under_selection['name'],
+            'name': 'Under 1.5',
             'price': float(under_selection['value'])
         })
 
@@ -237,12 +248,12 @@ def get_total_goals_market(event):
         over_selection = [odd for odd in double_result_market_2_5[0]['odds'] if 'mais' in odd['name']][0]
 
         market['selections'].append({
-            'name': over_selection['name'],
+            'name': 'Over 2.5',
             'price': float(over_selection['value'])
         })
 
         market['selections'].append({
-            'name': under_selection['name'],
+            'name': 'Under 2.5',
             'price': float(under_selection['value'])
         })
 
@@ -258,12 +269,12 @@ def get_total_goals_market(event):
         over_selection = [odd for odd in double_result_market_3_5[0]['odds'] if 'mais' in odd['name']][0]
 
         market['selections'].append({
-            'name': over_selection['name'],
+            'name': 'Over 3.5',
             'price': float(over_selection['value'])
         })
 
         market['selections'].append({
-            'name': under_selection['name'],
+            'name': 'Under 3.5',
             'price': float(under_selection['value'])
         })
 
@@ -285,11 +296,11 @@ def get_double_result_markets(event, h2h_market):
         'name': '1x 2',
         'selections': [
             {
-                'name': selection_1x['name'],
+                'name': '1x',
                 'price': float(selection_1x['value'])
             },
             {
-                'name': h2h_market['selections'][2]['name'],
+                'name': '2',
                 'price': h2h_market['selections'][2]['price']
             }
         ]
@@ -299,11 +310,11 @@ def get_double_result_markets(event, h2h_market):
         'name': '1 x2',
         'selections': [
             {
-                'name': h2h_market['selections'][0]['name'],
+                'name': '1',
                 'price': h2h_market['selections'][0]['price']
             },
             {
-                'name': selection_x2['name'],
+                'name': 'x2',
                 'price': float(selection_x2['value'])
             }
         ]
@@ -313,11 +324,11 @@ def get_double_result_markets(event, h2h_market):
         'name': '12 x',
         'selections': [
             {
-                'name': selection_12['name'],
+                'name': '12',
                 'price': float(selection_12['value'])
             },
             {
-                'name': h2h_market['selections'][1]['name'],
+                'name': 'x',
                 'price': h2h_market['selections'][1]['price']
             }
         ]

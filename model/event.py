@@ -15,9 +15,9 @@ BET_SIZE = 100
 BOOKMAKER_INDEX = 0
 NAME_INDEX = 1
 ODDS_INDEX = 2
+URL_INDEX = 3
 FIRST = 0
 import json
-from notifications.telegram import send_telegram_message
 
 
 class Event:
@@ -25,6 +25,7 @@ class Event:
 
     def __init__(self, data):
         self.data = data
+        self.competition = data['competition']
         self.sport_key = data['sport_key']
         self.id = data['id']
 
@@ -34,8 +35,9 @@ class Event:
         self.num_outcomes = num_outcomes
 
         # finding the best odds for each outcome in each event
-        best_odds = [[None, None, float('-inf')] for _ in range(num_outcomes)]
-        # [Bookmaker, Name, Price]
+        best_odds = [[None, None, float('-inf'), None] for _ in range(num_outcomes)]
+        all_odds = [[None, float('-inf')] for _ in range(num_outcomes)]
+        # [Bookmaker, Name, Price, Url]
 
         bookmakers = self.data['bookmakers']
         for index, bookmaker in enumerate(bookmakers):
@@ -47,11 +49,17 @@ class Event:
                 bookmaker_odds = float(bookmaker['markets'][FIRST]['outcomes'][outcome]['price'])
                 current_best_odds = best_odds[outcome][ODDS_INDEX]
 
+                all_odds[outcome][0] = bookmaker['title']
+                all_odds[outcome][1] = bookmaker_odds
+
                 if bookmaker_odds > current_best_odds:
                     best_odds[outcome][BOOKMAKER_INDEX] = bookmaker['title']
                     best_odds[outcome][NAME_INDEX] = bookmaker['markets'][FIRST]['outcomes'][outcome]['name']
                     best_odds[outcome][ODDS_INDEX] = bookmaker_odds
+                    best_odds[outcome][URL_INDEX] = bookmaker['url']
 
+
+        self.all_odds = all_odds
         self.best_odds = best_odds
         return best_odds
 
@@ -61,7 +69,8 @@ class Event:
         self.num_outcomes = num_outcomes
 
         # finding the best odds for each outcome in each event
-        best_odds = [[None, None, float('-inf')] for _ in range(num_outcomes)]
+        best_odds = [[None, None, float('-inf'), None] for _ in range(num_outcomes)]
+        all_odds = [[None, float('-inf')] for _ in range(num_outcomes)]
         # [Bookmaker, Name, Price]
 
         bookmakers = self.data['bookmakers']
@@ -78,12 +87,18 @@ class Event:
                 bookmaker_odds = float(bookmaker['markets'][market_info['index']]['outcomes'][outcome]['price'])
                 current_best_odds = best_odds[outcome][ODDS_INDEX]
 
+
+                all_odds[outcome][0] = bookmaker['title']
+                all_odds[outcome][1] = bookmaker_odds
+
                 if bookmaker_odds > current_best_odds:
                     best_odds[outcome][BOOKMAKER_INDEX] = bookmaker['title']
                     best_odds[outcome][NAME_INDEX] = bookmaker['markets'][market_info['index']]['outcomes'][outcome][
                         'name']
                     best_odds[outcome][ODDS_INDEX] = bookmaker_odds
+                    best_odds[outcome][URL_INDEX] = bookmaker['url']
 
+        self.all_odds = all_odds
         self.best_odds = best_odds
         return best_odds
 
@@ -99,58 +114,9 @@ class Event:
         else:
             return False
 
-        # if the sum of the reciprocals of the odds is less than 1, there is opportunity for arbitrage
-        if total_arbitrage_percentage < 0.995:
+        profit = (1 - total_arbitrage_percentage) * 100
 
-            stakes_message = None
-            if len(best_odds) == 2:
-                stakes_message = calculate_arbitrage_stakes(100, {
-                    'name': (f"Outcome: {best_odds[0][1]} @ {best_odds[0][0]} - "),
-                    'odd': best_odds[0][2]
-                },
-                                                            {
-                                                                'name': (
-                                                                    f"Outcome: {best_odds[1][1]} @ {best_odds[1][0]} - "),
-                                                                'odd': best_odds[1][2]
-                                                            })
-            else:
-                stakes_message = calculate_arbitrage_stakes(100, {
-                    'name': (f"Outcome: {best_odds[0][1]} @ {best_odds[0][0]} - "),
-                    'odd': best_odds[0][2]
-                },
-                                                            {
-                                                                'name': (
-                                                                    f"Outcome: {best_odds[1][1]}] @ {best_odds[1][0]} - "),
-                                                                'odd': best_odds[1][2]
-                                                            },
-                                                            {
-                                                                'name': (
-                                                                    f"Outcome: {best_odds[2][1]} @ {best_odds[2][0]} - "),
-                                                                'odd': best_odds[2][2]
-
-                                                            })
-
-            message = "\nEvent: {} \nSport: {} \nProfit %: {profit:.3f}\n---\n{stake}".format(str(self.data['name']),
-                                                                                              str(self.data[
-                                                                                                      'sport_key']),
-                                                                                              profit=((
-                                                                                                                  1 - self.total_arbitrage_percentage) * 100),
-                                                                                              stake=stakes_message)
-            print(message)
-
-            #event_name = best_odds_to_names(best_odds)
-            #if event_name not in Event.cache:
-            #    Event.cache[event_name] = time.time()
-            #else:
-                # event expires in cache after 30 minutes
-            #    if time.time() - 1800 > Event.cache[event_name]:
-            #        del Event.cache[event_name]
-
-                # notify only if its not the first time this opportunity appears
-            #    send_telegram_message(message)
-            send_telegram_message(message)
-            return True
-        return False
+        return profit
 
     # converts decimal/European best odds to American best odds
     def convert_decimal_to_american(self):

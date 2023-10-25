@@ -23,13 +23,15 @@ async def lebull_tennis():
             continue
         event_data = {
             'bookmaker': 'lebull',
+            'competition': event['leagueName'],
             'name': event['teamA'] + ' - ' + event['teamB'],
             'markets': [{
                 'name': 'h2h',
                 'selections': []
             }],
             'start_time': str(convert_time(event['timestamp'])),
-            'start_time_ms': event['timestamp']
+            'start_time_ms': event['timestamp'],
+            'url': 'https://www.lebull.pt/pt/sportsbook?page=/event/{event_id}?isLive=false'.format(event_id=str(event['eventId']))
         }
 
         for stakeType in event['stakeTypes']:
@@ -62,13 +64,15 @@ async def lebull_basket():
             continue
         event_data = {
             'bookmaker': 'lebull',
+            'competition': event['leagueName'],
             'name': event['teamA'] + ' - ' + event['teamB'],
             'markets': [{
                 'name': 'h2h',
                 'selections': []
             }],
             'start_time': str(convert_time(event['timestamp'])),
-            'start_time_ms': event['timestamp']
+            'start_time_ms': event['timestamp'],
+            'url': 'https://www.lebull.pt/pt/sportsbook?page=/event/{event_id}?isLive=false'.format(event_id=str(event['eventId']))
         }
 
         for stakeType in event['stakeTypes']:
@@ -101,10 +105,12 @@ async def lebull_football():
             continue
         event_data = {
             'bookmaker': 'lebull',
+            'competition': event['leagueName'],
             'name': event['teamA'] + ' - ' + event['teamB'],
             'markets': [],
             'start_time': str(convert_time(event['timestamp'])),
-            'start_time_ms': event['timestamp']
+            'start_time_ms': event['timestamp'],
+            'url': 'https://www.lebull.pt/pt/sportsbook?page=/event/{event_id}?isLive=false'.format(event_id=str(event['eventId']))
         }
 
         market_data = {

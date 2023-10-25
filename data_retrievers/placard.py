@@ -76,6 +76,14 @@ def convert_time(iso_format):
 
 
 async def handle_event_responses(bookmaker, event_responses_t, id_to_get_winner_market, single_market_message_template, ws, sport):
+    base_url = ""
+    if sport == 'football':
+        base_url = 'https://www.placard.pt/apostas/sports/soccer/events/'
+    elif sport == 'basket':
+        base_url = 'https://www.placard.pt/apostas/sports/basketball/events/'
+    elif sport == 'tennis':
+        base_url = 'https://www.placard.pt/apostas/sports/tennis/events/'
+
     events_to_return = []
     event_responses = []
     event_with_markets = []
@@ -92,13 +100,15 @@ async def handle_event_responses(bookmaker, event_responses_t, id_to_get_winner_
 
         event_data = {
             'bookmaker': bookmaker,
+            'competition': event_dict['canonicalTypeName'] + ' - ' + event_dict['canonicalClassName'],
             'name': event_dict['name'],
             'markets': [{
                 'name': 'h2h',
                 'selections': []
             }],
             'start_time': event_dict['startTime'],
-            'start_time_ms': round(convert_time(event_dict['startTime']))
+            'start_time_ms': round(convert_time(event_dict['startTime'])),
+            'url': base_url + str(event_dict['id'])
         }
 
         if id_to_get_winner_market not in event_dict['marketTypesToIds']:

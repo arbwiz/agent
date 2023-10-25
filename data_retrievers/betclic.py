@@ -17,13 +17,15 @@ async def betclic_tennis_win_match():
             continue
         event_data = {
             'bookmaker': 'betclic',
+            'competition': event['competition']['name'],
             'name': event['name'],
             'markets': [{
                 'name': 'h2h',
                 'selections': []
             }],
             'start_time': event['date'],
-            'start_time_ms': round(convert_time(event['date']))
+            'start_time_ms': round(convert_time(event['date'])),
+            'url': "https://www.betclic.pt/{competition_name}/{event_name}".format(competition_name=event['competition']['relative_desktop_url'], event_name=event['relative_desktop_url'])
         }
 
         if len(event['grouped_markets']) == 0 or len(event['grouped_markets'][0]['markets']) == 0:
@@ -60,10 +62,12 @@ async def betclic_football():
 
         event_data = {
             'bookmaker': 'betclic',
+            'competition': event['competition']['name'],
             'name': event['name'],
             'markets': get_markets(event, total_goals_event, double_results_event),
             'start_time': event['date'],
-            'start_time_ms': round(convert_time(event['date']))
+            'start_time_ms': round(convert_time(event['date'])),
+            'url': "https://www.betclic.pt/{competition_name}/{event_name}".format(competition_name=event['competition']['relative_desktop_url'], event_name=event['relative_desktop_url'])
         }
 
         if is_valid_football_event(event_data):
@@ -80,13 +84,15 @@ async def betclic_basket():
             continue
         event_data = {
             'bookmaker': 'betclic',
+            'competition': event['competition']['name'],
             'name': event['name'],
             'markets': [{
                 'name': 'h2h',
                 'selections': []
             }],
             'start_time': event['date'],
-            'start_time_ms': round(convert_time(event['date']))
+            'start_time_ms': round(convert_time(event['date'])),
+            'url': "https://www.betclic.pt/{competition_name}/{event_name}".format(competition_name=event['competition']['relative_desktop_url'], event_name=event['relative_desktop_url'])
         }
 
         if len(event['grouped_markets']) == 0 or len(event['grouped_markets'][0]['markets']) == 0:
@@ -115,13 +121,15 @@ async def betclic_volley():
             continue
         event_data = {
             'bookmaker': 'betclic',
+            'competition': event['competition']['name'],
             'name': event['name'],
             'markets': [{
                 'name': 'h2h',
                 'selections': []
             }],
             'start_time': event['date'],
-            'start_time_ms': round(convert_time(event['date']))
+            'start_time_ms': round(convert_time(event['date'])),
+            'url': "https://www.betclic.pt/{competition_name}/{event_name}".format(competition_name=event['competition']['relative_desktop_url'], event_name=event['relative_desktop_url'])
         }
 
         if len(event['grouped_markets']) == 0 or len(event['grouped_markets'][0]['markets']) == 0:
@@ -226,10 +234,16 @@ def get_total_goals_market(event, handicap):
         if str(handicap) not in selection['name']:
             break
 
-        market['selections'].append({
-            'name': selection['name'],
-            'price': float(selection['odds'])
-        })
+        if 'Acima' in selection['name']:
+            market['selections'].append({
+                'name': 'Over ' + str(handicap),
+                'price': float(selection['odds'])
+            })
+        elif 'Abaixo' in selection['name']:
+            market['selections'].append({
+                'name': 'Over ' + str(handicap),
+                'price': float(selection['odds'])
+            })
 
     if len(market['selections']) != 2:
         return None
@@ -249,11 +263,11 @@ def get_double_result_markets(event, h2h_market):
         'name': '1x 2',
         'selections': [
             {
-                'name': event['grouped_markets'][0]['markets'][0]['selections'][0][0]['name'],
+                'name': '1x',
                 'price': float(event['grouped_markets'][0]['markets'][0]['selections'][0][0]['odds'])
             },
             {
-                'name': h2h_market['selections'][2]['name'],
+                'name': '2',
                 'price': h2h_market['selections'][2]['price']
             }
         ]
@@ -263,11 +277,11 @@ def get_double_result_markets(event, h2h_market):
         'name': '1 x2',
         'selections': [
             {
-                'name': h2h_market['selections'][0]['name'],
+                'name': '1',
                 'price': h2h_market['selections'][0]['price']
             },
             {
-                'name': event['grouped_markets'][0]['markets'][0]['selections'][2][0]['name'],
+                'name': 'x2',
                 'price': float(event['grouped_markets'][0]['markets'][0]['selections'][2][0]['odds'])
             }
         ]
@@ -277,11 +291,11 @@ def get_double_result_markets(event, h2h_market):
         'name': '12 x',
         'selections': [
             {
-                'name': event['grouped_markets'][0]['markets'][0]['selections'][1][0]['name'],
+                'name': '12',
                 'price': float(event['grouped_markets'][0]['markets'][0]['selections'][1][0]['odds'])
             },
             {
-                'name': h2h_market['selections'][1]['name'],
+                'name': 'x',
                 'price': h2h_market['selections'][1]['price']
             }
         ]
