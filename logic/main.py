@@ -4,7 +4,7 @@ import time
 import requests
 
 from model.event import Event
-from data_retrievers.aggregator import get_tennis_data, get_basket_data, get_volley_data
+from data_retrievers.aggregator import get_tennis_data, get_basket_data, get_volley_data, get_american_football_data
 from data_retrievers.aggregator import get_football_data
 from notifications.telegram import send_telegram_message
 
@@ -28,9 +28,12 @@ async def run(sport):
         case 'volleyball':
             odds_response = await get_volley_data()
             handle_two_way_market(odds_response, 'volleyball')
+        case 'american_football':
+            odds_response = await get_american_football_data()
+            handle_two_way_market(odds_response, 'american_football')
         case _:
             odds_response = await get_tennis_data()
-            handle_two_way_market(odds_response)
+            handle_two_way_market(odds_response, 'tennis')
 
 
 def handle_football(odds_response):
@@ -156,11 +159,14 @@ def send_surebets_data(creation_timestamp, sport, surebets):
         'surebets': surebets
     }
 
+
+    url = f'https://arbwiz-backend.onrender.com/surebets'
+
+    requests.post(url,
+                  data=json.dumps(data),
+                  headers={'Content-Type': 'application/json'})
+
     if len(surebets) > 0:
         send_telegram_message(data)
 
-    url = f'http://localhost:8080/surebets'
 
-    #requests.post(url,
-     #             data=json.dumps(data),
-       #           headers={'Content-Type': 'application/json'})

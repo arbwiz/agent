@@ -43,6 +43,37 @@ async def betano_tennis_win_match_24h():
 
     return events
 
+async def betano_american_football():
+    url = 'https://www.betano.pt/api/sport/futebol-americano/ligas/1611,10116/?req=la,s,stnf,c,mb'
+    result = requests.get(url)
+    main_data = json.loads(result.content)
+
+    events = []
+    for block in main_data['data']['blocks']:
+        for event in block['events']:
+            event_data = {
+                'bookmaker': 'betano',
+                'competition': event['regionName'],
+                'name': event['name'],
+                'markets': [{
+                    'name': 'h2h',
+                    'selections': []
+                }],
+                'start_time': str(convert_time(event['startTime'])),
+                'start_time_ms': event['startTime'],
+                'url': 'https://www.betano.pt' + event['url']
+            }
+            for market in event['markets']:
+                if market['name'] == 'Vencedor':
+                    for selection in market['selections']:
+                        event_data['markets'][0]['selections'].append({
+                            'name': selection['name'],
+                            'price': float(selection['price'])
+                        })
+            if is_valid_basket_event(event_data):
+                events.append(event_data)
+
+    return events
 
 async def betano_basket():
     url = 'https://www.betano.pt/api/sport/basquetebol/jogos-de-hoje/?sort=Leagues&req=la,s,stnf,c,mb'

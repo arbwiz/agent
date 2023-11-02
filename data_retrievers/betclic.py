@@ -74,6 +74,41 @@ async def betclic_football():
             events.append(event_data)
     return events
 
+async def betclic_american_football():
+    h2h_events = request_events(14, 1076)
+
+    events = []
+    for event in h2h_events:
+        if event['is_live'] == 'true':
+            continue
+        event_data = {
+            'bookmaker': 'betclic',
+            'competition': event['competition']['name'],
+            'name': event['name'],
+            'markets': [{
+                'name': 'h2h',
+                'selections': []
+            }],
+            'start_time': event['date'],
+            'start_time_ms': round(convert_time(event['date'])),
+            'url': "https://www.betclic.pt/{competition_name}/{event_name}".format(competition_name=event['competition']['relative_desktop_url'], event_name=event['relative_desktop_url'])
+        }
+
+        if len(event['grouped_markets']) == 0 or len(event['grouped_markets'][0]['markets']) == 0:
+            continue
+
+        for selection in event['grouped_markets'][0]['markets'][0]['selections']:
+            if len(selection) == 0:
+                break
+
+            event_data['markets'][0]['selections'].append({
+                'name': selection[0]['name'],
+                'price': float(selection[0]['odds'])
+            })
+
+        if is_valid_basket_event(event_data):
+            events.append(event_data)
+    return events
 
 async def betclic_basket():
     h2h_events = request_events(4, 1115)

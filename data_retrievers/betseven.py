@@ -47,6 +47,83 @@ async def betseven_tennis():
     return events
 
 
+async def get_american_football_events():
+    nfl = "https://www.betseven13.com/iapi/sportsbook/v2/tournaments/31"
+    cfl = "https://www.betseven13.com/iapi/sportsbook/v2/tournaments/790"
+
+    token_resp = requests.get(nfl)
+    token = token_resp.cookies.get_dict()['XSRF-TOKEN'][:-4] + '=0'
+
+    req_body = {
+        "marketTypeIds": [223, 225, 219]
+    }
+
+    headers = {
+        'Content-Type': 'application/json',
+        'X-Xsrf-Token': token,
+        'Cookie': 'site_session=' + token_resp.cookies.get_dict()['site_session']
+    }
+
+    nfl_resp = requests.post(cfl, json=req_body, headers=headers)
+    cfl_resp = requests.post(nfl, json=req_body, headers=headers)
+
+    cfl_result = json.loads(cfl_resp.content)
+    nfl_result = json.loads(nfl_resp.content)
+
+    events = []
+
+    for nfl_e in nfl_result['data']['events']:
+        nfl_e['competition'] = nfl_result['data']['categoryName'] + ' - ' + nfl_result['data']['tournamentName']
+        events.append(nfl_e)
+
+    for cfl_e in cfl_result['data']['events']:
+        cfl_e['competition'] = cfl_result['data']['categoryName'] + ' - ' + cfl_result['data']['tournamentName']
+        events.append(cfl_e)
+
+    return events
+
+
+async def betseven_american_football():
+    result_events = await get_american_football_events()
+
+    events = []
+    for event in result_events:
+        event_data = {
+            'bookmaker': 'betseven',
+            'competition': event['competition'],
+            'name': event['participants']['home']['name'] + ' - ' + event['participants']['away']['name'],
+            'markets': [],
+            'start_time': event['startTime'],
+            'start_time_ms': convert_time(event['startTime']),
+            'url': 'https://www.bet7.com/sportsbook/2/events/' + str(event['id'])
+        }
+
+        market_data = {
+            'name': 'h2h',
+            'selections': []
+        }
+
+        for market in event['markets']:
+            if market['name'] == 'Vencedor (Incluindo Prolongamento)':
+
+                for odd in market['odds']:
+                    if odd['type'] == 4:
+                        market_data['selections'].insert(0, {
+                            'name': odd['name'],
+                            'price': float(odd['value'])
+                        })
+                    elif odd['type'] == 5:
+                        market_data['selections'].insert(1, {
+                            'name': odd['name'],
+                            'price': float(odd['value'])
+                        })
+
+        event_data['markets'] = [market_data]
+
+        if is_valid_basket_event(event_data):
+            events.append(event_data)
+    return events
+
 async def betseven_basket():
     result_events = await get_events('basket')
 

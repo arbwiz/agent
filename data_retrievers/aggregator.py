@@ -1,14 +1,15 @@
-from data_retrievers.betano import betano_tennis_win_match_24h, betano_basket, betano_volley
+from data_retrievers.betano import betano_tennis_win_match_24h, betano_basket, betano_volley, betano_american_football
 from data_retrievers.betano import betano_football
 
-from data_retrievers.betclic import betclic_tennis_win_match, betclic_basket, betclic_volley
+from data_retrievers.betclic import betclic_tennis_win_match, betclic_basket, betclic_volley, betclic_american_football
 from data_retrievers.betclic import betclic_football
-from data_retrievers.betseven import betseven_tennis, betseven_basket, betseven_football
+from data_retrievers.betseven import betseven_tennis, betseven_basket, betseven_football, betseven_american_football
 from data_retrievers.bettilt import bettilt_tennis, bettilt_basket, bettilt_football, bettilt_volley
 from data_retrievers.casinoportugal import casinoportugal_tennis, casinoportugal_football
 from data_retrievers.placard import placard_tennis, placard_football, placard_basket
 
-from data_retrievers.twentytwobet import twentytwobet_tennis_win_match, twentytwobet_basket, twentytwobet_volley
+from data_retrievers.twentytwobet import twentytwobet_tennis_win_match, twentytwobet_basket, twentytwobet_volley, \
+    twentytwobet_american_football
 from data_retrievers.twentytwobet import twentytwobet_football
 
 from data_retrievers.esconline import esconline_tennis_win_match_24h, esconline_basket
@@ -29,6 +30,32 @@ from utils import market_types
 import asyncio
 
 from utils import compare_strings_with_ratio
+
+
+async def get_american_football_data():
+    twentytwo_t = asyncio.create_task(twentytwobet_american_football())
+    betano_t = asyncio.create_task(betano_american_football())
+    betclic_t = asyncio.create_task(betclic_american_football())
+    betseven_t = asyncio.create_task(betseven_american_football())
+
+    bookmakers = []
+
+    for func in [["twentytwo", twentytwo_t],
+                 ["betano", betano_t],
+                 ["betclic", betclic_t],
+                 ["betseven", betseven_t]]:
+        try:
+            result = await func[1]
+        except Exception as e:
+            print(f"Error at volley for provider: [{func[0]}] with exception: [{e}]")
+            result = []
+        bookmakers.append(result)
+
+    data = aggregate_data(bookmakers, 'american_football')
+
+    await generate_output_files(bookmakers, data, 'american_football')
+
+    return data
 
 async def get_volley_data():
     twentytwo_t = asyncio.create_task(twentytwobet_volley())

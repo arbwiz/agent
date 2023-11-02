@@ -58,6 +58,48 @@ async def twentytwobet_tennis_win_match():
             events.append(event_data)
     return events
 
+async def twentytwobet_american_football():
+    comps_ids = get_competition_ids('american_football')
+
+    result_events = await get_events_from_competitions(comps_ids, 'american_football')
+
+    events = []
+    for event in result_events:
+        event_data = {
+            'bookmaker': '22bet',
+            'competition': event['LE'],
+            'name': event['O1'] + ' - ' + event['O2'],
+            'markets': [],
+            'start_time': str(convert_time(event['S'])),
+            'start_time_ms': event['S'] * 1000,
+            'url': 'https://22win88.com/line/basketball/' + format_url(event)
+        }
+
+        market_data = {
+            'name': 'h2h',
+            'selections': []
+        }
+
+        for selection in event['E']:
+            if selection['T'] == 1:
+                market_data['selections'].insert(0, {
+                    'name': event['O1'],
+                    'price': float(selection['C'])
+                })
+
+            elif selection['T'] == 3:
+                market_data['selections'].insert(1, {
+                    'name': event['O2'],
+                    'price': float(selection['C'])
+                })
+            else:
+                continue
+
+        event_data['markets'] = [market_data]
+
+        if is_valid_basket_event(event_data):
+            events.append(event_data)
+    return events
 
 async def twentytwobet_basket():
     comps_ids = get_competition_ids('basket')
@@ -384,6 +426,9 @@ def get_competition_ids(sport_arg):
     elif sport_arg == 'volleyball':
         sport_id = 6
         sport_name = 'Volleyball'
+    elif sport_arg == 'american_football':
+        sport_id = 13
+        sport_name = 'American Football'
 
     comps_url = (
         f"https://22win88.com/LineFeed/GetSportsShortZip?sports={sport_id}&lng=pt&tf=2880&country=148&partner=151"
@@ -430,6 +475,7 @@ def get_competition_ids(sport_arg):
 
 
 async def get_events_from_competitions(competition_ids, sport):
+    tf = 2880
     if sport == 'football':
         mode_id = 4
         sport_id = 1
@@ -442,15 +488,19 @@ async def get_events_from_competitions(competition_ids, sport):
     elif sport == 'volleyball':
         sport_id = 6
         mode_id = 1
+    elif sport == 'american_football':
+        sport_id = 13
+        mode_id = 1
+        tf = 3000000
 
     url_template = ("https://22win88.com/LineFeed/Get1x2_VZip?sports={sport_id}&champs={"
-                    "competition_id}&count=50&lng=pt&tf=2880&tz=1&mode={mode_id}&country=148&partner=151&getEmpty=true")
+                    "competition_id}&count=50&lng=pt&tf={tf}&tz=1&mode={mode_id}&country=148&partner=151&getEmpty=true")
     events = []
     results_t = []
 
     for ids in competition_ids:
         url = url_template.format(url_template, sport_id=sport_id, competition_id=','.join(map(str, ids)),
-                                  mode_id=mode_id)
+                                  tf=tf, mode_id=mode_id)
         result_t = asyncio.create_task(req(url))
         results_t.append(result_t)
 
