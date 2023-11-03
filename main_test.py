@@ -46,7 +46,7 @@ async def test():
 
     # print(result)
 
-    data = await betseven_american_football()
+    data = await betseven_football()
     print(data)
 
 
