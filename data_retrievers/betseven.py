@@ -240,16 +240,17 @@ async def get_events(sport_arg):
         market_type_ids = "&marketTypeIds[]=219"
 
     comps_url = (
-        f"https://www.bet7.com/iapi/sportsbook/v2/sports/{sport_id}/tournaments?timespan=24{market_type_ids}").format(
-        sport_id=sport_id, market_type_ids=market_type_ids)
+        f"https://www.bet7.com/iapi/sportsbook/v2/sports/{sport_id}").format(sport_id=sport_id)
 
     comp_result = requests.get(comps_url)
     comp_result_dict = json.loads(comp_result.content)
 
     ids = []
-    for comp in comp_result_dict['data']['tournaments']:
-        if 'id' in comp:
-            ids.append(comp['id'])
+    for cat in comp_result_dict['data']['categories']:
+        if 'tournaments' in cat:
+            for comp in cat['tournaments']:
+                if 'id' in comp:
+                    ids.append(comp['id'])
 
     tournament_ids_template = "tournamentIds[]={tournament_id}"
 

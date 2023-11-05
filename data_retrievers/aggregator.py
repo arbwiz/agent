@@ -57,6 +57,7 @@ async def get_american_football_data():
 
     return data
 
+
 async def get_volley_data():
     twentytwo_t = asyncio.create_task(twentytwobet_volley())
     betano_t = asyncio.create_task(betano_volley())
@@ -81,6 +82,7 @@ async def get_volley_data():
     await generate_output_files(bookmakers, data, 'volleyball')
 
     return data
+
 
 async def get_tennis_data():
     solverde_t = asyncio.create_task(solverde_tennis())
@@ -354,18 +356,20 @@ def merge_data_sets(aggregate_data, new_data, sport_name):
 def contains_event_name(events, name):
     return compare_strings_with_ratio(events['name'], name, 0.6)
 
-async def generate_output_files(bookmakers, aggregated, sport_type):
 
+async def generate_output_files(bookmakers, aggregated, sport_type):
     await write_output_file(f"aggregated_{sport_type}", aggregated)
     for bookmaker in bookmakers:
         if len(bookmaker) > 0:
-            await write_output_file(f"{bookmaker[0]['bookmaker']}_{sport_type}", bookmaker)
+            await write_output_file(f"{bookmaker[0]['bookmaker']}_{sport_type}", bookmaker, ".json")
+            await write_output_file("last_time_written", int(time.time()))
 
 
-async def write_output_file(file_name, file_data):
-    with open("output/" + file_name + ".json", 'w') as outfile:
+async def write_output_file(file_name, file_data, format_extension=""):
+    with open("output/" + file_name + format_extension, 'w') as outfile:
         outfile.write(json.dumps(file_data, indent=4))
     outfile.close()
+
 
 def log_aggregate_data_info(aggregate_data):
     current_time = ("time:" + str(datetime.now()))

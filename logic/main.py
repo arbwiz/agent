@@ -8,11 +8,9 @@ from data_retrievers.aggregator import get_tennis_data, get_basket_data, get_vol
 from data_retrievers.aggregator import get_football_data
 from notifications.telegram import send_telegram_message
 
-# -5 should only be use to test
+# -5 can be used to test
 MIN_PROFIT_MARGIN = 0
 
-
-# MIN_PROFIT_MARGIN = 0
 
 async def run(sport):
     match sport:
@@ -159,7 +157,6 @@ def send_surebets_data(creation_timestamp, sport, surebets):
         'surebets': surebets
     }
 
-
     url = f'https://arbwiz-backend.onrender.com/surebets'
 
     requests.post(url,
@@ -168,5 +165,3 @@ def send_surebets_data(creation_timestamp, sport, surebets):
 
     if len(surebets) > 0:
         send_telegram_message(data)
-
-
