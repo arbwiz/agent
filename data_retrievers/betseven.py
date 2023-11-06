@@ -173,6 +173,10 @@ async def betseven_football():
 
     events = []
     for event in result_events:
+
+        if 'Liga Realidade Simulada' in event['competition']:
+            continue
+
         event_data = {
             'bookmaker': 'betseven',
             'competition': event['competition'],
