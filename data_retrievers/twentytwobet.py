@@ -530,4 +530,4 @@ def format_url(event):
             event['O1'].lower().replace(' ', '-').replace('.', '') +
             '-' +
             event['O2'].lower().replace(' ', '-').replace('.', '')
-    )
+    ).replace('(feminino)', 'women')

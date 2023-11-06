@@ -109,20 +109,22 @@ async def bettilt_football():
 
             if '' in h2h_market_raw:
                 if '1' in h2h_market_raw[''] and '2' in h2h_market_raw[''] and '3' in h2h_market_raw['']:
-                    event_data['markets'][0]['selections'].append({
-                        'name': event['participant_a'],
-                        'price': float(h2h_market_raw['']['1']['k'])
-                    })
+                    if 'b' not in h2h_market_raw['']['1']:
+                        event_data['markets'][0]['selections'].append({
+                            'name': event['participant_a'],
+                            'price': float(h2h_market_raw['']['1']['k'])
+                        })
 
-                    event_data['markets'][0]['selections'].append({
-                        'name': 'Draw',
-                        'price': float(h2h_market_raw['']['2']['k'])
-                    })
-
-                    event_data['markets'][0]['selections'].append({
-                        'name': event['participant_b'],
-                        'price': float(h2h_market_raw['']['3']['k'])
-                    })
+                    if 'b' not in h2h_market_raw['']['2']:
+                        event_data['markets'][0]['selections'].append({
+                            'name': 'Draw',
+                            'price': float(h2h_market_raw['']['2']['k'])
+                        })
+                    if 'b' not in h2h_market_raw['']['3']:
+                        event_data['markets'][0]['selections'].append({
+                            'name': event['participant_b'],
+                            'price': float(h2h_market_raw['']['3']['k'])
+                        })
 
             double_results_markets = get_double_result_markets(double_result_raw, event_data['markets'][0])
             event_data['markets'].extend(double_results_markets)
@@ -246,11 +248,16 @@ def find_market_by_id(markets, id):
 
 
 def get_double_result_markets(double_result_market, h2h_market):
-    if '' not in double_result_market:
+    if ('' not in double_result_market):
         return []
 
     if '9' not in double_result_market[''] or '10' not in double_result_market[''] or '11' not in double_result_market[
         '']:
+        return []
+
+    if('b' in double_result_market['']['9'] or
+            'b' in double_result_market['']['10'] or
+            'b' in double_result_market['']['11']):
         return []
 
     market = {
@@ -316,6 +323,9 @@ def get_total_goals_markets(total_goals_markets_raw):
 def get_market_with_handicap(markets_raw, handicap):
     over = markets_raw[f'total={handicap}']['12']['k']
     under = markets_raw[f'total={handicap}']['13']['k']
+
+    if 'b' in markets_raw[f'total={handicap}']['12'] or 'b' in markets_raw[f'total={handicap}']['13']:
+        return None
     return {
         'name': f'total_goals_{handicap}',
         'selections': [
