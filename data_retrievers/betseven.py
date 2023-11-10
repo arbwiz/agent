@@ -18,7 +18,7 @@ async def betseven_tennis():
             'markets': [],
             'start_time': event['startTime'],
             'start_time_ms': convert_time(event['startTime']),
-            'url': 'https://www.bet7.com/sportsbook/5/events/' + str(event['id'])
+            'url': 'https://www.betseven13.com/sportsbook/5/events/' + str(event['id'])
         }
 
         market_data = {
@@ -96,7 +96,7 @@ async def betseven_american_football():
             'markets': [],
             'start_time': event['startTime'],
             'start_time_ms': convert_time(event['startTime']),
-            'url': 'https://www.bet7.com/sportsbook/2/events/' + str(event['id'])
+            'url': 'https://www.betseven13.com/sportsbook/2/events/' + str(event['id'])
         }
 
         market_data = {
@@ -137,7 +137,7 @@ async def betseven_basket():
             'markets': [],
             'start_time': event['startTime'],
             'start_time_ms': convert_time(event['startTime']),
-            'url': 'https://www.bet7.com/sportsbook/2/events/' + str(event['id'])
+            'url': 'https://www.betseven13.com/sportsbook/2/events/' + str(event['id'])
         }
 
         market_data = {
@@ -184,7 +184,7 @@ async def betseven_football():
             'markets': [],
             'start_time': event['startTime'],
             'start_time_ms': convert_time(event['startTime']),
-            'url': 'https://www.bet7.com/sportsbook/1/events/' + str(event['id'])
+            'url': 'https://www.betseven13.com/sportsbook/1/events/' + str(event['id'])
         }
 
         market_data = {
@@ -244,7 +244,7 @@ async def get_events(sport_arg):
         market_type_ids = "&marketTypeIds[]=219"
 
     comps_url = (
-        f"https://www.bet7.com/iapi/sportsbook/v2/sports/{sport_id}").format(sport_id=sport_id)
+        f"https://www.betseven13.com/iapi/sportsbook/v2/sports/{sport_id}").format(sport_id=sport_id)
 
     comp_result = requests.get(comps_url)
     comp_result_dict = json.loads(comp_result.content)
@@ -262,7 +262,7 @@ async def get_events(sport_arg):
     for id in ids:
         params.append(tournament_ids_template.format(tournament_id=id))
 
-    events_url = f"https://www.bet7.com/iapi/sportsbook/v2/sports/{sport_id}/events?timespan=24&{'&'.join(params)}&{market_type_ids}"
+    events_url = f"https://www.betseven13.com/iapi/sportsbook/v2/sports/{sport_id}/events?timespan=24&{'&'.join(params)}&{market_type_ids}"
 
     result = requests.get(events_url)
     result_dict = json.loads(result.content)
@@ -305,8 +305,8 @@ def get_total_goals_market(event):
             'selections': []
         }
 
-        under_selection = [odd for odd in double_result_market_1_5[0]['odds'] if 'menos' in odd['name']][0]
-        over_selection = [odd for odd in double_result_market_1_5[0]['odds'] if 'mais' in odd['name']][0]
+        under_selection = [odd for odd in double_result_market_1_5[0]['odds'] if 'menos' or 'Menos' in odd['name']][0]
+        over_selection = [odd for odd in double_result_market_1_5[0]['odds'] if 'mais' or 'Mais' in odd['name']][1]
 
         market['selections'].append({
             'name': 'Over 1.5',
@@ -326,8 +326,8 @@ def get_total_goals_market(event):
             'selections': []
         }
 
-        under_selection = [odd for odd in double_result_market_2_5[0]['odds'] if 'menos' in odd['name']][0]
-        over_selection = [odd for odd in double_result_market_2_5[0]['odds'] if 'mais' in odd['name']][0]
+        under_selection = [odd for odd in double_result_market_2_5[0]['odds'] if 'menos' or 'Menos' in odd['name']][0]
+        over_selection = [odd for odd in double_result_market_2_5[0]['odds'] if 'mais' or 'Mais' in odd['name']][1]
 
         market['selections'].append({
             'name': 'Over 2.5',
@@ -347,8 +347,8 @@ def get_total_goals_market(event):
             'selections': []
         }
 
-        under_selection = [odd for odd in double_result_market_3_5[0]['odds'] if 'menos' in odd['name']][0]
-        over_selection = [odd for odd in double_result_market_3_5[0]['odds'] if 'mais' in odd['name']][0]
+        under_selection = [odd for odd in double_result_market_3_5[0]['odds'] if 'menos' or 'Menos' in odd['name']][0]
+        over_selection = [odd for odd in double_result_market_3_5[0]['odds'] if 'mais' or 'Mais' in odd['name']][0]
 
         market['selections'].append({
             'name': 'Over 3.5',
@@ -366,7 +366,11 @@ def get_total_goals_market(event):
 
 
 def get_double_result_markets(event, h2h_market):
+    if len(h2h_market['selections']) != 3:
+        return None
+
     double_result_market = [market for market in event['markets'] if market['type'] == 10]
+
     if len(double_result_market) <= 0:
         return None
 
