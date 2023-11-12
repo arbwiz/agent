@@ -327,8 +327,8 @@ def get_total_goals_market(event):
             'selections': []
         }
 
-        under_selection = [odd for odd in double_result_market_2_5[0]['odds'] if 'menos' or 'Menos' in odd['name']][0]
-        over_selection = [odd for odd in double_result_market_2_5[0]['odds'] if 'mais' or 'Mais' in odd['name']][1]
+        under_selection = [odd for odd in double_result_market_2_5[0]['odds'] if 'menos' in odd['name'] or 'Menos' in odd['name']][0]
+        over_selection = [odd for odd in double_result_market_2_5[0]['odds'] if 'mais' in odd['name'] or 'Mais' in odd['name']][0]
 
         market['selections'].append({
             'name': 'Over 2.5',
