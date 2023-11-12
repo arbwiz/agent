@@ -65,21 +65,22 @@ async def get_american_football_events():
         'Cookie': 'site_session=' + token_resp.cookies.get_dict()['site_session']
     }
 
-    nfl_resp = requests.post(cfl, json=req_body, headers=headers)
-    cfl_resp = requests.post(nfl, json=req_body, headers=headers)
+    nfl_resp = requests.post(nfl, json=req_body, headers=headers)
+    cfl_resp = requests.post(cfl, json=req_body, headers=headers)
 
     cfl_result = json.loads(cfl_resp.content)
     nfl_result = json.loads(nfl_resp.content)
 
     events = []
 
-    for nfl_e in nfl_result['data']['events']:
-        nfl_e['competition'] = nfl_result['data']['categoryName'] + ' - ' + nfl_result['data']['tournamentName']
-        events.append(nfl_e)
-
-    for cfl_e in cfl_result['data']['events']:
-        cfl_e['competition'] = cfl_result['data']['categoryName'] + ' - ' + cfl_result['data']['tournamentName']
-        events.append(cfl_e)
+    if nfl_result['data'] is not None:
+        for nfl_e in nfl_result['data']['events']:
+            nfl_e['competition'] = nfl_result['data']['categoryName'] + ' - ' + nfl_result['data']['tournamentName']
+            events.append(nfl_e)
+    if cfl_result['data'] is not None:
+        for cfl_e in cfl_result['data']['events']:
+            cfl_e['competition'] = cfl_result['data']['categoryName'] + ' - ' + cfl_result['data']['tournamentName']
+            events.append(cfl_e)
 
     return events
 
@@ -146,7 +147,7 @@ async def betseven_basket():
         }
 
         for market in event['markets']:
-            if market['name'] == 'Vencedor (incluindo prorrogação)':
+            if market['name'] == 'Vencedor (incluindo prorrogação)' or 'Vencedor (Incluindo Prolongamento)' in market['name']:
 
                 for odd in market['odds']:
                     if odd['type'] == 4:
@@ -193,7 +194,7 @@ async def betseven_football():
         }
 
         for market in event['markets']:
-            if market['name'] == 'Vencedor':
+            if market['name'] == '1x2':
                 for odd in market['odds']:
                     if odd['type'] == 1:
                         market_data['selections'].insert(0, {
