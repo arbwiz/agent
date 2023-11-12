@@ -306,8 +306,8 @@ def get_total_goals_market(event):
             'selections': []
         }
 
-        under_selection = [odd for odd in double_result_market_1_5[0]['odds'] if 'menos' or 'Menos' in odd['name']][0]
-        over_selection = [odd for odd in double_result_market_1_5[0]['odds'] if 'mais' or 'Mais' in odd['name']][1]
+        under_selection = get_over_or_under_selection(double_result_market_1_5, 'menos')
+        over_selection = get_over_or_under_selection(double_result_market_1_5, 'mais')
 
         market['selections'].append({
             'name': 'Over 1.5',
@@ -327,8 +327,8 @@ def get_total_goals_market(event):
             'selections': []
         }
 
-        under_selection = [odd for odd in double_result_market_2_5[0]['odds'] if 'menos' in odd['name'] or 'Menos' in odd['name']][0]
-        over_selection = [odd for odd in double_result_market_2_5[0]['odds'] if 'mais' in odd['name'] or 'Mais' in odd['name']][0]
+        under_selection = get_over_or_under_selection(double_result_market_2_5, 'menos')
+        over_selection = get_over_or_under_selection(double_result_market_2_5, 'mais')
 
         market['selections'].append({
             'name': 'Over 2.5',
@@ -348,8 +348,8 @@ def get_total_goals_market(event):
             'selections': []
         }
 
-        under_selection = [odd for odd in double_result_market_3_5[0]['odds'] if 'menos' or 'Menos' in odd['name']][0]
-        over_selection = [odd for odd in double_result_market_3_5[0]['odds'] if 'mais' or 'Mais' in odd['name']][0]
+        under_selection = get_over_or_under_selection(double_result_market_3_5, 'menos')
+        over_selection = get_over_or_under_selection(double_result_market_3_5, 'mais')
 
         market['selections'].append({
             'name': 'Over 3.5',
@@ -366,6 +366,12 @@ def get_total_goals_market(event):
     return markets
 
 
+def get_over_or_under_selection(double_market, over_or_under):
+    found = [odd for odd in double_market[0]['odds'] if over_or_under.lower() in odd['name'].lower()]
+    if len(found) == 1:
+        return found[0]
+    else:
+        return None
 def get_double_result_markets(event, h2h_market):
     if len(h2h_market['selections']) != 3:
         return None
