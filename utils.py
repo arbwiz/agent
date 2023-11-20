@@ -1,5 +1,8 @@
 import difflib
 import json
+import re
+
+import unidecode
 
 market_types = ['h2h', 'total_goals_1.5', 'total_goals_2.5', 'total_goals_3.5', '1x 2', '1 x2', '12 x']
 
@@ -145,3 +148,16 @@ def calculate_arbitrage_3_websites(odds):
 
 def print_properly(data):
     print(json.dumps(data, indent=4))
+
+
+def sanitize_text(text):
+    return strip_text(normalize_text(text)).strip()
+
+
+def normalize_text(text):
+    return unidecode.unidecode(text)
+
+
+def strip_text(text):
+    pattern_to_replace = r'[^\w\s]'
+    return re.sub(pattern_to_replace, '', text)
