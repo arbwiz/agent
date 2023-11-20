@@ -3,6 +3,7 @@ import json
 import datetime
 
 from data_retrievers.common import is_valid_tennis_event, is_valid_football_event, is_valid_basket_event
+from utils import sanitize_text
 
 
 async def lebull_tennis():
@@ -25,13 +26,16 @@ async def lebull_tennis():
             'bookmaker': 'lebull',
             'competition': event['leagueName'],
             'name': event['teamA'] + ' - ' + event['teamB'],
+            'participant_a': sanitize_text(event['teamA']),
+            'participant_b': sanitize_text(event['teamB']),
             'markets': [{
                 'name': 'h2h',
                 'selections': []
             }],
             'start_time': str(convert_time(event['timestamp'])),
             'start_time_ms': event['timestamp'],
-            'url': 'https://www.lebull.pt/pt/sportsbook?page=/event/{event_id}?isLive=false'.format(event_id=str(event['eventId']))
+            'url': 'https://www.lebull.pt/pt/sportsbook?page=/event/{event_id}?isLive=false'.format(
+                event_id=str(event['eventId']))
         }
 
         for stakeType in event['stakeTypes']:
@@ -45,6 +49,7 @@ async def lebull_tennis():
         if is_valid_tennis_event(event_data):
             events.append(event_data)
     return events
+
 
 async def lebull_basket():
     # might change
@@ -65,14 +70,17 @@ async def lebull_basket():
         event_data = {
             'bookmaker': 'lebull',
             'competition': event['leagueName'],
-            'name': event['teamA'] + ' - ' + event['teamB'],
+            'name': event['teamB'] + ' - ' + event['teamA'],
+            'participant_a': sanitize_text(event['teamB']),
+            'participant_b': sanitize_text(event['teamA']),
             'markets': [{
                 'name': 'h2h',
                 'selections': []
             }],
             'start_time': str(convert_time(event['timestamp'])),
             'start_time_ms': event['timestamp'],
-            'url': 'https://www.lebull.pt/pt/sportsbook?page=/event/{event_id}?isLive=false'.format(event_id=str(event['eventId']))
+            'url': 'https://www.lebull.pt/pt/sportsbook?page=/event/{event_id}?isLive=false'.format(
+                event_id=str(event['eventId']))
         }
 
         for stakeType in event['stakeTypes']:
@@ -84,8 +92,12 @@ async def lebull_basket():
                     })
 
         if is_valid_basket_event(event_data):
+            aux = event_data['markets'][0]['selections'][0]
+            event_data['markets'][0]['selections'][0] = event_data['markets'][0]['selections'][1]
+            event_data['markets'][0]['selections'][1] = aux
             events.append(event_data)
     return events
+
 
 async def lebull_football():
     # might change
@@ -107,10 +119,13 @@ async def lebull_football():
             'bookmaker': 'lebull',
             'competition': event['leagueName'],
             'name': event['teamA'] + ' - ' + event['teamB'],
+            'participant_a': sanitize_text(event['teamA']),
+            'participant_b': sanitize_text(event['teamB']),
             'markets': [],
             'start_time': str(convert_time(event['timestamp'])),
             'start_time_ms': event['timestamp'],
-            'url': 'https://www.lebull.pt/pt/sportsbook?page=/event/{event_id}?isLive=false'.format(event_id=str(event['eventId']))
+            'url': 'https://www.lebull.pt/pt/sportsbook?page=/event/{event_id}?isLive=false'.format(
+                event_id=str(event['eventId']))
         }
 
         market_data = {
