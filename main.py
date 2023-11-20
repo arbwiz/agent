@@ -33,7 +33,7 @@ async def execute():
         try:
             print('\nrunning for football')
             start_time = time.time()
-            await run("football")
+            await asyncio.wait_for(run("football"), timeout=60)
             end_time = time.time()
             elapsed_time = end_time - start_time
             print('football done')
@@ -51,7 +51,7 @@ async def execute():
         try:
             print('\nrunning for volleyball')
             start_time = time.time()
-            await run("volleyball")
+            await asyncio.wait_for(run("volleyball"), timeout=60)
             end_time = time.time()
             elapsed_time = end_time - start_time
             print('volleyball done')
@@ -68,7 +68,7 @@ async def execute():
         try:
             print('\nrunning for american football')
             start_time = time.time()
-            await run("american_football")
+            await asyncio.wait_for(run("american_football"), timeout=60)
             end_time = time.time()
             elapsed_time = end_time - start_time
             print('american football done')
@@ -85,7 +85,7 @@ async def execute():
         try:
             print('\nrunning for tennis')
             start_time = time.time()
-            await run("tennis")
+            await asyncio.wait_for(run("tennis"), timeout=60)
             end_time = time.time()
             elapsed_time = end_time - start_time
             print('tennis done')
@@ -102,7 +102,7 @@ async def execute():
         try:
             print('\nrunning for basket')
             start_time = time.time()
-            await run("basket")
+            await asyncio.wait_for(run("basket"), timeout=60)
             end_time = time.time()
             elapsed_time = end_time - start_time
             print('basket done')
