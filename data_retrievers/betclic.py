@@ -3,6 +3,7 @@ import json
 import datetime
 
 from data_retrievers.common import is_valid_football_event, is_valid_tennis_event, is_valid_basket_event
+from utils import sanitize_text
 
 
 async def betclic_tennis_win_match():
@@ -19,6 +20,8 @@ async def betclic_tennis_win_match():
             'bookmaker': 'betclic',
             'competition': event['competition']['name'],
             'name': event['name'],
+            'participant_a': sanitize_text(event['name'].split('-')[0]),
+            'participant_b': sanitize_text(event['name'].split('-')[1]),
             'markets': [{
                 'name': 'h2h',
                 'selections': []
@@ -64,6 +67,8 @@ async def betclic_football():
             'bookmaker': 'betclic',
             'competition': event['competition']['name'],
             'name': event['name'],
+            'participant_a': sanitize_text(event['name'].split('-')[0]),
+            'participant_b': sanitize_text(event['name'].split('-')[1]),
             'markets': get_markets(event, total_goals_event, double_results_event),
             'start_time': event['date'],
             'start_time_ms': round(convert_time(event['date'])),
@@ -85,6 +90,8 @@ async def betclic_american_football():
             'bookmaker': 'betclic',
             'competition': event['competition']['name'],
             'name': event['name'],
+            'participant_a': sanitize_text(event['name'].split('-')[0]),
+            'participant_b': sanitize_text(event['name'].split('-')[1]),
             'markets': [{
                 'name': 'h2h',
                 'selections': []
@@ -121,6 +128,8 @@ async def betclic_basket():
             'bookmaker': 'betclic',
             'competition': event['competition']['name'],
             'name': event['name'],
+            'participant_a': sanitize_text(event['name'].split('-')[0]),
+            'participant_b': sanitize_text(event['name'].split('-')[1]),
             'markets': [{
                 'name': 'h2h',
                 'selections': []
@@ -158,6 +167,8 @@ async def betclic_volley():
             'bookmaker': 'betclic',
             'competition': event['competition']['name'],
             'name': event['name'],
+            'participant_a': sanitize_text(event['name'].split('-')[0]),
+            'participant_b': sanitize_text(event['name'].split('-')[1]),
             'markets': [{
                 'name': 'h2h',
                 'selections': []

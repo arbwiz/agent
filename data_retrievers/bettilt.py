@@ -4,6 +4,7 @@ from datetime import datetime
 import requests
 
 from data_retrievers.common import is_valid_tennis_event, is_valid_basket_event, is_valid_football_event
+from utils import sanitize_text
 
 all_data = {}
 
@@ -93,6 +94,8 @@ async def bettilt_football():
             'bookmaker': 'bettilt',
             'competition': event['competition'],
             'name': event['name'],
+            'participant_a': sanitize_text(event['name'].split('-')[0]),
+            'participant_b': sanitize_text(event['name'].split('-')[1]),
             'markets': [{
                 'name': 'h2h',
                 'selections': []
@@ -145,6 +148,8 @@ async def bettilt_tennis():
             'bookmaker': 'bettilt',
             'competition': event['competition'],
             'name': event['name'],
+            'participant_a': sanitize_text(event['name'].split('-')[0]),
+            'participant_b': sanitize_text(event['name'].split('-')[1]),
             'markets': [{
                 'name': 'h2h',
                 'selections': []
@@ -178,6 +183,8 @@ async def bettilt_volley():
             'bookmaker': 'bettilt',
             'competition': event['competition'],
             'name': event['name'],
+            'participant_a': sanitize_text(event['name'].split('-')[0]),
+            'participant_b': sanitize_text(event['name'].split('-')[1]),
             'markets': [{
                 'name': 'h2h',
                 'selections': []
@@ -211,6 +218,8 @@ async def bettilt_basket():
             'bookmaker': 'bettilt',
             'competition': event['competition'],
             'name': event['name'],
+            'participant_a': sanitize_text(event['name'].split('-')[0]),
+            'participant_b': sanitize_text(event['name'].split('-')[1]),
             'markets': [{
                 'name': 'h2h',
                 'selections': []

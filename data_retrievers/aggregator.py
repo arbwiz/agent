@@ -1,3 +1,7 @@
+import os
+
+import requests
+
 from data_retrievers.betano import betano_tennis_win_match_24h, betano_basket, betano_volley, betano_american_football
 from data_retrievers.betano import betano_football
 
@@ -49,7 +53,10 @@ async def get_american_football_data():
         except Exception as e:
             print(f"Error at volley for provider: [{func[0]}] with exception: [{e}]")
             result = []
-        bookmakers.append(result)
+        bookmakers.append({
+            'bookmaker': func[0],
+            'result': result
+        })
 
     data = aggregate_data(bookmakers, 'american_football')
 
@@ -75,7 +82,10 @@ async def get_volley_data():
         except Exception as e:
             print(f"Error at volley for provider: [{func[0]}] with exception: [{e}]")
             result = []
-        bookmakers.append(result)
+        bookmakers.append({
+            'bookmaker': func[0],
+            'result': result
+        })
 
     data = aggregate_data(bookmakers, 'volleyball')
 
@@ -115,7 +125,10 @@ async def get_tennis_data():
         except Exception as e:
             print(f"Error at tennis for provider: [{func[0]}] with exception: [{e}]")
             result = []
-        bookmakers.append(result)
+        bookmakers.append({
+            'bookmaker': func[0],
+            'result': result
+        })
 
     data = aggregate_data(bookmakers, 'tennis')
 
@@ -155,7 +168,10 @@ async def get_basket_data():
         except Exception as e:
             print(f"Error at basket for provider: [{func[0]}] with exception: [{e}]")
             result = []
-        bookmakers.append(result)
+        bookmakers.append({
+            'bookmaker': func[0],
+            'result': result
+        })
 
     data = aggregate_data(bookmakers, 'basket')
 
@@ -195,7 +211,10 @@ async def get_football_data():
         except Exception as e:
             print(f"Error at football for provider: [{func[0]}] with exception: [{e}]")
             result = []
-        bookmakers.append(result)
+        bookmakers.append({
+            'bookmaker': func[0],
+            'result': result
+        })
 
     data = aggregate_data(bookmakers, 'football')
 
@@ -207,7 +226,24 @@ async def get_football_data():
 def aggregate_data(all_sport_data, sport_name):
     aggregate_data = []
     for sport_data in all_sport_data:
-        aggregate_data = merge_data_sets(aggregate_data, sport_data, sport_name)
+
+        #TODO Remove from here .1
+        data = {
+            'sport': sport_name,
+            'bookmaker': sport_data['bookmaker'],
+            'data': sport_data['result']
+        }
+
+        base_url = os.environ['BACKEND_URL']
+        url = f'{base_url}/events'
+
+        requests.post(url,
+                      data=json.dumps(data),
+                      headers={'Content-Type': 'application/json'})
+
+        #TODO Remove to here .1
+
+        aggregate_data = merge_data_sets(aggregate_data, sport_data['result'], sport_name)
 
     print('\n======' + sport_name + '=======')
     log_aggregate_data_info(aggregate_data)
@@ -361,7 +397,7 @@ async def generate_output_files(bookmakers, aggregated, sport_type):
     await write_output_file(f"aggregated_{sport_type}", aggregated)
     for bookmaker in bookmakers:
         if len(bookmaker) > 0:
-            await write_output_file(f"{bookmaker[0]['bookmaker']}_{sport_type}", bookmaker, ".json")
+            await write_output_file(f"{bookmaker['bookmaker']}_{sport_type}", bookmaker['result'], ".json")
             await write_output_file("last_time_written", int(time.time()))
 
 
@@ -416,11 +452,11 @@ def get_matched_event(new_event, existing_events):
             if (
                     compare_strings_with_ratio(new_event['markets'][0]['selections'][0]['name'],
                                                existing_event["bookmakers"][0]['markets'][0]['outcomes'][0]['name'],
-                                               0.6)
+                                               0.65)
                     and
                     compare_strings_with_ratio(new_event['markets'][0]['selections'][second_outcome_idx]['name'],
                                                existing_event["bookmakers"][0]['markets'][0]['outcomes'][
-                                                   second_outcome_idx]['name'], 0.6)
+                                                   second_outcome_idx]['name'], 0.65)
             ):
                 return existing_event
     return None

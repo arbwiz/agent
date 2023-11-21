@@ -7,6 +7,7 @@ import websockets
 import asyncio
 
 from data_retrievers.common import is_valid_tennis_event, is_valid_football_event, is_valid_basket_event
+from utils import sanitize_text
 
 
 async def solverde_basket():
@@ -149,6 +150,8 @@ async def handle_event_responses(bookmaker, event_responses_t,
             'bookmaker': bookmaker,
             'competition': event_dict['canonicalTypeName'] + ' - ' + event_dict['canonicalClassName'],
             'name': event_dict['name'],
+            'participant_a': sanitize_text(event_dict['name'].split('-')[0]),
+            'participant_b': sanitize_text(event_dict['name'].split('-')[1]),
             'markets': [],
             'start_time': event_dict['startTime'],
             'start_time_ms': round(convert_time(event_dict['startTime'])),
@@ -338,6 +341,8 @@ async def handle_event_responses_tennis(bookmaker, event_responses_t, id_to_get_
             'bookmaker': bookmaker,
             'competition': event_dict['canonicalTypeName'] + ' - ' + event_dict['canonicalClassName'],
             'name': event_dict['name'],
+            'participant_a': sanitize_text(event_dict['name'].split('-')[0]),
+            'participant_b': sanitize_text(event_dict['name'].split('-')[1]),
             'markets': [{
                 'name': 'h2h',
                 'selections': []

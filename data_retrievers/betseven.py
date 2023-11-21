@@ -4,6 +4,7 @@ from datetime import datetime
 import requests
 
 from data_retrievers.common import is_valid_tennis_event, is_valid_basket_event, is_valid_football_event
+from utils import sanitize_text
 
 
 async def betseven_tennis():
@@ -15,6 +16,8 @@ async def betseven_tennis():
             'bookmaker': 'betseven',
             'competition': event['competition'],
             'name': event['participants']['home']['name'] + ' - ' + event['participants']['away']['name'],
+            'participant_a': sanitize_text(event['participants']['home']['name']),
+            'participant_b': sanitize_text(event['participants']['away']['name']),
             'markets': [],
             'start_time': event['startTime'],
             'start_time_ms': convert_time(event['startTime']),
@@ -94,6 +97,8 @@ async def betseven_american_football():
             'bookmaker': 'betseven',
             'competition': event['competition'],
             'name': event['participants']['home']['name'] + ' - ' + event['participants']['away']['name'],
+            'participant_a': sanitize_text(event['participants']['home']['name']),
+            'participant_b': sanitize_text(event['participants']['away']['name']),
             'markets': [],
             'start_time': event['startTime'],
             'start_time_ms': convert_time(event['startTime']),
@@ -135,6 +140,8 @@ async def betseven_basket():
             'bookmaker': 'betseven',
             'competition': event['competition'],
             'name': event['participants']['home']['name'] + ' - ' + event['participants']['away']['name'],
+            'participant_a': sanitize_text(event['participants']['home']['name']),
+            'participant_b': sanitize_text(event['participants']['away']['name']),
             'markets': [],
             'start_time': event['startTime'],
             'start_time_ms': convert_time(event['startTime']),
@@ -182,6 +189,8 @@ async def betseven_football():
             'bookmaker': 'betseven',
             'competition': event['competition'],
             'name': event['participants']['home']['name'] + ' - ' + event['participants']['away']['name'],
+            'participant_a': sanitize_text(event['participants']['home']['name']),
+            'participant_b': sanitize_text(event['participants']['away']['name']),
             'markets': [],
             'start_time': event['startTime'],
             'start_time_ms': convert_time(event['startTime']),
@@ -288,7 +297,7 @@ async def get_events(sport_arg):
 
 def convert_time(iso_format):
     dt = datetime.fromisoformat(iso_format)
-    return dt.timestamp() * 1000
+    return round(dt.timestamp() * 1000)
 
 
 def get_total_goals_market(event):

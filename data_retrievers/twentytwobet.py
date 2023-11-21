@@ -4,6 +4,7 @@ import datetime
 import asyncio
 
 from data_retrievers.common import is_valid_tennis_event, is_valid_football_event, is_valid_basket_event
+from utils import sanitize_text
 
 blacklisted_outcome1 = ['Home (Apostas especiais)', 'Equipa da Casa']
 blacklisted_outcome2 = ['Convidados (especial)', 'Equipa visitante']
@@ -12,7 +13,8 @@ blacklisted_comp_ids = [2150631, 2590430, 2390706, 2322382, 2498900]
 whitelisted_comp_ids = {
     'football': [7067, 8777, 11113, 12821, 12829, 13521, 13709, 16819, 17555, 26031, 27687, 27707, 27731, 28787,
                  30467, 88637, 96463, 105759, 109313, 110163, 118663, 118737, 127733, 166251, 211661, 214147,
-                 225733, 281719, 828065, 1015483, 1268397, 1471313, 2018750, 2151274, 2284664, 2421233, 2252762],
+                 225733, 281719, 828065, 1015483, 1268397, 1471313, 2018750, 2151274, 2284664, 2421233, 2252762,
+                 2463568, 34275, 108319, 118587, 118593, 119235],
     'tennis': []
 }
 
@@ -28,6 +30,8 @@ async def twentytwobet_tennis_win_match():
             'bookmaker': '22bet',
             'competition': event['LE'],
             'name': event['O1'] + ' - ' + event['O2'],
+            'participant_a': sanitize_text(event['O1']),
+            'participant_b': sanitize_text(event['O2']),
             'markets': [],
             'start_time': str(convert_time(event['S'])),
             'start_time_ms': event['S'] * 1000,
@@ -58,6 +62,7 @@ async def twentytwobet_tennis_win_match():
             events.append(event_data)
     return events
 
+
 async def twentytwobet_american_football():
     comps_ids = get_competition_ids('american_football')
 
@@ -69,6 +74,8 @@ async def twentytwobet_american_football():
             'bookmaker': '22bet',
             'competition': event['LE'],
             'name': event['O1'] + ' - ' + event['O2'],
+            'participant_a': sanitize_text(event['O1']),
+            'participant_b': sanitize_text(event['O2']),
             'markets': [],
             'start_time': str(convert_time(event['S'])),
             'start_time_ms': event['S'] * 1000,
@@ -101,6 +108,7 @@ async def twentytwobet_american_football():
             events.append(event_data)
     return events
 
+
 async def twentytwobet_basket():
     comps_ids = get_competition_ids('basket')
 
@@ -112,6 +120,8 @@ async def twentytwobet_basket():
             'bookmaker': '22bet',
             'competition': event['LE'],
             'name': event['O1'] + ' - ' + event['O2'],
+            'participant_a': sanitize_text(event['O1']),
+            'participant_b': sanitize_text(event['O2']),
             'markets': [],
             'start_time': str(convert_time(event['S'])),
             'start_time_ms': event['S'] * 1000,
@@ -144,6 +154,7 @@ async def twentytwobet_basket():
             events.append(event_data)
     return events
 
+
 async def twentytwobet_volley():
     comps_ids = get_competition_ids('volleyball')
 
@@ -155,6 +166,8 @@ async def twentytwobet_volley():
             'bookmaker': '22bet',
             'competition': event['LE'],
             'name': event['O1'] + ' - ' + event['O2'],
+            'participant_a': sanitize_text(event['O1']),
+            'participant_b': sanitize_text(event['O2']),
             'markets': [],
             'start_time': str(convert_time(event['S'])),
             'start_time_ms': event['S'] * 1000,
@@ -187,6 +200,7 @@ async def twentytwobet_volley():
             events.append(event_data)
     return events
 
+
 async def twentytwobet_football():
     # only retrieves 50 events and no pagination
     # result = requests.get(
@@ -205,6 +219,8 @@ async def twentytwobet_football():
             'bookmaker': '22bet',
             'competition': event['LE'],
             'name': event['O1'] + ' - ' + event['O2'],
+            'participant_a': sanitize_text(event['O1']),
+            'participant_b': sanitize_text(event['O2']),
             'markets': [],
             'start_time': str(convert_time(event['S'])),
             'start_time_ms': event['S'] * 1000,

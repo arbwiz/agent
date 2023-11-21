@@ -3,6 +3,7 @@ import json
 import datetime
 
 from data_retrievers.common import is_valid_tennis_event, is_valid_football_event, is_valid_basket_event
+from utils import sanitize_text
 
 
 async def casinoportugal_tennis():
@@ -21,6 +22,8 @@ async def casinoportugal_tennis():
             'bookmaker': 'casinoportugal',
             'competition': event['region_name'] + ' - ' + event['comp_name'],
             'name': event['home_name'] + ' - ' + event['away_name'],
+            'participant_a': sanitize_text(event['home_name']),
+            'participant_b': sanitize_text(event['away_name']),
             'markets': [],
             'start_time': event['start_time_utc'] + 'Z',
             'start_time_ms': convert_time(event['start_time_utc'] + 'Z'),
@@ -69,6 +72,8 @@ async def casinoportugal_basket():
             'bookmaker': 'casinoportugal',
             'competition': event['region_name'] + ' - ' + event['comp_name'],
             'name': event['home_name'] + ' - ' + event['away_name'],
+            'participant_a': sanitize_text(event['home_name']),
+            'participant_b': sanitize_text(event['away_name']),
             'markets': [],
             'start_time': event['start_time_utc'] + 'Z',
             'start_time_ms': convert_time(event['start_time_utc'] + 'Z'),
@@ -119,6 +124,8 @@ async def casinoportugal_football():
             'bookmaker': 'casinoportugal',
             'competition': event['region_name'] + ' - ' + event['comp_name'],
             'name': event['home_name'] + ' - ' + event['away_name'],
+            'participant_a': sanitize_text(event['home_name']),
+            'participant_b': sanitize_text(event['away_name']),
             'markets': [],
             'start_time': event['start_time_utc'] + 'Z',
             'start_time_ms': convert_time(event['start_time_utc'] + 'Z'),
@@ -155,12 +162,6 @@ async def casinoportugal_football():
             events.append(event_data)
     return events
 
-
-def convert_time(millis):
-    dt = datetime.datetime.fromtimestamp(millis / 1000)
-    return dt.isoformat()
-
-
 def find_market_by_id(markets, id):
     found = [market for market in markets if market['name'] == id]
     return found[0] if len(found) == 1 else None
@@ -168,4 +169,4 @@ def find_market_by_id(markets, id):
 
 def convert_time(iso_format):
     dt = datetime.datetime.fromisoformat(iso_format)
-    return dt.timestamp() * 1000
+    return round(dt.timestamp() * 1000)

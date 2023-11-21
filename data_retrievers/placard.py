@@ -8,6 +8,7 @@ import websockets
 from data_retrievers.common import is_valid_tennis_event, is_valid_football_event, is_valid_basket_event
 
 from data_retrievers.solverde import retrieve_info_websocket_football
+from utils import sanitize_text
 
 
 async def placard_tennis():
@@ -102,6 +103,8 @@ async def handle_event_responses(bookmaker, event_responses_t, id_to_get_winner_
             'bookmaker': bookmaker,
             'competition': event_dict['canonicalTypeName'] + ' - ' + event_dict['canonicalClassName'],
             'name': event_dict['name'],
+            'participant_a': sanitize_text(event_dict['name'].split('-')[0]),
+            'participant_b': sanitize_text(event_dict['name'].split('-')[1]),
             'markets': [{
                 'name': 'h2h',
                 'selections': []

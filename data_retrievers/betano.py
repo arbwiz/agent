@@ -4,6 +4,7 @@ import datetime
 from data_retrievers.common import scrape_website, is_valid_basket_event
 from data_retrievers.common import is_valid_tennis_event
 from data_retrievers.common import is_valid_football_event
+from utils import sanitize_text
 
 
 async def betano_tennis_win_match_24h():
@@ -23,6 +24,8 @@ async def betano_tennis_win_match_24h():
                 'bookmaker': 'betano',
                 'competition': event['leagueDescription'],
                 'name': event['name'],
+                'participant_a': sanitize_text(event['name'].split('-')[0]),
+                'participant_b': sanitize_text(event['name'].split('-')[1]),
                 'markets': [{
                     'name': 'h2h',
                     'selections': []
@@ -55,6 +58,8 @@ async def betano_american_football():
                 'bookmaker': 'betano',
                 'competition': event['regionName'],
                 'name': event['name'],
+                'participant_a': sanitize_text(event['name'].split('-')[0]),
+                'participant_b': sanitize_text(event['name'].split('-')[1]),
                 'markets': [{
                     'name': 'h2h',
                     'selections': []
@@ -87,6 +92,8 @@ async def betano_basket():
                 'bookmaker': 'betano',
                 'competition': event['regionName'],
                 'name': event['name'],
+                'participant_a': sanitize_text(event['name'].split('-')[0]),
+                'participant_b': sanitize_text(event['name'].split('-')[1]),
                 'markets': [{
                     'name': 'h2h',
                     'selections': []
@@ -119,6 +126,8 @@ async def betano_volley():
                 'bookmaker': 'betano',
                 'competition': event['regionName'],
                 'name': event['name'],
+                'participant_a': sanitize_text(event['name'].split('-')[0]),
+                'participant_b': sanitize_text(event['name'].split('-')[1]),
                 'markets': [{
                     'name': 'h2h',
                     'selections': []
@@ -154,6 +163,8 @@ async def betano_football():
                 'bookmaker': 'betano',
                 'competition': event['leagueDescription'],
                 'name': event['name'],
+                'participant_a': sanitize_text(event['name'].split('-')[0]),
+                'participant_b': sanitize_text(event['name'].split('-')[1]),
                 'markets': [],
                 'start_time': str(convert_time(event['startTime'])),
                 'start_time_ms': event['startTime'],

@@ -4,6 +4,7 @@ import datetime
 import brotli
 
 from data_retrievers.common import is_valid_tennis_event, is_valid_football_event, is_valid_basket_event
+from utils import sanitize_text
 
 SPORT_ID_TENNIS = '5'
 SPORT_ID_BASKET = '7'
@@ -50,6 +51,8 @@ async def bwin_tennis():
             'bookmaker': 'bwin',
             'competition': event['competition']['name']['value'],
             'name': event['name']['value'],
+            'participant_a': sanitize_text(event['name']['value'].split('-')[0]),
+            'participant_b': sanitize_text(event['name']['value'].split('-')[1]),
             'markets': [{
                 'name': 'h2h',
                 'selections': []
@@ -106,7 +109,9 @@ async def bwin_basket():
         event_data = {
             'bookmaker': 'bwin',
             'competition': event['competition']['name']['value'],
-            'name': event['name']['value'],
+            'name': event['participants'][1]['name']['value'] + ' - ' + event['participants'][0]['name']['value'],
+            'participant_a': sanitize_text(event['participants'][1]['name']['value']),
+            'participant_b': sanitize_text(event['participants'][0]['name']['value']),
             'markets': [{
                 'name': 'h2h',
                 'selections': []
@@ -164,6 +169,8 @@ async def bwin_football():
             'bookmaker': 'bwin',
             'competition': event['competition']['name']['value'],
             'name': event['name']['value'],
+            'participant_a': sanitize_text(event['name']['value'].split('-')[0]),
+            'participant_b': sanitize_text(event['name']['value'].split('-')[1]),
             'markets': [],
             'start_time': event['startDate'],
             'start_time_ms': round(convert_time(event['startDate'])),

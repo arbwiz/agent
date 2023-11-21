@@ -1,4 +1,5 @@
 import json
+import os
 import time
 
 import requests
@@ -157,11 +158,13 @@ def send_surebets_data(creation_timestamp, sport, surebets):
         'surebets': surebets
     }
 
-    url = f'https://arbwiz-backend.onrender.com/surebets'
+    #TODO  prod should be https://arbwiz-backend.onrender.com
+    base_url = os.environ['BACKEND_URL']
+    url = f'{base_url}/surebets'
 
     requests.post(url,
                   data=json.dumps(data),
                   headers={'Content-Type': 'application/json'})
 
-    if len(surebets) > 0:
-        send_telegram_message(data)
+    #if len(surebets) > 0:
+    #    send_telegram_message(data)

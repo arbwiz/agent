@@ -6,6 +6,7 @@ import uuid
 import datetime
 
 from data_retrievers.common import is_valid_tennis_event, is_valid_football_event, is_valid_basket_event
+from utils import sanitize_text
 
 
 async def esconline_tennis_win_match_24h():
@@ -31,6 +32,8 @@ async def esconline_tennis_win_match_24h():
             'bookmaker': 'esconline',
             'competition': event['competition'],
             'name': event['EventName'].replace(':', '-'),
+            'participant_a': sanitize_text(event['EventName'].split(':')[0]),
+            'participant_b': sanitize_text(event['EventName'].split(':')[1]),
             'markets': [{
                 'name': 'h2h',
                 'selections': []
@@ -75,6 +78,8 @@ async def esconline_basket():
             'bookmaker': 'esconline',
             'competition': event['competition'],
             'name': event['EventName'].replace(':', '-'),
+            'participant_a': sanitize_text(event['EventName'].split(':')[0]),
+            'participant_b': sanitize_text(event['EventName'].split(':')[1]),
             'markets': [{
                 'name': 'h2h',
                 'selections': []
@@ -120,6 +125,8 @@ async def esconline_football():
             'bookmaker': 'esconline',
             'competition': event['competition'],
             'name': event['EventName'].replace(':', '-'),
+            'participant_a': sanitize_text(event['EventName'].split(':')[0]),
+            'participant_b': sanitize_text(event['EventName'].split(':')[1]),
             'markets': [],
             'start_time': event['StartDate'],
             'start_time_ms': round(convert_time(event['StartDate'])),
