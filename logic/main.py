@@ -166,5 +166,5 @@ def send_surebets_data(creation_timestamp, sport, surebets):
                   data=json.dumps(data),
                   headers={'Content-Type': 'application/json'})
 
-    #if len(surebets) > 0:
-    #    send_telegram_message(data)
+    if len(surebets) > 0:
+        send_telegram_message(data)

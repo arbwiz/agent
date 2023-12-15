@@ -47,39 +47,39 @@ async def execute():
 
         await asyncio.sleep(3)
 
-        ### volleyball
-        try:
-            print('\nrunning for volleyball')
-            start_time = time.time()
-            await asyncio.wait_for(run("volleyball"), timeout=60)
-            end_time = time.time()
-            elapsed_time = end_time - start_time
-            print('volleyball done')
-            print("elapsed time: {:.2f}s".format(elapsed_time))
-
-        except Exception as ex:
-            print('volleyball exception')
-            traceback.print_exc()
-        ### finish volleyball
+        # ### volleyball
+        # try:
+        #     print('\nrunning for volleyball')
+        #     start_time = time.time()
+        #     await asyncio.wait_for(run("volleyball"), timeout=60)
+        #     end_time = time.time()
+        #     elapsed_time = end_time - start_time
+        #     print('volleyball done')
+        #     print("elapsed time: {:.2f}s".format(elapsed_time))
+        #
+        # except Exception as ex:
+        #     print('volleyball exception')
+        #     traceback.print_exc()
+        # ### finish volleyball
 
         await asyncio.sleep(3)
 
         ### american football
-        try:
-            print('\nrunning for american football')
-            start_time = time.time()
-            await asyncio.wait_for(run("american_football"), timeout=60)
-            end_time = time.time()
-            elapsed_time = end_time - start_time
-            print('american football done')
-            print("elapsed time: {:.2f}s".format(elapsed_time))
-
-        except Exception as ex:
-            print('american football exception')
-            traceback.print_exc()
-        ### finish american football
-
-        await asyncio.sleep(3)
+        # try:
+        #     print('\nrunning for american football')
+        #     start_time = time.time()
+        #     await asyncio.wait_for(run("american_football"), timeout=60)
+        #     end_time = time.time()
+        #     elapsed_time = end_time - start_time
+        #     print('american football done')
+        #     print("elapsed time: {:.2f}s".format(elapsed_time))
+        #
+        # except Exception as ex:
+        #     print('american football exception')
+        #     traceback.print_exc()
+        # ### finish american football
+        #
+        # await asyncio.sleep(3)
 
         ### tennis
         try:

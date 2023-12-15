@@ -33,7 +33,6 @@ from data_retrievers.bwin import bwin_football, bwin_basket
 from model.event import calculate_arbitrage_stakes
 from model.event import Event
 from data_retrievers.solverde import solverde_tennis, solverde_football, solverde_basket
-from gpt4all import GPT4All
 
 
 async def main():
@@ -71,7 +70,7 @@ async def test():
     #                          [sanitize_text("Orle\u00e3es Loiret Basquetebol")], limit=10,
     #                          scorer=fuzz.token_set_ratio)
 
-    result = await twentytwobet_football()
+    result = await betseven_football()
     print(result)
 
 

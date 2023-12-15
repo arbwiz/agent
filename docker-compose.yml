@@ -2,6 +2,9 @@ version: "3.9"
 
 services:
   arbwiz:
+    environment:
+      - TELEGRAM_CHANNEL_ID=-4010862393
+      - BACKEND_URL=https://arbwiz-backend.onrender.com
     restart: always
     build: .
     ports:
