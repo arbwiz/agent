@@ -48,7 +48,8 @@ async def betano_tennis_win_match_24h():
 
 async def betano_american_football():
     url = 'https://www.betano.pt/api/sport/futebol-americano/ligas/1611,10116/?req=la,s,stnf,c,mb'
-    result = requests.get(url)
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:20.0) Gecko/20100101 Firefox/20.0'}
+    result = requests.get(url, headers=headers)
     main_data = json.loads(result.content)
 
     events = []
@@ -82,7 +83,8 @@ async def betano_american_football():
 
 async def betano_basket():
     url = 'https://www.betano.pt/api/sport/basquetebol/jogos-de-hoje/?sort=Leagues&req=la,s,stnf,c,mb'
-    result = requests.get(url)
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:20.0) Gecko/20100101 Firefox/20.0'}
+    result = requests.get(url, headers=headers)
     main_data = json.loads(result.content)
 
     events = []
@@ -116,7 +118,8 @@ async def betano_basket():
 
 async def betano_volley():
     url = 'https://www.betano.pt/api/sport/voleibol/jogos-de-hoje/?sort=Leagues&req=la,s,stnf,c,mb'
-    result = requests.get(url)
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:20.0) Gecko/20100101 Firefox/20.0'}
+    result = requests.get(url, headers=headers)
     main_data = json.loads(result.content)
 
     events = []
@@ -151,8 +154,8 @@ async def betano_volley():
 
 async def betano_football():
     url = 'https://www.betano.pt/api/sport/futebol/jogos-de-hoje/?sort=Leagues&req=la,s,stnf,c,mb'
-
-    result = requests.get(url)
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:20.0) Gecko/20100101 Firefox/20.0'}
+    result = requests.get(url, headers=headers)
 
     main_data = json.loads(result.content)
 
