@@ -15,7 +15,8 @@ from data_retrievers.twentytwobet import twentytwobet_tennis_win_match, twentytw
     twentytwobet_american_football
 from data_retrievers.esconline import esconline_tennis_win_match_24h, esconline_basket
 from data_retrievers.esconline import esconline_football
-from data_retrievers.betano import betano_football, betano_basket, betano_volley, betano_american_football
+from data_retrievers.betano import betano_football, betano_basket, betano_volley, betano_american_football, \
+    betano_tennis_win_match_24h
 from data_retrievers.betclic import betclic_football, betclic_basket, betclic_volley, betclic_american_football
 from data_retrievers.twentytwobet import twentytwobet_football
 from data_retrievers.twentytwobet import get_competition_ids
@@ -70,7 +71,7 @@ async def test():
     #                          [sanitize_text("Orle\u00e3es Loiret Basquetebol")], limit=10,
     #                          scorer=fuzz.token_set_ratio)
 
-    result = await betano_basket()
+    result = await betano_tennis_win_match_24h()
     print(result)
 
 

@@ -35,7 +35,7 @@ async def twentytwobet_tennis_win_match():
             'markets': [],
             'start_time': str(convert_time(event['S'])),
             'start_time_ms': event['S'] * 1000,
-            'url': 'https://22win88.com/line/tennis/' + format_url(event)
+            'url': 'https://22b-win.com/line/tennis/' + format_url(event)
         }
 
         market_data = {
@@ -79,7 +79,7 @@ async def twentytwobet_american_football():
             'markets': [],
             'start_time': str(convert_time(event['S'])),
             'start_time_ms': event['S'] * 1000,
-            'url': 'https://22win88.com/line/basketball/' + format_url(event)
+            'url': 'https://22b-win.com/line/basketball/' + format_url(event)
         }
 
         market_data = {
@@ -125,7 +125,7 @@ async def twentytwobet_basket():
             'markets': [],
             'start_time': str(convert_time(event['S'])),
             'start_time_ms': event['S'] * 1000,
-            'url': 'https://22win88.com/line/basketball/' + format_url(event)
+            'url': 'https://22b-win.com/line/basketball/' + format_url(event)
         }
 
         market_data = {
@@ -171,7 +171,7 @@ async def twentytwobet_volley():
             'markets': [],
             'start_time': str(convert_time(event['S'])),
             'start_time_ms': event['S'] * 1000,
-            'url': 'https://22win88.com/line/volleyball/' + format_url(event)
+            'url': 'https://22b-win.com/line/volleyball/' + format_url(event)
         }
 
         market_data = {
@@ -204,7 +204,7 @@ async def twentytwobet_volley():
 async def twentytwobet_football():
     # only retrieves 50 events and no pagination
     # result = requests.get(
-    #    "https://22win88.com/LineFeed/Get1x2_VZip?sports=1&count=300&lng=pt&tf=3000000&tz=1&mode=4&country=148"
+    #    "https://22b-win.com/LineFeed/Get1x2_VZip?sports=1&count=300&lng=pt&tf=3000000&tz=1&mode=4&country=148"
     #    "&partner=151&getEmpty=true")
 
     # resultDict = json.loads(result.content)
@@ -224,7 +224,7 @@ async def twentytwobet_football():
             'markets': [],
             'start_time': str(convert_time(event['S'])),
             'start_time_ms': event['S'] * 1000,
-            'url': 'https://22win88.com/line/football/' + format_url(event)
+            'url': 'https://22b-win.com/line/football/' + format_url(event)
         }
 
         market_data = {
@@ -447,7 +447,7 @@ def get_competition_ids(sport_arg):
         sport_name = 'American Football'
 
     comps_url = (
-        f"https://22win88.com/LineFeed/GetSportsShortZip?sports={sport_id}&lng=pt&tf=2880&country=148&partner=151"
+        f"https://22b-win.com/LineFeed/GetSportsShortZip?sports={sport_id}&lng=pt&tf=2880&country=148&partner=151"
         "&virtualSports=true&group=151&gr=151").format(sport_id=sport_id)
 
     result = requests.get(comps_url)
@@ -509,7 +509,7 @@ async def get_events_from_competitions(competition_ids, sport):
         mode_id = 1
         tf = 3000000
 
-    url_template = ("https://22win88.com/LineFeed/Get1x2_VZip?sports={sport_id}&champs={"
+    url_template = ("https://22b-win.com/LineFeed/Get1x2_VZip?sports={sport_id}&champs={"
                     "competition_id}&count=50&lng=pt&tf={tf}&tz=1&mode={mode_id}&country=148&partner=151&getEmpty=true")
     events = []
     results_t = []
