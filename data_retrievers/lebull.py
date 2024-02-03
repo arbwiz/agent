@@ -67,12 +67,20 @@ async def lebull_basket():
     for event in lebull_events:
         if event['isLive'] == 'true':
             continue
+
+        participant_a = sanitize_text(event['teamA'])
+        participant_b = sanitize_text(event['teamB'])
+
+        if event['leagueName'] == 'NBA':
+            participant_a = sanitize_text(event['teamB'])
+            participant_b = sanitize_text(event['teamA'])
+
         event_data = {
             'bookmaker': 'lebull',
             'competition': event['leagueName'],
             'name': event['teamB'] + ' - ' + event['teamA'],
-            'participant_a': sanitize_text(event['teamB']),
-            'participant_b': sanitize_text(event['teamA']),
+            'participant_a': participant_a,
+            'participant_b': participant_b,
             'markets': [{
                 'name': 'h2h',
                 'selections': []
@@ -92,9 +100,10 @@ async def lebull_basket():
                     })
 
         if is_valid_basket_event(event_data):
-            aux = event_data['markets'][0]['selections'][0]
-            event_data['markets'][0]['selections'][0] = event_data['markets'][0]['selections'][1]
-            event_data['markets'][0]['selections'][1] = aux
+            if event['leagueName'] == 'NBA':
+                aux = event_data['markets'][0]['selections'][0]
+                event_data['markets'][0]['selections'][0] = event_data['markets'][0]['selections'][1]
+                event_data['markets'][0]['selections'][1] = aux
             events.append(event_data)
     return events
 
