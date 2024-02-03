@@ -105,7 +105,8 @@ async def get_tennis_data():
     bwin_t = asyncio.create_task(bwin_tennis())
     casinoportugal_t = asyncio.create_task(casinoportugal_tennis())
     betseven_t = asyncio.create_task(betseven_tennis())
-    bettilt_t = asyncio.create_task(bettilt_tennis())
+
+    #bettilt_t = asyncio.create_task(bettilt_tennis())
 
     bookmakers = []
 
@@ -119,7 +120,7 @@ async def get_tennis_data():
                  ["bwin", bwin_t],
                  ["casinoportugal", casinoportugal_t],
                  ["betseven", betseven_t],
-                 ["bettilt", bettilt_t]]:
+                ]:
         try:
             result = await func[1]
         except Exception as e:
@@ -149,7 +150,7 @@ async def get_basket_data():
     # not supported yet due to default winner market having draw option
     # casinoportugal_t = asyncio.create_task(casinoportugal_basket())
     betseven_t = asyncio.create_task(betseven_basket())
-    bettilt_t = asyncio.create_task(bettilt_basket())
+    #bettilt_t = asyncio.create_task(bettilt_basket())
 
     bookmakers = []
 
@@ -161,8 +162,8 @@ async def get_basket_data():
                  ["lebull", lebull_t],
                  ["bwin", bwin_t],
                  ["placard", placard_t],
-                 ["betseven", betseven_t],
-                 ["bettilt", bettilt_t]]:
+                 ["betseven", betseven_t]
+                 ]:
         try:
             result = await func[1]
         except Exception as e:
@@ -190,7 +191,7 @@ async def get_football_data():
     placard_t = asyncio.create_task(placard_football())
     casinoportugal_t = asyncio.create_task(casinoportugal_football())
     betseven_t = asyncio.create_task(betseven_football())
-    bettilt_t = asyncio.create_task(bettilt_football())
+    #bettilt_t = asyncio.create_task(bettilt_football())
 
     bookmakers = []
 
@@ -203,8 +204,8 @@ async def get_football_data():
                  ["lebull", lebull_t],
                  ["bwin", bwin_t],
                  ["casinoportugal", casinoportugal_t],
-                 ["betseven", betseven_t],
-                 ["bettilt", bettilt_t]]:
+                 ["betseven", betseven_t]
+                 ]:
 
         try:
             result = await func[1]
