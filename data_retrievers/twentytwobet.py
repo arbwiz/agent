@@ -9,7 +9,9 @@ from utils import sanitize_text
 blacklisted_outcome1 = ['Home (Apostas especiais)', 'Equipa da Casa']
 blacklisted_outcome2 = ['Convidados (especial)', 'Equipa visitante']
 max_comps = 10
-blacklisted_comp_ids = [2150631, 2590430, 2390706, 2322382, 2498900]
+blacklisted_comp_ids = {
+    'basket': [165593]
+}
 whitelisted_comp_ids = {
     'football': [7067, 8777, 11113, 12821, 12829, 13521, 13709, 16819, 17555, 26031, 27687, 27707, 27731, 28787,
                  30467, 88637, 96463, 105759, 109313, 110163, 118663, 118737, 127733, 166251, 211661, 214147,
@@ -471,6 +473,9 @@ def get_competition_ids(sport_arg):
         # if number of games in comp is higher than 15, consider relevant to request
 
         if sport_arg == 'football' and comp['LI'] not in whitelisted_comp_ids[sport_arg]:
+            continue
+
+        if sport_arg == 'basket' and comp['LI'] in blacklisted_comp_ids[sport_arg]:
             continue
 
         number_of_games += comp['GC']
