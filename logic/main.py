@@ -162,9 +162,9 @@ def send_surebets_data(creation_timestamp, sport, surebets):
     base_url = os.environ['BACKEND_URL']
     url = f'{base_url}/surebets'
 
-    #requests.post(url,
-    #              data=json.dumps(data),
-    #              headers={'Content-Type': 'application/json'})
+    requests.post(url,
+                  data=json.dumps(data),
+                  headers={'Content-Type': 'application/json'})
 
     if len(surebets) > 0:
         send_telegram_message(data)
