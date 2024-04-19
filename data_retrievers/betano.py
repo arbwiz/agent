@@ -7,15 +7,13 @@ from data_retrievers.common import is_valid_football_event
 from utils import sanitize_text
 
 
-async def betano_tennis_win_match_24h():
-    url = 'https://www.betano.pt/sport/tenis/jogos-de-hoje/'
-    soup = scrape_website(url)
+async def betano_tennis():
 
-    data = soup.find('body').find('script').text
-    json_end = data.rfind('}')
-    json_start = data.find('{')
 
-    main_data = json.loads(data[json_start:json_end + 1])
+    url = 'https://www.betano.pt/api/sport/tenis/jogos-de-hoje/?req=la,s,stnf,c,mb,mbl'
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:20.0) Gecko/20100101 Firefox/20.0'}
+    result = requests.get(url, headers=headers)
+    main_data = json.loads(result.content)
 
     events = []
     for block in main_data['data']['blocks']:

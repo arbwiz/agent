@@ -6,6 +6,7 @@ import unidecode
 
 from data_retrievers.betseven import betseven_tennis, betseven_basket, betseven_football, betseven_american_football
 from data_retrievers.bettilt import get_all_events, bettilt_tennis, bettilt_football, bettilt_volley
+from data_retrievers.betway import betway_tennis, convert_time_plus2_ms, convert_time_from_plus2_to_z
 from data_retrievers.casinoportugal import casinoportugal_football, casinoportugal_tennis, casinoportugal_basket
 from data_retrievers.placard import placard_football, placard_basket
 from data_retrievers.placard import placard_tennis
@@ -15,9 +16,9 @@ from data_retrievers.twentytwobet import twentytwobet_tennis_win_match, twentytw
     twentytwobet_american_football
 from data_retrievers.esconline import esconline_tennis_win_match_24h, esconline_basket
 from data_retrievers.esconline import esconline_football
-from data_retrievers.betano import betano_football, betano_basket, betano_volley, betano_american_football, \
-    betano_tennis_win_match_24h
-from data_retrievers.betclic import betclic_football, betclic_basket, betclic_volley, betclic_american_football
+from data_retrievers.betano import betano_football, betano_basket, betano_volley, betano_american_football, betano_tennis
+from data_retrievers.betclic import betclic_football, betclic_basket, betclic_volley, betclic_american_football, \
+    betclic_tennis
 from data_retrievers.twentytwobet import twentytwobet_football
 from data_retrievers.twentytwobet import get_competition_ids
 from data_retrievers.twentytwobet import get_events_from_competitions
@@ -71,8 +72,9 @@ async def test():
     #                          [sanitize_text("Orle\u00e3es Loiret Basquetebol")], limit=10,
     #                          scorer=fuzz.token_set_ratio)
 
-    result = await betano_tennis_win_match_24h()
+    result = await betclic_tennis()
     print(result)
+
 
 
 if __name__ == "__main__":

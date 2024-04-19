@@ -6,7 +6,7 @@ from data_retrievers.common import is_valid_football_event, is_valid_tennis_even
 from utils import sanitize_text
 
 
-async def betclic_tennis_win_match():
+async def betclic_tennis():
     result = requests.get(
         "https://offer.cdn.begmedia.com/api/pub/v4/sports/2?application=1024&countrycode=pt&hasSwitchMtc=true&language=pt&limit=150&markettypeId=2013&offset=0&sitecode=ptpt&sortBy=ByLiveRankingPreliveDate")
 
@@ -14,7 +14,7 @@ async def betclic_tennis_win_match():
 
     events = []
     for event in resultDict['matches']:
-        if event['is_live'] == 'true':
+        if event['is_live'] == 'true' or '-' not in event['name']:
             continue
         event_data = {
             'bookmaker': 'betclic',
