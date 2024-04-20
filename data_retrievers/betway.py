@@ -50,7 +50,7 @@ async def betway_tennis():
                 'selections': []
             }],
             'start_time': str(convert_time_from_plus2_to_z(event['start'])),
-            'start_time_ms': convert_time_plus2_ms(event['start']),
+            'start_time_ms': round(convert_time_plus2_ms(event['start'])),
             'url': 'https://apostas.betway.pt' + event['url']
         }
 
@@ -105,7 +105,7 @@ async def betway_basket():
                 'selections': []
             }],
             'start_time': str(convert_time_from_plus2_to_z(event['start'])),
-            'start_time_ms': convert_time_plus2_ms(event['start']),
+            'start_time_ms': round(convert_time_plus2_ms(event['start'])),
             'url': 'https://apostas.betway.pt' + event['url']
         }
 
