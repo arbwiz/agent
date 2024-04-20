@@ -11,6 +11,7 @@ from data_retrievers.betseven import betseven_tennis, betseven_basket, betseven_
 from data_retrievers.bettilt import bettilt_tennis, bettilt_basket, bettilt_football, bettilt_volley
 from data_retrievers.betway import betway_tennis
 from data_retrievers.casinoportugal import casinoportugal_tennis, casinoportugal_football
+from data_retrievers.leonbet import leonbet_tennis
 from data_retrievers.placard import placard_tennis, placard_football, placard_basket
 
 from data_retrievers.twentytwobet import twentytwobet_tennis_win_match, twentytwobet_basket, twentytwobet_volley, \
@@ -107,6 +108,7 @@ async def get_tennis_data():
     casinoportugal_t = asyncio.create_task(casinoportugal_tennis())
     betseven_t = asyncio.create_task(betseven_tennis())
     betway_t = asyncio.create_task(betway_tennis())
+    leonbet_t = asyncio.create_task(leonbet_tennis())
 
     #bettilt_t = asyncio.create_task(bettilt_tennis())
 
@@ -123,6 +125,7 @@ async def get_tennis_data():
                  ["casinoportugal", casinoportugal_t],
                  ["betseven", betseven_t],
                  ["betway", betway_t],
+                 ["leonbet", leonbet_t],
                 ]:
         try:
             result = await func[1]
