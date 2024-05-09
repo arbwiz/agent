@@ -73,7 +73,7 @@ async def test():
     #                          [sanitize_text("Orle\u00e3es Loiret Basquetebol")], limit=10,
     #                          scorer=fuzz.token_set_ratio)
 
-    result = await betway_basket()
+    result = await betway_tennis()
     print(result)
 
 

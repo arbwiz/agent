@@ -21,7 +21,7 @@ async def betseven_tennis():
             'markets': [],
             'start_time': event['startTime'],
             'start_time_ms': convert_time(event['startTime']),
-            'url': 'https://www.bet7.com/sportsbook/5/events/' + str(event['id'])
+            'url': 'https://www.betseven17.com/sportsbook/5/events/' + str(event['id'])
         }
 
         market_data = {
@@ -52,10 +52,14 @@ async def betseven_tennis():
 
 
 async def get_american_football_events():
-    nfl = "https://www.bet7.com/iapi/sportsbook/v2/tournaments/31"
-    cfl = "https://www.bet7.com/iapi/sportsbook/v2/tournaments/790"
+    nfl = "https://www.betseven17.com/iapi/sportsbook/v2/tournaments/31"
+    cfl = "https://www.betseven17.com/iapi/sportsbook/v2/tournaments/790"
 
-    token_resp = requests.get(nfl)
+    headers = {
+        'referer': 'https://www.betseven17.com/sportsbook/2'
+    }
+
+    token_resp = requests.get(nfl, headers=headers)
     token = token_resp.cookies.get_dict()['XSRF-TOKEN'][:-4] + '=0'
 
     req_body = {
@@ -102,7 +106,7 @@ async def betseven_american_football():
             'markets': [],
             'start_time': event['startTime'],
             'start_time_ms': convert_time(event['startTime']),
-            'url': 'https://www.bet7.com/sportsbook/2/events/' + str(event['id'])
+            'url': 'https://www.betseven17.com/sportsbook/2/events/' + str(event['id'])
         }
 
         market_data = {
@@ -145,7 +149,7 @@ async def betseven_basket():
             'markets': [],
             'start_time': event['startTime'],
             'start_time_ms': convert_time(event['startTime']),
-            'url': 'https://www.bet7.com/sportsbook/2/events/' + str(event['id'])
+            'url': 'https://www.betseven17.com/sportsbook/2/events/' + str(event['id'])
         }
 
         market_data = {
@@ -194,7 +198,7 @@ async def betseven_football():
             'markets': [],
             'start_time': event['startTime'],
             'start_time_ms': convert_time(event['startTime']),
-            'url': 'https://www.bet7.com/sportsbook/1/events/' + str(event['id'])
+            'url': 'https://www.betseven17.com/sportsbook/1/events/' + str(event['id'])
         }
 
         market_data = {
@@ -254,10 +258,16 @@ async def get_events(sport_arg):
         market_type_ids = "&marketTypeIds[]=219"
 
     comps_url = (
-        f"https://www.bet7.com/iapi/sportsbook/v2/sports/{sport_id}").format(sport_id=sport_id)
+        f"https://www.betseven17.com/iapi/sportsbook/v2/sports/{sport_id}").format(sport_id=sport_id)
 
-    comp_result = requests.get(comps_url)
+    headers = {
+        'referer': 'https://www.betseven17.com/sportsbook/2'
+    }
+
+    comp_result = requests.get(comps_url, headers=headers)
+
     comp_result_dict = json.loads(comp_result.content)
+
 
     ids = []
     for cat in comp_result_dict['data']['categories']:
@@ -272,9 +282,12 @@ async def get_events(sport_arg):
     for id in ids:
         params.append(tournament_ids_template.format(tournament_id=id))
 
-    events_url = f"https://www.bet7.com/iapi/sportsbook/v2/sports/{sport_id}/events?timespan=24&{'&'.join(params)}&{market_type_ids}"
+    events_url = f"https://www.betseven17.com/iapi/sportsbook/v2/sports/{sport_id}/events?timespan=24&{'&'.join(params)}&{market_type_ids}"
 
-    result = requests.get(events_url)
+    headers = {
+        'referer': 'https://www.betseven17.com/sportsbook/2'
+    }
+    result = requests.get(events_url, headers=headers)
     result_dict = json.loads(result.content)
 
     tournaments = []

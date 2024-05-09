@@ -54,7 +54,7 @@ async def betway_tennis():
             'url': 'https://apostas.betway.pt' + event['url']
         }
 
-        if len(event['bets'][0]['choices']) != 2:
+        if 'bets' not in event or len(event['bets'][0]['choices']) != 2:
             continue
 
         event_data['markets'][0]['selections'].append({
@@ -109,7 +109,7 @@ async def betway_basket():
             'url': 'https://apostas.betway.pt' + event['url']
         }
 
-        if len(event['bets'][0]['choices']) != 2:
+        if 'bets' not in event or len(event['bets'][0]['choices']) != 2:
             continue
 
         event_data['markets'][0]['selections'].append({

@@ -37,6 +37,21 @@ import asyncio
 
 from utils import compare_strings_with_ratio
 
+# Configuration specifying whether to use each bookmaker
+BOOKMAKER_CONFIG = {
+    'betano': True,
+    'betclic': True,
+    'betseven': True,
+    'twentytwo': True,
+    'esconline': True,
+    'solverde': True,
+    'placard': True,
+    'casinoportugal': True,
+    'lebull': True,
+    'bwin': True,
+    'betway': True,
+    'leonbet': True
+}
 
 async def get_american_football_data():
     twentytwo_t = asyncio.create_task(twentytwobet_american_football())
@@ -99,8 +114,8 @@ async def get_volley_data():
 async def get_tennis_data():
     solverde_t = asyncio.create_task(solverde_tennis())
     placard_t = asyncio.create_task(placard_tennis())
-    twentytwo_t = asyncio.create_task(twentytwobet_tennis_win_match())
-    esconline_t = asyncio.create_task(esconline_tennis_win_match_24h())
+    #twentytwo_t = asyncio.create_task(twentytwobet_tennis_win_match())
+    #esconline_t = asyncio.create_task(esconline_tennis_win_match_24h())
     betano_t = asyncio.create_task(betano_tennis())
     betclic_t = asyncio.create_task(betclic_tennis())
     lebull_t = asyncio.create_task(lebull_tennis())
@@ -116,8 +131,8 @@ async def get_tennis_data():
 
     for func in [["solverde", solverde_t],
                  ["placard", placard_t],
-                 ["twentytwo", twentytwo_t],
-                 ["esconline", esconline_t],
+                 #["twentytwo", twentytwo_t],
+                 #["esconline", esconline_t],
                  ["betano", betano_t],
                  ["betclic", betclic_t],
                  ["lebull", lebull_t],
@@ -147,8 +162,8 @@ async def get_tennis_data():
 async def get_basket_data():
     solverde_t = asyncio.create_task(solverde_basket())
     placard_t = asyncio.create_task(placard_basket())
-    twentytwo_t = asyncio.create_task(twentytwobet_basket())
-    esconline_t = asyncio.create_task(esconline_basket())
+    #twentytwo_t = asyncio.create_task(twentytwobet_basket())
+    #esconline_t = asyncio.create_task(esconline_basket())
     betano_t = asyncio.create_task(betano_basket())
     betclic_t = asyncio.create_task(betclic_basket())
     lebull_t = asyncio.create_task(lebull_basket())
@@ -161,8 +176,8 @@ async def get_basket_data():
     bookmakers = []
 
     for func in [["solverde", solverde_t],
-                 ["twentytwo", twentytwo_t],
-                 ["esconline", esconline_t],
+                 #["twentytwo", twentytwo_t],
+                 #["esconline", esconline_t],
                  ["betano", betano_t],
                  ["betclic", betclic_t],
                  ["lebull", lebull_t],
@@ -188,8 +203,8 @@ async def get_basket_data():
 
 async def get_football_data():
     solverde_t = asyncio.create_task(solverde_football())
-    twentytwo_t = asyncio.create_task(twentytwobet_football())
-    esconline_t = asyncio.create_task(esconline_football())
+    #twentytwo_t = asyncio.create_task(twentytwobet_football())
+    #esconline_t = asyncio.create_task(esconline_football())
     betano_t = asyncio.create_task(betano_football())
     betclic_t = asyncio.create_task(betclic_football())
     lebull_t = asyncio.create_task(lebull_football())

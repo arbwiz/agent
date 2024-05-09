@@ -10,7 +10,7 @@ def convert_time(millis):
     return dt.isoformat()
 
 async def leonbet_tennis():
-    url = ('https://leon57.bet/api-2/betline/events/all?ctag=pt-PT&hideClosed=true&flags=reg,urlv2,mm2,rrc,'
+    url = ('https://leon68.bet/api-2/betline/events/all?ctag=pt-PT&hideClosed=true&flags=reg,urlv2,mm2,rrc,'
            'nodup&sport_id=1970324836974594')
 
     result = requests.get(url)
@@ -65,8 +65,11 @@ async def leonbet_tennis():
             }],
             'start_time': str(convert_time(event['kickoff'])),
             'start_time_ms': event['kickoff'],
-            'url': 'https://leon57.bet/bets/tennis/' + competition['url'] + '/' + str(event['id']) + event['url']
+            'url': 'https://leon68.bet/bets/tennis/' + competition['url'] + '/' + str(event['id']) + event['url']
         }
+
+        if 'market' not in event:
+            continue
 
         for market in event['markets']:
             if 'Vencedor' != market['name'] or len(market['runners']) != 2:
