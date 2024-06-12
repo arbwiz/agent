@@ -23,6 +23,8 @@ async def betano_tennis():
     }
 
     response = requests.get(url, headers=headers)
+
+    print(response.content)
     main_data = json.loads(response.content)
 
     events = []
