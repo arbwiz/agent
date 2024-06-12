@@ -10,10 +10,28 @@ from utils import sanitize_text
 async def betano_tennis():
 
 
-    url = 'https://www.betano.pt/api/sport/tenis/jogos-de-hoje/?req=la,s,stnf,c,mb,mbl'
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:20.0) Gecko/20100101 Firefox/20.0'}
-    result = requests.get(url, headers=headers)
-    main_data = json.loads(result.content)
+    url = "https://www.betano.pt/api/sport/tenis/jogos-de-hoje/?req=la,s,stnf,c,mb,mbl"
+
+    headers = {
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Accept-Language": "en-GB,en;q=0.5",
+        "Cache-Control": "max-age=0",
+        "Cookie": "sticky=stx73.710; _fs_sample=false; _kml_sample_sb=false; _kml_sample=false; sticky=stx65.772; __cf_bm=7z5lKrG_Frsa9c9sz30d_VTTZtAiSTmEwCqXNZN0W40-1718228837-1.0.1.1-gDRiACim5xbVSxV5i_10j6YrXoy_IoLmTLL..RCnBSwI5kdT9xsG0yMB15JhlSGXHCQbScfoFK0zJP.0KCARVg; _cfuvid=t6BpZIGYUYAVe6HmfhOMK8NC5ohkk9R1h1DFBnirHgA-1718228837629-0.0.1.1-604800000; sb_landing=true; sticky_sb=9e82404b00d2e28a46dbb9fdecad5663; cf_clearance=Z1YB.hna48SZDEFCJdFm0lqDS9BCGkAF96RbhErmyuk-1718228838-1.0.1.1-m7IG.Lt_GOEsTqd8v7e6yVeWgqvQ71C96q.QVlKE9fKvHeK4arMu3Y7rgcZGeC9i9UT9xzYe2VdMP2MBrXI9og",
+        "Sec-Ch-Ua": "\"Not A(Brand\";v=\"99\", \"Brave\";v=\"121\", \"Chromium\";v=\"121\"",
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": "\"macOS\"",
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "none",
+        "Sec-Fetch-User": "?1",
+        "Sec-Gpc": "1",
+        "Upgrade-Insecure-Requests": "1",
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+    }
+
+    response = requests.get(url, headers=headers)
+    main_data = json.loads(response.content)
 
     events = []
     for block in main_data['data']['blocks']:
