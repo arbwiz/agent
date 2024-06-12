@@ -218,8 +218,6 @@ async def get_football_data():
 
     for func in [["solverde", solverde_t],
                  ["placard", placard_t],
-                 ["twentytwo", twentytwo_t],
-                 ["esconline", esconline_t],
                  ["betano", betano_t],
                  ["betclic", betclic_t],
                  ["lebull", lebull_t],
