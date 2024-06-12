@@ -26,7 +26,10 @@ echo "Docker container ID: $container_id"
 # Create a new cron job entry to restart the container every hour
 cron_job="0 * * * * docker container restart $container_id"
 
-# Add the cron job to the crontab file if it's not already present
+# Remove existing cron job entries for docker container restart
+crontab -r
+
+# Add the new cron job entry
 (crontab -l ; echo "$cron_job") | crontab -
 
 echo "Cron job added: $cron_job"
