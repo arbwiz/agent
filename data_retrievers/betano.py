@@ -1,6 +1,8 @@
 import json
 import requests
 import datetime
+from http.cookiejar import DefaultCookiePolicy
+
 from data_retrievers.common import scrape_website, is_valid_basket_event
 from data_retrievers.common import is_valid_tennis_event
 from data_retrievers.common import is_valid_football_event
@@ -22,6 +24,8 @@ async def betano_tennis():
         "Upgrade-Insecure-Requests": "1"
     }
 
+    session = requests.Session()
+    session.cookies.set_policy(DefaultCookiePolicy(strict_ns_domain=False))
     response = requests.get(url, headers=headers)
 
     print(response.content)
