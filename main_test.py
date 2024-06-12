@@ -29,7 +29,7 @@ import difflib
 import asyncio
 from thefuzz import process, fuzz
 import json
-from data_retrievers.aggregator import get_matched_event
+from data_retrievers.aggregator import get_matched_event, get_basket_data
 from data_retrievers.aggregator import merge_data_sets
 from data_retrievers.lebull import lebull_football, lebull_basket
 from data_retrievers.bwin import bwin_football, bwin_basket
@@ -73,8 +73,8 @@ async def test():
     #                          [sanitize_text("Orle\u00e3es Loiret Basquetebol")], limit=10,
     #                          scorer=fuzz.token_set_ratio)
 
-    result = await betway_tennis()
-    print(result)
+    odds_response = await get_basket_data()
+    print(odds_response)
 
 
 

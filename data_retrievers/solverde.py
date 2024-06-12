@@ -13,8 +13,8 @@ from utils import sanitize_text
 async def solverde_basket():
     basket_url = "wss://sportswidget.solverde.pt/api/147/apffea14/websocket"
     basket_events_message = "[\"SUBSCRIBE\\nid:\/api\/eventgroups\/basketball-custom-span-48h-events\\nlocale:pt\\ndestination:\/api\/eventgroups\/basketball-custom-span-48h-events\\n\\n\\u0000\"]"
-    # tennis h2h market is 97
-    id_to_get_winner_market = "97"
+    # basket h2h market is 2
+    id_to_get_winner_market = "2"
     return await retrieve_info_websocket_tennis("solverde", basket_url, id_to_get_winner_market, basket_events_message,
                                                 'basket')
 
@@ -22,8 +22,8 @@ async def solverde_basket():
 async def solverde_tennis():
     tenis_url = "wss://sportswidget.solverde.pt/api/980/qrvp3bgt/websocket"
     tennis_events_message = "[\"SUBSCRIBE\\nid:\/api\/eventgroups\/tennis-custom-span-48h-events\\nlocale:pt\\ndestination:\/api\/eventgroups\/tennis-custom-span-48h-events\\n\\n\\u0000\"]"
-    # tennis h2h market is 97
-    id_to_get_winner_market = "97"
+    # tennis h2h market is 2
+    id_to_get_winner_market = "2"
     return await retrieve_info_websocket_tennis("solverde", tenis_url, id_to_get_winner_market, tennis_events_message,
                                          'tennis')
 
@@ -32,9 +32,9 @@ async def solverde_football():
     football_url = "wss://sportswidget.solverde.pt/api/067/j5uargcx/websocket"
     football_events_message = "[\"SUBSCRIBE\\nid:\/api\/eventgroups\/soccer-custom-span-48h-events\\nlocale:pt\\ndestination:\/api\/eventgroups\/soccer-custom-span-48h-events\\n\\n\\u0000\"]"
     # tennis h2h market is 1
-    id_to_get_winner_market = '1'
-    id_to_get_double_result_market = '2'
-    id_to_get_total_goals_markets = '18'
+    id_to_get_winner_market = '0'
+    id_to_get_double_result_market = '3'
+    id_to_get_total_goals_markets = '6'
     data = await retrieve_info_websocket_football("solverde", football_url,
                                          id_to_get_winner_market,
                                          football_events_message,
@@ -158,10 +158,10 @@ async def handle_event_responses(bookmaker, event_responses_t,
             'url': base_url + str(event_dict['id'])
         }
 
-        if id_to_get_winner_market not in event_dict['marketTypesToIds']:
+        if id_to_get_winner_market not in event_dict['marketLines']:
             continue
 
-        market_id = event_dict['marketTypesToIds'][id_to_get_winner_market][0]
+        market_id = event_dict['marketLines'][id_to_get_winner_market]['id']
 
         additional_markets = []
 
@@ -169,14 +169,14 @@ async def handle_event_responses(bookmaker, event_responses_t,
         await ws.send(single_market_message_template.format(market_id=market_id))
         market_response_t = ws.recv()
 
-        if id_to_get_double_result_market in event_dict['marketTypesToIds']:
-            double_results_markets_id = event_dict['marketTypesToIds'][id_to_get_double_result_market][0]
+        if id_to_get_double_result_market in event_dict['marketLines']:
+            double_results_markets_id = event_dict['marketLines'][id_to_get_double_result_market]['id']
             await ws.send(single_market_message_template.format(market_id=double_results_markets_id))
             total_goals_market_t = ws.recv()
             additional_markets.append(total_goals_market_t)
 
-        if id_to_get_total_goals_markets in event_dict['marketTypesToIds']:
-            total_goals_markets_ids = event_dict['marketTypesToIds'][id_to_get_total_goals_markets]
+        if id_to_get_total_goals_markets in event_dict['marketLines']:
+            total_goals_markets_ids = event_dict['marketLines'][id_to_get_total_goals_markets]
             for m_id in total_goals_markets_ids:
                 await ws.send(single_market_message_template.format(market_id=m_id))
                 total_goal_market_t = ws.recv()
@@ -352,10 +352,13 @@ async def handle_event_responses_tennis(bookmaker, event_responses_t, id_to_get_
             'url': base_url + str(event_dict['id'])
         }
 
-        if id_to_get_winner_market not in event_dict['marketTypesToIds']:
+        if 'marketLines' not in event_dict:
             continue
 
-        market_id = event_dict['marketTypesToIds'][id_to_get_winner_market][0]
+        if id_to_get_winner_market not in event_dict['marketLines']:
+            continue
+
+        market_id = event_dict['marketLines'][id_to_get_winner_market]['id']
 
         await ws.send(single_market_message_template.format(market_id=market_id))
         market_response_t = ws.recv()
