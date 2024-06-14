@@ -1,7 +1,6 @@
 import json
 import requests
 import datetime
-from http.cookiejar import DefaultCookiePolicy
 
 from data_retrievers.common import scrape_website, is_valid_basket_event
 from data_retrievers.common import is_valid_tennis_event
@@ -10,26 +9,8 @@ from utils import sanitize_text
 
 
 async def betano_tennis():
-
-
     url = "https://www.betano.pt/api/sport/tenis/jogos-de-hoje/?req=la,s,stnf,c,mb,mbl"
-
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-        "Accept-Language": "en-GB,en;q=0.5",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Cache-Control": "max-age=0",
-        "Cookie": "__cf_bm=MTVbGX7oym_VWGYhhELoVeo6QIFvntbfMPZx8zbcqQQ-1718230928-1.0.1.1-ke7nPCNxa_BEZBN4tuRC4K4mTiWahxNvvC1xZCEpDNedEWshx_XNJDxKslYw6EcHxQNq6eM_Zgj76yJGqANw.Q; _cfuvid=toihVXq5FxJzyGcAXWaNTk5ERmH5p0sWm0VB92HmlQY-1718230928751-0.0.1.1-604800000",
-        "Upgrade-Insecure-Requests": "1"
-    }
-
-    session = requests.Session()
-    session.cookies.set_policy(DefaultCookiePolicy(strict_ns_domain=False))
-    response = requests.get(url, headers=headers)
-
-    print(response.content)
-    main_data = json.loads(response.content)
+    main_data = scrape_website(url)
 
     events = []
     for block in main_data['data']['blocks']:
@@ -59,6 +40,7 @@ async def betano_tennis():
                 events.append(event_data)
 
     return events
+
 
 async def betano_american_football():
     url = 'https://www.betano.pt/api/sport/futebol-americano/ligas/1611,10116/?req=la,s,stnf,c,mb'
@@ -105,21 +87,11 @@ async def betano_american_football():
 
     return events
 
+
 async def betano_basket():
     url = 'https://www.betano.pt/api/sport/basquetebol/jogos-de-hoje/?sort=Leagues&req=la,s,stnf,c,mb'
 
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-        "Accept-Language": "en-GB,en;q=0.5",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Cache-Control": "max-age=0",
-        "Cookie": "__cf_bm=MTVbGX7oym_VWGYhhELoVeo6QIFvntbfMPZx8zbcqQQ-1718230928-1.0.1.1-ke7nPCNxa_BEZBN4tuRC4K4mTiWahxNvvC1xZCEpDNedEWshx_XNJDxKslYw6EcHxQNq6eM_Zgj76yJGqANw.Q; _cfuvid=toihVXq5FxJzyGcAXWaNTk5ERmH5p0sWm0VB92HmlQY-1718230928751-0.0.1.1-604800000",
-        "Upgrade-Insecure-Requests": "1"
-    }
-
-    result = requests.get(url, headers=headers)
-    main_data = json.loads(result.content)
+    main_data = scrape_website(url)
 
     events = []
     for block in main_data['data']['blocks']:
@@ -149,6 +121,7 @@ async def betano_basket():
                 events.append(event_data)
 
     return events
+
 
 async def betano_volley():
     url = 'https://www.betano.pt/api/sport/voleibol/jogos-de-hoje/?sort=Leagues&req=la,s,stnf,c,mb'
@@ -199,19 +172,7 @@ async def betano_volley():
 async def betano_football():
     url = 'https://www.betano.pt/api/sport/futebol/jogos-de-hoje/?sort=Leagues&req=la,s,stnf,c,mb'
 
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-        "Accept-Language": "en-GB,en;q=0.5",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Cache-Control": "max-age=0",
-        "Cookie": "__cf_bm=MTVbGX7oym_VWGYhhELoVeo6QIFvntbfMPZx8zbcqQQ-1718230928-1.0.1.1-ke7nPCNxa_BEZBN4tuRC4K4mTiWahxNvvC1xZCEpDNedEWshx_XNJDxKslYw6EcHxQNq6eM_Zgj76yJGqANw.Q; _cfuvid=toihVXq5FxJzyGcAXWaNTk5ERmH5p0sWm0VB92HmlQY-1718230928751-0.0.1.1-604800000",
-        "Upgrade-Insecure-Requests": "1"
-    }
-
-    result = requests.get(url, headers=headers)
-
-    main_data = json.loads(result.content)
+    main_data = scrape_website(url)
 
     events = []
     for block in main_data['data']['blocks']:
