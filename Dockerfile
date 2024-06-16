@@ -10,7 +10,7 @@ RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.34.0/geckod
     tar -xvzf geckodriver-v0.34.0-linux-aarch64.tar.gz && \
     mv geckodriver /usr/local/bin/ && \
     chmod +x /usr/local/bin/geckodriver && \
-    rm geckodriver-v0.34.0-linux64.tar.gz
+    rm geckodriver-v0.34.0-linux-aarch64.tar.gz
 
 # Copy and install Python dependencies
 COPY requirements.txt .
