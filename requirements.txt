@@ -1,6 +1,6 @@
 beautifulsoup4==4.12.2
-Requests==2.31.0
-urllib3==2.0.4
+requests
+urllib3
 websockets==11.0.3
 thefuzz==0.20.0
 brotli==1.1.0

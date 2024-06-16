@@ -186,7 +186,7 @@ async def betano_football():
                 'markets': [],
                 'start_time': str(convert_time(event['startTime'])),
                 'start_time_ms': event['startTime'],
-                'url': 'https://www.betano.pt' + event['matchComboUrl']
+                'url': 'https://www.betano.pt' + event['url']
             }
             if not event['markets']:
                 break
