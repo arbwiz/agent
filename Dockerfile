@@ -1,17 +1,18 @@
 FROM python:3.11-slim
 
+ARG GECKODRIVER_VERSION=v0.34.0
+
 # Install necessary packages for Firefox and geckodriver
 RUN apt-get update && \
     apt-get install -y firefox-esr wget curl && \
     rm -rf /var/lib/apt/lists/*
 
 # Download and install geckodriver
-RUN GECKODRIVER_VERSION=$(curl -s https://api.github.com/repos/mozilla/geckodriver/releases/latest | grep 'tag_name' | cut -d\" -f4) && \
-    wget https://github.com/mozilla/geckodriver/releases/download/$GECKODRIVER_VERSION/geckodriver-$GECKODRIVER_VERSION-linux-aarch64.tar.gz && \
-    tar -xvzf geckodriver-$GECKODRIVER_VERSION-linux-aarch64.tar.gz && \
+RUN wget https://github.com/mozilla/geckodriver/releases/download/${GECKODRIVER_VERSION}/geckodriver-${GECKODRIVER_VERSION}-linux-aarch64.tar.gz && \
+    tar -xvzf geckodriver-${GECKODRIVER_VERSION}-linux-aarch64.tar.gz && \
     mv geckodriver /usr/local/bin/ && \
     chmod +x /usr/local/bin/geckodriver && \
-    rm geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz
+    rm geckodriver-${GECKODRIVER_VERSION}-linux64.tar.gz
 
 # Copy and install Python dependencies
 COPY requirements.txt .
