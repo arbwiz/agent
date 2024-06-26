@@ -1,7 +1,6 @@
 import requests
 import json
 import datetime
-import brotli
 
 from data_retrievers.common import is_valid_tennis_event, is_valid_football_event, is_valid_basket_event
 from utils import sanitize_text
@@ -9,41 +8,25 @@ from utils import sanitize_text
 SPORT_ID_TENNIS = '5'
 SPORT_ID_BASKET = '7'
 SPORT_ID_FOOTBALL = '4'
-BWIN_URL = "https://sports.bwin.pt/cds-api/bettingoffer/fixtures?x-bwin-accessid" \
-           "=YmQwNTFkNDAtNzM3Yi00YWIyLThkNDYtYWFmNGY2N2Y1OWIx&lang=pt&country=PT&userCountry=PT&fixtureTypes=Standard" \
-           "&state=Latest&offerMapping=Filtered&offerCategories=Gridable&fixtureCategories=Gridable&sportIds=SPORT_ID" \
-           "&regionIds=&competitionIds=&conferenceIds=&isPriceBoost=false&statisticsModes=None&skip=0&take=100&sortBy" \
-           "=Tags "
+BWIN_URL = "https://sports.bwin.pt/pt/sports/api/widget?layoutSize=Medium&page=SportLobby&sportId=SPORT_ID"
 
 
 async def bwin_tennis():
     url = BWIN_URL.replace('SPORT_ID', SPORT_ID_TENNIS)
 
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Sec-Ch-Ua': 'Google Chrome";v="117", "Not;A=Brand";v="8", "Chromium";v="117',
-        'Sec-Ch-Ua-Mobile': '?0',
-        'Sec-Ch-Ua-Platform': 'Windows',
-        'Sec-Fetch-Dest': 'document',
-        'Sec-Fetch-Mode': 'navigate',
-        'Sec-Fetch-Site': 'none',
-        'Sec-Fetch-User': '?1',
-        'Upgrade-Insecure-Requests': '1',
-        'Connection': 'keep-alive',
-        'X-Requested-With': 'XMLHttpRequest'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36'
     }
 
     response = requests.get(url, headers=headers)
 
     res_dict = json.loads(response.content)
 
-    bwin_events = res_dict['fixtures']
+    bwin_events = res_dict['widgets'][3]['payload']['fixtures']
+    proper_events = [fixture['fixture'] for fixture in bwin_events]
 
     events = []
-    for event in bwin_events:
+    for event in proper_events:
         if event['stage'] == 'Live':
             continue
 
@@ -79,20 +62,7 @@ async def bwin_basket():
     url = BWIN_URL.replace('SPORT_ID', SPORT_ID_BASKET)
 
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Sec-Ch-Ua': 'Google Chrome";v="117", "Not;A=Brand";v="8", "Chromium";v="117',
-        'Sec-Ch-Ua-Mobile': '?0',
-        'Sec-Ch-Ua-Platform': 'Windows',
-        'Sec-Fetch-Dest': 'document',
-        'Sec-Fetch-Mode': 'navigate',
-        'Sec-Fetch-Site': 'none',
-        'Sec-Fetch-User': '?1',
-        'Upgrade-Insecure-Requests': '1',
-        'Connection': 'keep-alive',
-        'X-Requested-With': 'XMLHttpRequest'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36'
     }
 
     response = requests.get(url, headers=headers)
@@ -138,20 +108,7 @@ async def bwin_football():
     url = "https://sports.bwin.pt/cds-api/bettingoffer/fixtures?x-bwin-accessid=YmQwNTFkNDAtNzM3Yi00YWIyLThkNDYtYWFmNGY2N2Y1OWIx&lang=pt&country=PT&userCountry=PT&fixtureTypes=Standard&state=Latest&offerMapping=Filtered&offerCategories=Gridable&fixtureCategories=Gridable&sportIds=4&regionIds=&competitionIds=&conferenceIds=&isPriceBoost=false&statisticsModes=None&skip=0&take=100&sortBy=Tags"
 
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Sec-Ch-Ua': 'Google Chrome";v="117", "Not;A=Brand";v="8", "Chromium";v="117',
-        'Sec-Ch-Ua-Mobile': '?0',
-        'Sec-Ch-Ua-Platform': 'Windows',
-        'Sec-Fetch-Dest': 'document',
-        'Sec-Fetch-Mode': 'navigate',
-        'Sec-Fetch-Site': 'none',
-        'Sec-Fetch-User': '?1',
-        'Upgrade-Insecure-Requests': '1',
-        'Connection': 'keep-alive',
-        'X-Requested-With': 'XMLHttpRequest'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36'
     }
 
     response = requests.get(url, headers=headers)

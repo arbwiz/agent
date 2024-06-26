@@ -8,7 +8,7 @@ from data_retrievers.betseven import betseven_tennis, betseven_basket, betseven_
 from data_retrievers.bettilt import get_all_events, bettilt_tennis, bettilt_football, bettilt_volley
 from data_retrievers.betway import betway_tennis, convert_time_plus2_ms, convert_time_from_plus2_to_z, betway_basket
 from data_retrievers.casinoportugal import casinoportugal_football, casinoportugal_tennis, casinoportugal_basket
-from data_retrievers.leonbet import leonbet_tennis
+from data_retrievers.leonbet import leonbet_tennis, leonbet_football
 from data_retrievers.placard import placard_football, placard_basket
 from data_retrievers.placard import placard_tennis
 from logic.main import run
@@ -32,7 +32,7 @@ import json
 from data_retrievers.aggregator import get_matched_event, get_basket_data
 from data_retrievers.aggregator import merge_data_sets
 from data_retrievers.lebull import lebull_football, lebull_basket
-from data_retrievers.bwin import bwin_football, bwin_basket
+from data_retrievers.bwin import bwin_football, bwin_basket, bwin_tennis
 from model.event import calculate_arbitrage_stakes
 from model.event import Event
 from data_retrievers.solverde import solverde_tennis, solverde_football, solverde_basket
@@ -73,7 +73,7 @@ async def test():
     #                          [sanitize_text("Orle\u00e3es Loiret Basquetebol")], limit=10,
     #                          scorer=fuzz.token_set_ratio)
 
-    odds_response = await bwin_football()
+    odds_response = await bwin_tennis()
     print(odds_response)
 
 

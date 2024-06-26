@@ -9,6 +9,76 @@ def convert_time(millis):
     dt = datetime.datetime.fromtimestamp(millis / 1000)
     return dt.isoformat()
 
+
+async def leonbet_football():
+    url = ('https://leon76.bet/api-2/betline/events/all?ctag=pt-PT&hideClosed=true&flags=reg,urlv2,mm2,rrc,%27%27nodup&sport_id=1970324836974595')
+
+    result = requests.get(url)
+    main_data = json.loads(result.content)
+
+    events = []
+    for event in main_data['events']:
+
+        if 'inplay' in event['betline'] or len(event['competitors']) != 2:
+            continue
+
+        participant_a = event['competitors'][0]['name']
+        participant_b = event['competitors'][1]['name']
+
+        if 'league' not in event:
+            continue
+
+
+        competition = {
+            'name': event['league']['name'],
+            'url': event['league']['region']['url'] + '/' + event['league']['url'],
+            'sport_id': event['league']['sport']['id']
+        }
+
+        if competition is None:
+            continue
+
+        event_data = {
+            'bookmaker': 'leonbet',
+            'competition': competition['name'],
+            'name': event['name'],
+            'participant_a': sanitize_text(participant_a),
+            'participant_b': sanitize_text(participant_b),
+            'markets': [{
+                'name': 'h2h',
+                'selections': []
+            }],
+            'start_time': str(convert_time(event['kickoff'])),
+            'start_time_ms': event['kickoff'],
+            'url': 'https://leon76.bet/bets/soccer/' + competition['url'] + '/' + str(event['id']) + event['url']
+        }
+
+        if 'markets' not in event:
+            continue
+
+        for market in event['markets']:
+            if 'Vencedor' != market['name'] or len(market['runners']) != 3:
+                continue
+
+            event_data['markets'][0]['selections'].append({
+                'name': participant_a,
+                'price': market['runners'][0]['price']
+            })
+
+            event_data['markets'][0]['selections'].append({
+                'name': 'Draw',
+                'price': market['runners'][1]['price']
+            })
+
+            event_data['markets'][0]['selections'].append({
+                'name': participant_b,
+                'price': market['runners'][2]['price']
+            })
+
+            events.append(event_data)
+
+    return events
+
 async def leonbet_tennis():
     url = ('https://leon76.bet/api-2/betline/events/all?ctag=pt-PT&hideClosed=true&flags=reg,urlv2,mm2,rrc,'
            'nodup&sport_id=1970324836974594')
