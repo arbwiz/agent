@@ -11,7 +11,7 @@ from data_retrievers.betseven import betseven_tennis, betseven_basket, betseven_
 from data_retrievers.bettilt import bettilt_tennis, bettilt_basket, bettilt_football, bettilt_volley
 from data_retrievers.betway import betway_tennis
 from data_retrievers.casinoportugal import casinoportugal_tennis, casinoportugal_football
-from data_retrievers.leonbet import leonbet_tennis
+from data_retrievers.leonbet import leonbet_tennis, leonbet_football
 from data_retrievers.placard import placard_tennis, placard_football, placard_basket
 
 from data_retrievers.twentytwobet import twentytwobet_tennis_win_match, twentytwobet_basket, twentytwobet_volley, \
@@ -213,6 +213,7 @@ async def get_football_data():
     casinoportugal_t = asyncio.create_task(casinoportugal_football())
     betseven_t = asyncio.create_task(betseven_football())
     #bettilt_t = asyncio.create_task(bettilt_football())
+    leonbet_t = asyncio.create_task(leonbet_football())
 
     bookmakers = []
 
@@ -223,7 +224,8 @@ async def get_football_data():
                  ["lebull", lebull_t],
                  ["bwin", bwin_t],
                  ["casinoportugal", casinoportugal_t],
-                 ["betseven", betseven_t]
+                 ["betseven", betseven_t],
+                 ["leonbet", leonbet_t]
                  ]:
 
         try:
