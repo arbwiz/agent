@@ -11,6 +11,7 @@ from notifications.telegram import send_telegram_message
 
 # -5 can be used to test
 MIN_PROFIT_MARGIN = 0
+MAX_PROFIT_MARGIN = 11
 
 
 async def run(sport):
@@ -80,7 +81,7 @@ def handle_football(odds_response):
                 continue
             profit_percentage = event.arbitrage(best_odds[1])
 
-            if profit_percentage > MIN_PROFIT_MARGIN:
+            if MAX_PROFIT_MARGIN > profit_percentage > MIN_PROFIT_MARGIN:
                 converted_event = convert_data(data, best_odds[1], best_odds[0], profit_percentage)
                 surebets.append(converted_event)
         # TODO: refactor to here
@@ -95,7 +96,7 @@ def handle_two_way_market(odds_response, sport):
         best_odds = event.find_best_odds()
         profit_percentage = event.arbitrage(best_odds)
         # if profit_percentage > 0.049:
-        if profit_percentage > MIN_PROFIT_MARGIN:
+        if MIN_PROFIT_MARGIN < profit_percentage < MAX_PROFIT_MARGIN:
             converted_event = convert_data(data, best_odds, 'h2h', profit_percentage)
             surebets.append(converted_event)
 

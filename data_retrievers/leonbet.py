@@ -35,7 +35,7 @@ async def leonbet_football():
             'sport_id': event['league']['sport']['id']
         }
 
-        if competition is None:
+        if competition is None or competition['sport_id'] is 1970324836979329:
             continue
 
         event_data = {
